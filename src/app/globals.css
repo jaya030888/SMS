@@ -52,7 +52,8 @@ body {
 }
 
 h1, h2, h3, h4, h5, h6, .brand-name, .brand-mark, button, .button, .eyebrow {
-  font-family: 'helvetica'
+  font-family: 'helvetica';
+  font-weight: 600;
 }
 
 a {
@@ -258,7 +259,7 @@ select:focus-visible {
   margin: 0;
   font-size: clamp(2rem, 5vw, 3.5rem);
   line-height: 1.1;
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0;
 }
 
@@ -375,7 +376,7 @@ select:focus-visible {
   margin: 0;
   font-size: clamp(1.6rem, 3vw, 2.4rem);
   line-height: 1.15;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .hero-card p {
@@ -403,7 +404,7 @@ select:focus-visible {
   color: var(--primary);
   font-size: 1.4rem;
   line-height: 1;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .hero-badges span {
@@ -537,7 +538,7 @@ select:focus-visible {
 .courses-section .section-heading h1 {
   color: var(--ink);
   font-size: clamp(2.1rem, 4vw, 2.65rem);
-  font-weight: 700;
+  font-weight: 600;
   line-height: 1.05;
 }
 
@@ -627,7 +628,7 @@ select:focus-visible {
   place-items: center;
   gap: 0.85rem;
   text-align: center;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .contact-layout {
@@ -682,7 +683,7 @@ select:focus-visible {
   place-items: center;
   background: linear-gradient(135deg, var(--mist-gray), #ffffff);
   color: var(--primary);
-  font-weight: 900;
+  font-weight: 600;
 }
 
 .form-page,
@@ -895,7 +896,7 @@ select:focus {
 
 .app-nav span {
   color: var(--muted);
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .app-nav-links {
@@ -908,7 +909,7 @@ select:focus {
 .app-nav-links a {
   border-radius: 8px;
   color: var(--muted);
-  font-weight: 850;
+  font-weight: 600;
   padding: 0.58rem 0.72rem;
 }
 
@@ -965,7 +966,7 @@ select:focus {
   border-radius: 8px;
   padding: 0.7rem 0.85rem;
   color: var(--muted);
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .sidebar-link:hover {
@@ -1102,7 +1103,7 @@ select:focus {
   align-items: center;
   gap: 0.7rem;
   padding: 1rem;
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .stat-card,
@@ -1132,14 +1133,14 @@ select:focus {
 
 .metric-card p:first-child {
   font-size: 0.9rem;
-  font-weight: 800;
+  font-weight: 500;
 }
 
 .metric-card p:last-child {
   margin-top: 0.35rem;
   color: var(--ink);
   font-size: 1.2rem;
-  font-weight: 900;
+  font-weight: 600;
 }
 
 .info-card {
@@ -1188,7 +1189,7 @@ select:focus {
   display: inline-flex;
   align-items: center;
   border-radius: 999px;
-  font-weight: 900;
+  font-weight: 600;
 }
 
 .rank-pill {
@@ -1214,7 +1215,7 @@ select:focus {
 
 .same-line p {
   margin: 0;
-  font-weight: 850;
+  font-weight: 600;
 }
 
 .total-row {
@@ -1361,7 +1362,7 @@ select:focus {
   flex-wrap: wrap;
   margin-top: 1rem;
   color: var(--muted);
-  font-weight: 800;
+  font-weight: 600;
 }
 
 .legend span {
@@ -1415,7 +1416,7 @@ select:focus {
   margin: 0;
   padding: 0.75rem 0.9rem;
   text-align: left;
-  font-weight: 850;
+  font-weight: 600;
 }
 
 .auth-links {
@@ -1425,7 +1426,7 @@ select:focus {
   flex-wrap: wrap;
   margin-top: 0.75rem;
   color: var(--primary);
-  font-weight: 850;
+  font-weight: 600;
 }
 
 .auth-links a:hover {
@@ -1464,7 +1465,7 @@ select:focus {
 .admin-stat p {
   margin: 0;
   color: var(--muted);
-  font-weight: 800;
+  font-weight: 500;
 }
 
 .admin-stat strong {
@@ -1527,12 +1528,12 @@ select:focus {
 .application-row p {
   margin: 0;
   color: var(--ink);
-  font-weight: 900;
+  font-weight: 600;
 }
 
 .application-row span:not(.status-pill) {
   color: var(--muted);
-  font-weight: 800;
+  font-weight: 500;
 }
 
 .compact {
@@ -1594,7 +1595,7 @@ select:focus {
   background: var(--surface-soft);
   text-transform: uppercase;
   font-size: 0.78rem;
-  font-weight: 900;
+  font-weight: 600;
 }
 
 .row-actions {

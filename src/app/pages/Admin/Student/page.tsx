@@ -14,15 +14,19 @@ interface StudentData {
   Address: string;
   course: string;
   Qualification: string;
+  payment_status?: string;
+  amount_paid?: number;
 }
 
 export default function Page() {
   const [students, setStudents] = useState<StudentData[]>([]);
+  const [courseFees, setCourseFees] = useState<any[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     fetchStudents();
+    fetchCourseFees();
   }, []);
 
   const fetchStudents = () => {
@@ -43,15 +47,49 @@ export default function Page() {
       });
   };
 
-  const getFeeStatus = (studentId: number, courseName: string) => {
-    const name = courseName.toLowerCase();
-    if (name.includes("electrician") || name.includes("fitter")) {
-      return "Paid";
-    } else if (name.includes("copa") || name.includes("computer")) {
-      return "Pending";
-    } else {
-      return studentId % 2 === 0 ? "Paid" : "Pending";
-    }
+  const fetchCourseFees = () => {
+    fetch("/api/course-fees")
+      .then((res) => res.json())
+      .then((data) => setCourseFees(data))
+      .catch((err) => console.error("Error fetching course fees:", err));
+  };
+
+  const handleMarkPaid = (student: StudentData) => {
+    const courseName = student.course || "";
+    const matchedFee = courseFees.find(
+      (cf) => cf.course.toLowerCase() === courseName.toLowerCase() ||
+              courseName.toLowerCase().includes(cf.course.toLowerCase())
+    );
+    const totalFee = matchedFee ? matchedFee.total_fee : 15000;
+
+    fetch("/api/applicants", {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        id: student.id,
+        payment_status: "Paid",
+        amount_paid: totalFee,
+      }),
+    })
+      .then((res) => {
+        if (res.ok) {
+          // Update local state
+          setStudents((prev) =>
+            prev.map((s) =>
+              s.id === student.id
+                ? { ...s, payment_status: "Paid", amount_paid: totalFee }
+                : s
+            )
+          );
+        } else {
+          alert("Failed to update payment status.");
+        }
+      })
+      .catch((err) => {
+        console.error("Error marking paid:", err);
+      });
   };
 
   const filteredStudents = students.filter((student) => {
@@ -106,7 +144,7 @@ export default function Page() {
               </div>
             ) : (
               filteredStudents.map((student) => {
-                const status = getFeeStatus(student.id, student.course);
+                const status = student.payment_status || "Pending";
                 return (
                   <div key={student.id} className="student-row">
                     <h2>{student.name}</h2>
@@ -123,7 +161,11 @@ export default function Page() {
                         View
                       </button>
                       {status === "Pending" && (
-                        <button className="button button-secondary" style={{ display: "flex", gap: "0.4rem", alignItems: "center" }}>
+                        <button
+                          onClick={() => handleMarkPaid(student)}
+                          className="button button-secondary"
+                          style={{ display: "flex", gap: "0.4rem", alignItems: "center" }}
+                        >
                           <CheckCircle size={16} />
                           Mark Paid
                         </button>

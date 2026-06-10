@@ -15,6 +15,8 @@ interface Applicant {
   Address: string;
   course: string;
   Qualification: string;
+  payment_status: string;
+  amount_paid: number;
 }
 
 const COPA = () => {
@@ -39,20 +41,9 @@ const COPA = () => {
       });
   }, []);
 
-  const getFeeStatus = (id: number, courseName: string) => {
-    const name = courseName.toLowerCase();
-    if (name.includes("electrician") || name.includes("fitter")) {
-      return "Paid";
-    } else if (name.includes("copa") || name.includes("computer")) {
-      return "Pending";
-    } else {
-      return id % 2 === 0 ? "Paid" : "Pending";
-    }
-  };
-
   const totalStudents = students.length;
-  const feesPaid = students.filter((s) => getFeeStatus(s.id, s.course) === "Paid").length;
-  const feesPending = students.filter((s) => getFeeStatus(s.id, s.course) === "Pending").length;
+  const feesPaid = students.filter((s) => s.payment_status === "Paid").length;
+  const feesPending = students.filter((s) => s.payment_status !== "Paid").length;
 
   if (loading) {
     return <div style={{ padding: "2rem", textAlign: "center" }}>Loading COPA trade data...</div>;
@@ -79,7 +70,7 @@ const COPA = () => {
               key={student.id}
               name={student.name}
               course={student.course}
-              feeStatus={getFeeStatus(student.id, student.course)}
+              feeStatus={student.payment_status || "Pending"}
             />
           ))
         )}

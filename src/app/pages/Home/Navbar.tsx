@@ -19,6 +19,7 @@ export function Navbar() {
           <Link href="/#about">About Us</Link>
           <Link href="/#courses">Courses</Link>
           <Link href="/pages/Home/Addmission_Application_Form">Admissions</Link>
+          <Link href="/pages/Home/Fee_Structure">Fee Structure</Link>
           <Link href="/#contact">Contact</Link>
           <Link href="/pages/Chose_Login" className="login-link"><LogIn size={16} /> Login</Link>
           

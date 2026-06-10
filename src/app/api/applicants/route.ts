@@ -14,7 +14,9 @@ export async function GET() {
         phone,
         Address,
         course,
-        Qualification
+        Qualification,
+        payment_status,
+        amount_paid
       FROM Applicants
       ORDER BY id DESC
     `);
@@ -42,6 +44,8 @@ export async function POST(req: Request) {
       Address,
       course,
       Qualification,
+      payment_status,
+      amount_paid,
     } = await req.json();
 
     if (!name || !fatherName || !email) {
@@ -57,6 +61,9 @@ export async function POST(req: Request) {
 
     const nextId = idRows[0].nextId;
 
+    const statusValue = payment_status || "Pending";
+    const amountPaidValue = amount_paid !== undefined ? amount_paid : 2000;
+
     await db.execute(
       `
       INSERT INTO Applicants
@@ -69,9 +76,11 @@ export async function POST(req: Request) {
         phone,
         Address,
         course,
-        Qualification
+        Qualification,
+        payment_status,
+        amount_paid
       )
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
       `,
       [
         nextId,
@@ -83,6 +92,8 @@ export async function POST(req: Request) {
         Address,
         course,
         Qualification,
+        statusValue,
+        amountPaidValue,
       ]
     );
 
@@ -98,6 +109,8 @@ export async function POST(req: Request) {
         Address,
         course,
         Qualification,
+        payment_status: statusValue,
+        amount_paid: amountPaidValue,
       },
     });
   } catch (error: any) {
@@ -109,3 +122,56 @@ export async function POST(req: Request) {
     );
   }
 }
+
+// PATCH/UPDATE applicant (e.g. for markings fees paid)
+export async function PATCH(req: Request) {
+  try {
+    const { id, payment_status, amount_paid } = await req.json();
+
+    if (!id) {
+      return NextResponse.json(
+        { error: "Applicant ID is required" },
+        { status: 400 }
+      );
+    }
+
+    const updates: string[] = [];
+    const values: any[] = [];
+
+    if (payment_status !== undefined) {
+      updates.push("payment_status = ?");
+      values.push(payment_status);
+    }
+
+    if (amount_paid !== undefined) {
+      updates.push("amount_paid = ?");
+      values.push(amount_paid);
+    }
+
+    if (updates.length === 0) {
+      return NextResponse.json(
+        { error: "No fields to update" },
+        { status: 400 }
+      );
+    }
+
+    values.push(id);
+
+    await db.execute(
+      `UPDATE Applicants SET ${updates.join(", ")} WHERE id = ?`,
+      values
+    );
+
+    return NextResponse.json({
+      success: true,
+      message: "Student records updated successfully.",
+    });
+  } catch (error: any) {
+    console.error("PATCH Error:", error);
+
+    return NextResponse.json(
+      { error: error.message },
+      { status: 500 }
+    );
+  }
+}

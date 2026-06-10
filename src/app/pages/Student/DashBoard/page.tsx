@@ -32,32 +32,39 @@ const defaultStudent: StudentData = {
 
 export default function Page() {
   const [student, setStudent] = useState<StudentData>(defaultStudent);
+  const [courseFees, setCourseFees] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
       const storedId = localStorage.getItem("currentStudentId") || "1";
       
-      fetch("/api/applicants")
-        .then((res) => {
+      Promise.all([
+        fetch("/api/applicants").then((res) => {
           if (res.ok) return res.json();
-          throw new Error("Failed to fetch");
+          throw new Error("Failed to fetch applicants");
+        }),
+        fetch("/api/course-fees").then((res) => {
+          if (res.ok) return res.json();
+          throw new Error("Failed to fetch course fees");
         })
-        .then((applicants: StudentData[]) => {
-          const matched = applicants.find((a) => String(a.id) === String(storedId));
-          if (matched) {
-            setStudent(matched);
-          } else if (applicants.length > 0) {
-            // Fallback to first applicant in database if the stored ID wasn't found
-            setStudent(applicants[applicants.length - 1]);
-          }
-        })
-        .catch((err) => {
-          console.error("Error fetching student details:", err);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
+      ])
+      .then(([applicants, feesData]) => {
+        setCourseFees(feesData);
+        const matched = applicants.find((a: any) => String(a.id) === String(storedId));
+        if (matched) {
+          setStudent(matched);
+        } else if (applicants.length > 0) {
+          // Fallback to first applicant in database if the stored ID wasn't found
+          setStudent(applicants[applicants.length - 1]);
+        }
+      })
+      .catch((err) => {
+        console.error("Error fetching student details:", err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
     }
   }, []);
 
@@ -74,19 +81,29 @@ export default function Page() {
     }
   };
 
-  const getFeeDetails = (studentId: number, courseName: string) => {
-    const name = courseName.toLowerCase();
-    // Deterministic mock fee details based on course and ID
-    if (name.includes("electrician") || name.includes("fitter")) {
-      return { status: "Paid", paid: "Rs. 15,000", balance: "Rs. 0", color: "var(--success)" };
-    } else if (name.includes("copa") || name.includes("computer")) {
-      return { status: "Pending", paid: "Rs. 10,000", balance: "Rs. 5,000", color: "var(--warning)" };
-    } else {
-      const isEven = studentId % 2 === 0;
-      return isEven
-        ? { status: "Paid", paid: "Rs. 15,000", balance: "Rs. 0", color: "var(--success)" }
-        : { status: "Pending", paid: "Rs. 10,000", balance: "Rs. 5,000", color: "var(--warning)" };
-    }
+  const getFeeDetails = () => {
+    const courseName = student.course || "";
+    const matchedFee = courseFees.find(
+      (cf) => cf.course.toLowerCase() === courseName.toLowerCase() || 
+              courseName.toLowerCase().includes(cf.course.toLowerCase())
+    );
+
+    const totalFee = matchedFee ? matchedFee.total_fee : 15000;
+    const paidAmount = (student as any).amount_paid !== undefined ? (student as any).amount_paid : 2000;
+    const balanceAmount = Math.max(0, totalFee - paidAmount);
+    
+    const dbStatus = (student as any).payment_status || "Pending";
+    const status = balanceAmount <= 0 || dbStatus === "Paid" ? "Paid" : "Pending";
+    const color = status === "Paid" ? "var(--success)" : "var(--warning)";
+
+    return {
+      status,
+      total: `Rs. ${totalFee.toLocaleString("en-IN")}`,
+      paid: `Rs. ${paidAmount.toLocaleString("en-IN")}`,
+      balance: `Rs. ${balanceAmount.toLocaleString("en-IN")}`,
+      color,
+      percent: Math.round((paidAmount / totalFee) * 100)
+    };
   };
 
   const formatDate = (dateStr: string) => {
@@ -101,7 +118,7 @@ export default function Page() {
   };
 
   const subjects = getSubjects(student.course);
-  const fees = getFeeDetails(student.id, student.course);
+  const fees = getFeeDetails();
 
   if (loading) {
     return (
@@ -152,7 +169,7 @@ export default function Page() {
               <h2>Course Progress</h2>
             </div>
             <p>Overall Completion</p>
-            <progress value={fees.status === "Paid" ? "65" : "40"} max="100" />
+            <progress value={fees.percent} max="100" />
             <div className="rank-pill">Current Rank: {student.id % 3 === 0 ? "1st" : student.id % 2 === 0 ? "2nd" : "3rd"} in batch</div>
           </div>
 
