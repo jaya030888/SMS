@@ -5,6 +5,7 @@ import Info_Card from "@/src/app/components/Info_Card";
 import Info_sameliner from "@/src/app/components/Info_sameliner";
 import StuNav from "@/src/app/components/StuNav";
 import Image from "next/image";
+import Link from "next/link";
 
 interface StudentData {
   id: number;
@@ -16,6 +17,8 @@ interface StudentData {
   Address: string;
   course: string;
   Qualification: string;
+  amount_paid?: number;
+  payment_status?: string;
 }
 
 const defaultStudent: StudentData = {
@@ -44,7 +47,7 @@ export default function Page() {
           if (res.ok) return res.json();
           throw new Error("Failed to fetch applicants");
         }),
-        fetch("/api/course-fees").then((res) => {
+        fetch("/api/course_fees").then((res) => {
           if (res.ok) return res.json();
           throw new Error("Failed to fetch course fees");
         })
@@ -207,9 +210,12 @@ export default function Page() {
 
           <div className="panel">
             <h2>Fee Details</h2>
-            <Info_sameliner label="Total Fee" entry="Rs. 15,000" />
+            <Info_sameliner label="Total Fee" entry={fees.total} />
             <Info_sameliner label="Paid Amount" entry={fees.paid} entryColor={fees.color} />
             <Info_sameliner label="Balance" entry={fees.balance} entryColor={fees.status === "Paid" ? "var(--muted)" : "var(--warning)"} />
+            <Link href="/pages/Student/Fee_Details" className="button button-primary" style={{ width: "100%", marginTop: "1rem" }}>
+              Pay Fees & View History
+            </Link>
 
             <h2 className="panel-subtitle">{student.course} Updates</h2>
             <div className="stack-list">

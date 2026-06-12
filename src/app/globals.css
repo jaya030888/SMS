@@ -1,6 +1,18 @@
 @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
+@theme {
+  --color-primary: var(--primary);
+  --color-primary-dark: var(--primary-dark);
+  --color-secondary: var(--secondary);
+  --color-accent: var(--accent);
+  --color-accent-soft: var(--accent-soft);
+  --color-mist-gray: var(--mist-gray);
+  --color-champagne: var(--champagne);
+  --color-surface-soft: var(--surface-soft);
+}
+
+
 :root {
   --mist-gray: #ECEFF1;
   --midnight-blue: #191970;

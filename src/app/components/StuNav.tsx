@@ -1,11 +1,21 @@
 "use client";
 
-import Info_Card from "@/src/app/components/Info_Card";
-import Sidebar_Card from "@/src/app/components/Sidebar_Card";
-import { Menu, X } from "lucide-react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, useEffect } from "react";
+import { 
+  Menu, 
+  X, 
+  LayoutDashboard, 
+  User, 
+  Users, 
+  CalendarCheck, 
+  CreditCard, 
+  FileText, 
+  Home, 
+  LogOut,
+  GraduationCap
+} from "lucide-react";
 
 type StuNavProps = {
   name: string;
@@ -52,87 +62,168 @@ const StuNav = (props: StuNavProps) => {
     }
   }, [props.userName, role, props.role]);
 
-  const navItems =
-    role === "admin"
-      ? [
-          { name: "Dashboard", href: "/pages/Admin/DashBoard" },
-          { name: "Students", href: "/pages/Admin/Student" },
-          { name: "Attendance", href: "/pages/Admin/Attendance" },
-          { name: "Admissions", href: "/pages/Home/Addmission_Application_Form" },
-        ]
-      : [
-          { name: "Dashboard", href: "/pages/Student/DashBoard" },
-          { name: "My Profile", href: "/pages/Student/Profile" },
-          { name: "Attendance", href: "/pages/Student/Attendance" },
-          { name: "Fee Details", href: "/pages/Student/Fee_Details" },
-        ];
+  // Define navigation items with Lucide icons
+  const navItems = role === "admin"
+    ? [
+        { name: "Dashboard", href: "/pages/Admin/DashBoard", icon: LayoutDashboard },
+        { name: "Students", href: "/pages/Admin/Student", icon: Users },
+        { name: "Attendance", href: "/pages/Admin/Attendance", icon: CalendarCheck },
+        { name: "Fee Management", href: "/pages/Admin/FeeDetails", icon: CreditCard },
+        { name: "Admissions", href: "/pages/Home/Addmission_Application_Form", icon: FileText },
+      ]
+    : [
+        { name: "Dashboard", href: "/pages/Student/DashBoard", icon: LayoutDashboard },
+        { name: "My Profile", href: "/pages/Student/Profile", icon: User },
+        { name: "Attendance", href: "/pages/Student/Attendance", icon: CalendarCheck },
+        { name: "Fee Details", href: "/pages/Student/Fee_Details", icon: CreditCard },
+      ];
 
   const sidebarItems = [
     ...navItems,
-    { name: "Home", href: "/" },
-    { name: "Logout", href: "/pages/Chose_Login" },
+    { name: "Home", href: "/", icon: Home },
+    { name: "Logout", href: "/pages/Chose_Login", icon: LogOut },
   ];
+
+  // Get user initials for avatar
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .slice(0, 2)
+      .join("")
+      .toUpperCase();
+  };
 
   return (
     <>
-      <header className="app-header">
-        <nav className="app-nav">
-          <button
-            onClick={() => setOpen(true)}
-            className="icon-button"
-            aria-label="Open navigation"
-          >
-            <Menu size={22} />
-          </button>
-
-          <h1>{props.name}</h1>
-          <div className="app-nav-links">
-            {navItems.map((item) => (
-              <Link
-                key={item.href}
-                className={pathname === item.href ? "active" : ""}
-                href={item.href}
+      {/* Sticky Modern Top Header */}
+      <header className="sticky top-0 z-40 w-full border-b border-slate-200 bg-white/95 backdrop-blur-md shadow-sm transition-all duration-200">
+        <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+          <div className="flex h-16 items-center justify-between">
+            {/* Left side: Hamburger (mobile) + Branding Title */}
+            <div className="flex items-center gap-3">
+              <button
+                onClick={() => setOpen(true)}
+                className="rounded-lg p-2 text-slate-500 hover:bg-slate-100 hover:text-slate-700 focus:outline-none md:hidden"
+                aria-label="Open navigation"
               >
-                {item.name}
-              </Link>
-            ))}
+                <Menu size={20} />
+              </button>
+
+              <div className="flex items-center gap-2">
+                <span className="hidden sm:flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-white shadow-sm shadow-primary/20">
+                  <GraduationCap size={20} />
+                </span>
+                <h1 className="text-lg font-bold text-slate-800 tracking-tight sm:text-xl">
+                  {props.name}
+                </h1>
+              </div>
+            </div>
+
+            {/* Middle side: Desktop Nav Links */}
+            <nav className="hidden md:flex items-center space-x-1">
+              {navItems.map((item) => {
+                const isActive = pathname === item.href;
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all duration-150 ${
+                      isActive
+                        ? "bg-primary text-white shadow-sm shadow-primary/25"
+                        : "text-slate-600 hover:bg-slate-50 hover:text-primary"
+                    }`}
+                  >
+                    <Icon size={16} />
+                    {item.name}
+                  </Link>
+                );
+              })}
+            </nav>
+
+            {/* Right side: Welcome badge & User Profile Pill */}
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2.5 px-3 py-1.5 rounded-full bg-slate-50 border border-slate-100">
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-primary/10 text-primary text-xs font-bold">
+                  {getInitials(userName)}
+                </span>
+                <span className="hidden sm:inline text-xs font-bold text-slate-600">
+                  {role === "admin" ? "Admin Portal" : userName}
+                </span>
+              </div>
+            </div>
           </div>
-          <span>Welcome, {userName}</span>
-        </nav>
+        </div>
       </header>
 
+      {/* Mobile Drawer Drawer Sidebar Overlay & Sidebar Panel */}
       {open && (
         <>
-          <div className="sidebar-overlay" onClick={() => setOpen(false)} />
+          {/* Backdrop Overlay */}
+          <div 
+            className="fixed inset-0 z-50 bg-slate-900/40 backdrop-blur-sm transition-opacity duration-300" 
+            onClick={() => setOpen(false)} 
+          />
 
-          <aside className="app-sidebar">
-            <button
-              onClick={() => setOpen(false)}
-              className="icon-button sidebar-close"
-              aria-label="Close navigation"
-            >
-              <X size={20} />
-            </button>
+          {/* Sliding Panel */}
+          <aside className="fixed inset-y-0 left-0 z-50 w-full max-w-xs bg-white shadow-2xl flex flex-col p-6 border-r border-slate-100 transition-transform duration-300 ease-out transform">
+            {/* Sidebar Header */}
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-2 text-primary font-bold text-lg">
+                <GraduationCap size={24} />
+                <span>Maa Gauri ITI</span>
+              </div>
+              <button
+                onClick={() => setOpen(false)}
+                className="rounded-lg p-1.5 text-slate-500 hover:bg-slate-100 hover:text-slate-700 focus:outline-none"
+                aria-label="Close navigation"
+              >
+                <X size={20} />
+              </button>
+            </div>
 
-            <Info_Card
-              image="/file.svg"
-              alter={role}
-              feild={role === "admin" ? "Admin Panel" : userName}
-              entry={role === "admin" ? "Management access" : `ID: #${studentId}`}
-            />
+            {/* Profile Widget Card */}
+            <div className="bg-slate-50 border border-slate-100 p-4 rounded-xl mb-6 flex items-center gap-3">
+              <div className="h-10 w-10 rounded-full bg-primary text-white flex items-center justify-center font-bold text-sm shadow-sm shadow-primary/20">
+                {getInitials(userName)}
+              </div>
+              <div className="min-w-0 flex-1">
+                <h4 className="text-sm font-bold text-slate-800 truncate">{userName}</h4>
+                <p className="text-xs font-semibold text-slate-500 truncate">
+                  {role === "admin" ? "Administrator" : `ID: #${studentId}`}
+                </p>
+              </div>
+            </div>
 
-            <nav className="sidebar-nav">
-              {sidebarItems.map((item) => (
-                <Sidebar_Card
-                  key={item.href}
-                  image="/file.svg"
-                  alter={item.name}
-                  name={item.name}
-                  href={item.href}
-                  active={pathname === item.href}
-                />
-              ))}
+            {/* Navigation List */}
+            <nav className="flex-1 space-y-1">
+              {sidebarItems.map((item) => {
+                const isActive = pathname === item.href;
+                const Icon = item.icon;
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setOpen(false)}
+                    className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold transition-all duration-150 ${
+                      isActive
+                        ? "bg-primary/10 text-primary border-l-4 border-primary pl-2.5"
+                        : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
+                    }`}
+                  >
+                    <Icon size={18} />
+                    <span>{item.name}</span>
+                  </Link>
+                );
+              })}
             </nav>
+
+            {/* Footer Sign-off */}
+            <div className="mt-auto border-t border-slate-100 pt-4 text-center">
+              <p className="text-xs font-medium text-slate-400">Maa Gauri Private ITI</p>
+              <p className="text-[10px] text-slate-400 mt-0.5">ERP Portal v2.0</p>
+            </div>
           </aside>
         </>
       )}

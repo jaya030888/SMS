@@ -20,7 +20,7 @@ export default function FeeStructurePage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/course-fees")
+    fetch("/api/course_fees")
       .then((res) => {
         if (res.ok) return res.json();
         throw new Error("Failed to fetch fee structures");

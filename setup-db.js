@@ -49,60 +49,79 @@ async function main() {
     }
     console.log("Course fees seeded successfully.");
 
-    // 3. Alter applicants table to add payment_status if it doesn't exist
+    // 3. Create payments table with all dynamic fields
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS payments (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        student_id INT NOT NULL,
+        amount INT NOT NULL,
+        payment_method VARCHAR(50) NOT NULL DEFAULT 'UPI',
+        transaction_id VARCHAR(100) NULL,
+        payment_mode VARCHAR(20) NOT NULL DEFAULT 'Online',
+        payment_status VARCHAR(20) NOT NULL DEFAULT 'Success',
+        payment_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        remarks TEXT NULL,
+        FOREIGN KEY (student_id) REFERENCES applicants(id) ON DELETE CASCADE
+      )
+    `);
+    console.log("Table 'payments' verified/created.");
+
+    // Verify payments table columns and alter if needed (for legacy tables)
+    const [paymentCols] = await connection.query(`
+      SELECT COLUMN_NAME FROM information_schema.COLUMNS 
+      WHERE TABLE_SCHEMA='Applications' AND TABLE_NAME='payments' AND COLUMN_NAME='payment_method'
+    `);
+    
+    if (paymentCols.length === 0) {
+      console.log("Upgrading 'payments' table columns...");
+      await connection.query(`
+        ALTER TABLE payments 
+        ADD COLUMN payment_method VARCHAR(50) DEFAULT 'UPI',
+        ADD COLUMN transaction_id VARCHAR(100) DEFAULT NULL,
+        ADD COLUMN payment_mode VARCHAR(20) DEFAULT 'Online',
+        ADD COLUMN payment_status VARCHAR(20) DEFAULT 'Success',
+        ADD COLUMN remarks TEXT DEFAULT NULL
+      `);
+      console.log("'payments' table upgraded successfully.");
+    }
+
+    // 4. Check for legacy columns and migrate data
     const [statusCols] = await connection.query(`
       SELECT COLUMN_NAME FROM information_schema.COLUMNS 
       WHERE TABLE_SCHEMA='Applications' AND TABLE_NAME='applicants' AND COLUMN_NAME='payment_status'
     `);
-    if (statusCols.length === 0) {
-      await connection.query(`
-        ALTER TABLE applicants ADD COLUMN payment_status VARCHAR(20) DEFAULT 'Pending'
-      `);
-      console.log("Added column 'payment_status' to table 'applicants'.");
-    } else {
-      console.log("Column 'payment_status' already exists.");
-    }
-
-    // 4. Alter applicants table to add amount_paid if it doesn't exist
     const [paidCols] = await connection.query(`
       SELECT COLUMN_NAME FROM information_schema.COLUMNS 
       WHERE TABLE_SCHEMA='Applications' AND TABLE_NAME='applicants' AND COLUMN_NAME='amount_paid'
     `);
-    if (paidCols.length === 0) {
-      await connection.query(`
-        ALTER TABLE applicants ADD COLUMN amount_paid INT DEFAULT 0
-      `);
-      console.log("Added column 'amount_paid' to table 'applicants'.");
 
-      // Initialize existing students:
-      // Electrician/Fitter get Paid (total_fee), COPA gets Pending (2000)
-      console.log("Initializing payment data for existing students...");
-      const [students] = await connection.query("SELECT id, course FROM applicants");
+    if (paidCols.length > 0) {
+      console.log("Found legacy 'amount_paid' column. Migrating payment records to 'payments' table...");
+      const [students] = await connection.query("SELECT id, amount_paid FROM applicants");
       for (let s of students) {
-        const course = s.course.toLowerCase();
-        let status = 'Pending';
-        let paid = 2000; // paid registration
-        if (course.includes('electrician')) {
-          status = 'Paid';
-          paid = 21000;
-        } else if (course.includes('fitter')) {
-          status = 'Paid';
-          paid = 19500;
-        } else if (course.includes('copa') || course.includes('computer')) {
-          status = 'Pending';
-          paid = 2000;
-        } else {
-          status = s.id % 2 === 0 ? 'Paid' : 'Pending';
-          paid = status === 'Paid' ? 15000 : 2000;
+        const amount = Number(s.amount_paid);
+        if (amount > 0) {
+          // Verify if student already has a payment to avoid duplicate migration
+          const [existing] = await connection.query("SELECT id FROM payments WHERE student_id = ?", [s.id]);
+          if (existing.length === 0) {
+            await connection.query("INSERT INTO payments (student_id, amount) VALUES (?, ?)", [s.id, amount]);
+          }
         }
-
-        await connection.query(`
-          UPDATE applicants SET payment_status = ?, amount_paid = ? WHERE id = ?
-        `, [status, paid, s.id]);
       }
-      console.log("Existing students' payment info initialized successfully.");
+      console.log("Payment migration completed successfully.");
+
+      // Drop legacy columns from applicants
+      await connection.query("ALTER TABLE applicants DROP COLUMN amount_paid");
+      console.log("Dropped legacy column 'amount_paid' from table 'applicants'.");
     } else {
-      console.log("Column 'amount_paid' already exists.");
+      console.log("Legacy column 'amount_paid' does not exist (already migrated).");
+    }
+
+    if (statusCols.length > 0) {
+      await connection.query("ALTER TABLE applicants DROP COLUMN payment_status");
+      console.log("Dropped legacy column 'payment_status' from table 'applicants'.");
+    } else {
+      console.log("Legacy column 'payment_status' does not exist (already migrated).");
     }
 
     console.log("Database setup successfully completed!");

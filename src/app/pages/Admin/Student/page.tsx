@@ -48,7 +48,7 @@ export default function Page() {
   };
 
   const fetchCourseFees = () => {
-    fetch("/api/course-fees")
+    fetch("/api/course_fees")
       .then((res) => res.json())
       .then((data) => setCourseFees(data))
       .catch((err) => console.error("Error fetching course fees:", err));

@@ -16,6 +16,8 @@ interface Applicant {
   Address: string;
   course: string;
   Qualification: string;
+  payment_status: string;
+  amount_paid: number;
 }
 
 const All = () => {
@@ -39,28 +41,17 @@ const All = () => {
       });
   }, []);
 
-  const getFeeStatus = (id: number, courseName: string) => {
-    const name = courseName.toLowerCase();
-    if (name.includes("electrician") || name.includes("fitter")) {
-      return "Paid";
-    } else if (name.includes("copa") || name.includes("computer")) {
-      return "Pending";
-    } else {
-      return id % 2 === 0 ? "Paid" : "Pending";
-    }
-  };
-
   // Compute stats
   const totalStudents = applicants.length;
-  const feesPaid = applicants.filter((a) => getFeeStatus(a.id, a.course) === "Paid").length;
-  const feesPending = applicants.filter((a) => getFeeStatus(a.id, a.course) === "Pending").length;
+  const feesPaid = applicants.filter((a) => a.payment_status === "Paid").length;
+  const feesPending = applicants.filter((a) => a.payment_status !== "Paid").length;
 
   // Course-specific calculations
   const getCourseStats = (courseFilter: string) => {
     const list = applicants.filter((a) => a.course.toLowerCase().includes(courseFilter));
     const total = list.length;
-    const paid = list.filter((a) => getFeeStatus(a.id, a.course) === "Paid").length;
-    const pending = list.filter((a) => getFeeStatus(a.id, a.course) === "Pending").length;
+    const paid = list.filter((a) => a.payment_status === "Paid").length;
+    const pending = list.filter((a) => a.payment_status !== "Paid").length;
     return { total, paid, pending };
   };
 
@@ -120,7 +111,7 @@ const All = () => {
               key={app.id}
               name={app.name}
               course={app.course}
-              feeStatus={getFeeStatus(app.id, app.course)}
+              feeStatus={app.payment_status || "Pending"}
             />
           ))
         )}
