@@ -1,23 +1,23 @@
-import Image from "next/image";
+import React from "react";
+import { LucideIcon } from "lucide-react";
 
 type InfoCardProps = {
-  image: string;
-  alter: string;
+  icon: LucideIcon;
   feild: string;
   entry: string;
   className?: string;
 };
 
-const Info_Card = (props: InfoCardProps) => {
+const Info_Card = ({ icon: Icon, feild, entry, className }: InfoCardProps) => {
   return (
-    <div className={props.className ?? "info-card"}>
-      <div className="info-icon">
-        <Image src={props.image} alt={props.alter} height={18} width={18} />
+    <div className={className ?? "info-card"}>
+      <div className="info-icon" style={{ display: "grid", placeItems: "center" }}>
+        <Icon size={18} className="text-primary" />
       </div>
 
       <div>
-        <h2>{props.feild}</h2>
-        <p>{props.entry}</p>
+        <h2>{feild}</h2>
+        <p>{entry}</p>
       </div>
     </div>
   );

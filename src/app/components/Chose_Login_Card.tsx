@@ -1,17 +1,19 @@
 import Image from "next/image";
 import Link from "next/link";
 import { GraduationCap, ShieldCheck, User } from "lucide-react";
+import { useLanguage } from "../context/LanguageContext";
 
 type ChoseLoginCardProps = {
   image: string;
   alter: string;
-  role: "Student" | "Admin" | string;
+  role: string;
   para: string;
   to: string;
 };
 
 const Chose_Login_Card = (props: ChoseLoginCardProps) => {
-  const isStudent = props.role.toLowerCase() === "student";
+  const { t } = useLanguage();
+  const isStudent = props.to.toLowerCase().includes("student");
 
   return (
     <article className="flex flex-col items-center text-center p-6 bg-white border border-slate-100 shadow-md rounded-2xl transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
@@ -21,7 +23,7 @@ const Chose_Login_Card = (props: ChoseLoginCardProps) => {
       </div>
 
       <h3 className="text-xl font-bold text-slate-800 mb-2">
-        {props.role} Login
+        {props.role} {t("nav_login")}
       </h3>
       <p className="text-sm font-medium text-slate-500 mb-6 leading-relaxed flex-1">
         {props.para}
@@ -31,10 +33,11 @@ const Chose_Login_Card = (props: ChoseLoginCardProps) => {
         className="w-full flex items-center justify-center py-3 px-4 rounded-xl text-sm font-bold text-white bg-primary hover:bg-primary-dark shadow-sm shadow-primary/25 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-150 cursor-pointer" 
         href={props.to}
       >
-        Sign In as {props.role}
+        {t("language") === "hi" ? `${props.role} के रूप में साइन इन करें` : `Sign In as ${props.role}`}
       </Link>
     </article>
   );
 };
 
 export default Chose_Login_Card;
+

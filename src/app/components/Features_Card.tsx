@@ -1,25 +1,32 @@
-"use client"
 import React from 'react'
-import Image from 'next/image'
+import { LucideIcon } from 'lucide-react'
 
 type FeaturesCardProps = {
-  image: string;
+  icon: LucideIcon;
   feature: string;
   para: string;
 }
 
-const Features_Card = (props: FeaturesCardProps) => {
+const Features_Card = ({ icon: Icon, feature, para }: FeaturesCardProps) => {
   return (
     <article className="feature-card card">
-      <Image
-        src={props.image}
-        alt={props.feature}
-        width={100}
-        height={100}
-      />
+      <div className="feature-icon" style={{
+        borderRadius: "8px",
+        background: "var(--surface-soft)",
+        padding: "0.55rem",
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        width: "48px",
+        height: "48px",
+        color: "var(--primary)",
+        marginBottom: "1rem"
+      }}>
+        <Icon size={28} />
+      </div>
 
-      <h2>{props.feature}</h2>
-      <p>{props.para}</p>
+      <h2>{feature}</h2>
+      <p>{para}</p>
     </article>
   )
 }

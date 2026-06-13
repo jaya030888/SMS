@@ -4,8 +4,22 @@ import { useState, useEffect } from "react";
 import Info_Card from "@/src/app/components/Info_Card";
 import Info_sameliner from "@/src/app/components/Info_sameliner";
 import StuNav from "@/src/app/components/StuNav";
-import Image from "next/image";
 import Link from "next/link";
+import { 
+  User, 
+  Phone, 
+  Calendar, 
+  MapPin, 
+  GraduationCap, 
+  BookOpen, 
+  Book, 
+  LineChart, 
+  Activity, 
+  FileText, 
+  ClipboardList, 
+  Bell,
+  Wrench
+} from "lucide-react";
 
 interface StudentData {
   id: number;
@@ -141,7 +155,7 @@ export default function Page() {
       <main className="dashboard-page">
         <section className="dashboard-hero">
           <div className="course-badge">
-            <Image src="/file.svg" alt="Course" height={22} width={22} />
+            <GraduationCap size={22} className="text-primary" />
           </div>
           <div>
             <p className="eyebrow" style={{ color: "rgba(255, 255, 255, 0.78)" }}>Your enrolled course</p>
@@ -152,13 +166,13 @@ export default function Page() {
 
         <section className="panel">
           <div className="panel-heading">
-            <Image src="/file.svg" alt="" height={18} width={18} />
+            <BookOpen size={18} className="text-primary" />
             <h2>Course Subjects</h2>
           </div>
           <div className="chip-grid">
             {subjects.map((subject) => (
               <div className="subject-chip" key={subject}>
-                <Image src="/file.svg" alt="" height={16} width={16} />
+                <Book size={16} className="text-primary" />
                 <p style={{ margin: 0 }}>{subject}</p>
               </div>
             ))}
@@ -168,7 +182,7 @@ export default function Page() {
         <section className="dashboard-grid">
           <div className="panel progress-panel">
             <div className="panel-heading">
-              <Image src="/file.svg" alt="" height={18} width={18} />
+              <LineChart size={18} className="text-primary" />
               <h2>Course Progress</h2>
             </div>
             <p>Overall Completion</p>
@@ -199,12 +213,12 @@ export default function Page() {
           <div className="panel">
             <h2>Personal Information</h2>
             <div className="stack-list">
-              <Info_Card image="/file.svg" alter="" feild="Full Name" entry={student.name} />
-              <Info_Card image="/file.svg" alter="" feild="Father's Name" entry={student.fatherName} />
-              <Info_Card image="/file.svg" alter="" feild="Phone Number" entry={String(student.phone)} />
-              <Info_Card image="/file.svg" alter="" feild="Date of Birth" entry={formatDate(student.DOB)} />
-              <Info_Card image="/file.svg" alter="" feild="Address" entry={student.Address} />
-              <Info_Card image="/file.svg" alter="" feild="Previous Qualification" entry={student.Qualification} />
+              <Info_Card icon={User} feild="Full Name" entry={student.name} />
+              <Info_Card icon={User} feild="Father's Name" entry={student.fatherName} />
+              <Info_Card icon={Phone} feild="Phone Number" entry={String(student.phone)} />
+              <Info_Card icon={Calendar} feild="Date of Birth" entry={formatDate(student.DOB)} />
+              <Info_Card icon={MapPin} feild="Address" entry={student.Address} />
+              <Info_Card icon={GraduationCap} feild="Previous Qualification" entry={student.Qualification} />
             </div>
           </div>
 
@@ -219,9 +233,9 @@ export default function Page() {
 
             <h2 className="panel-subtitle">{student.course} Updates</h2>
             <div className="stack-list">
-              <Info_Card image="/file.svg" alter="" feild="Practical Test" entry="Workshop assessment on June 10" />
-              <Info_Card image="/file.svg" alter="" feild="Theory Exam" entry="Final exams start from June 15" />
-              <Info_Card image="/file.svg" alter="" feild="Holiday Notice" entry="Institute closed on June 7" />
+              <Info_Card icon={Wrench} feild="Practical Test" entry="Workshop assessment on June 10" />
+              <Info_Card icon={FileText} feild="Theory Exam" entry="Final exams start from June 15" />
+              <Info_Card icon={Bell} feild="Holiday Notice" entry="Institute closed on June 7" />
             </div>
           </div>
         </section>

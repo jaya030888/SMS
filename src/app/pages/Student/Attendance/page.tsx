@@ -2,7 +2,7 @@ import Info2liner_Card from "@/src/app/components/Info2liner_Card";
 import Month_Card from "@/src/app/components/Month_Card";
 import ProgressCircle from "@/src/app/components/ProgressCircle";
 import StuNav from "@/src/app/components/StuNav";
-import Image from "next/image";
+import { Sparkles } from "lucide-react";
 
 const Page = () => {
   return (
@@ -22,7 +22,7 @@ const Page = () => {
 
           <div className="panel notice-panel">
             <div className="panel-heading">
-              <Image src="/file.svg" alt="" width={18} height={18} />
+              <Sparkles className="text-primary" size={18} />
               <h2>You are on track</h2>
             </div>
             <p>

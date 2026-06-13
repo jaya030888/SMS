@@ -3,8 +3,8 @@
 import { useState, useEffect } from "react";
 import Info2liner_Card from "@/src/app/components/Info2liner_Card";
 import StuNav from "@/src/app/components/StuNav";
-import Image from "next/image";
 import Link from "next/link";
+import { User } from "lucide-react";
 
 interface StudentData {
   id: number;
@@ -91,7 +91,7 @@ export default function Page() {
       <main className="dashboard-page">
         <section className="profile-hero panel">
           <div className="avatar">
-            <Image src="/file.svg" alt="Student" width={34} height={34} />
+            <User size={34} className="text-primary" />
           </div>
 
           <div>

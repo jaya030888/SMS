@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;500;600;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Noto+Sans+Devanagari:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
 @theme {
@@ -10,41 +10,53 @@
   --color-mist-gray: var(--mist-gray);
   --color-champagne: var(--champagne);
   --color-surface-soft: var(--surface-soft);
+
+  /* Overriding Slate palette in Tailwind to map slate classes to our new Neutral and Canvas colors */
+  --color-slate-50: #f8fafc;
+  --color-slate-100: #f1f5f9;
+  --color-slate-200: #e2e8f0;
+  --color-slate-300: #cbd5e1;
+  --color-slate-400: #94a3b8;
+  --color-slate-500: #475569;
+  --color-slate-600: #334155;
+  --color-slate-700: #1e293b;
+  --color-slate-800: #0f172a;
+  --color-slate-900: #020617;
 }
 
 
 :root {
-  --mist-gray: #ECEFF1;
-  --midnight-blue: #191970;
-  --deep-forest: #191970;
-  --forest-green: #191970;
-  --forest-light: #7474C6;
-  --champagne: #F8F9FA;
+  --mist-gray: #f8fafc;              /* Cool Slate Mist */
+  --midnight-blue: #064e3b;          /* Deep Emerald Green */
+  --deep-forest: #064e3b;
+  --forest-green: #064e3b;
+  --forest-light: #10b981;           /* Bright Mint / Emerald */
+  --champagne: #f8fafc;
   --white: #ffffff;
-  --black: #111827;
-  --olive: #191970;
-  --dark-olive: #11114F;
-  --cream: #F8F9FA;
-  --tan: #ECEFF1;
-  --copper: #4B4BB2;
-  --page: #ECEFF1;
+  --black: #0f172a;                  /* Deep Slate Blue */
+  --olive: #064e3b;
+  --dark-olive: #022c22;
+  --cream: #f8fafc;
+  --tan: #f1f5f9;
+  --copper: #10b981;
+  --page: #f8fafc;
   --surface: #ffffff;
-  --surface-soft: #F4F6F8;
-  --ink: #141423;
-  --muted: #687180;
-  --primary: #191970;
-  --primary-dark: #11114F;
-  --secondary: #32328F;
-  --accent: #4B4BB2;
-  --accent-soft: #E7E8F7;
-  --info: #2B9AA4;
-  --success: #16735B;
-  --warning: #A16207;
-  --danger: #B4232B;
-  --border: rgba(25, 25, 112, 0.12);
-  --shadow-soft: 0 10px 30px rgba(25, 25, 112, 0.07);
-  --shadow-medium: 0 18px 42px rgba(25, 25, 112, 0.11);
-  --shadow-hard: 0 26px 60px rgba(25, 25, 112, 0.16);
+  --surface-soft: #f1f5f9;
+  --ink: #0f172a;                    /* Deep Slate Blue */
+  --muted: #475569;
+  --primary: #064e3b;                /* Deep Emerald Green */
+  --primary-dark: #022c22;           /* Extra Deep Green */
+  --secondary: #0f172a;              /* Deep Slate Blue */
+  --accent: #10b981;                 /* Bright Mint / Emerald */
+  --accent-soft: #ecfdf5;            /* Soft Mint Background */
+  --info: #059669;
+  --success: #15803d;
+  --warning: #b45309;
+  --danger: #be123c;
+  --border: #e2e8f0;
+  --shadow-soft: 0 10px 30px rgba(6, 78, 59, 0.05);
+  --shadow-medium: 0 18px 42px rgba(6, 78, 59, 0.08);
+  --shadow-hard: 0 26px 60px rgba(6, 78, 59, 0.12);
 }
 
 * {
@@ -59,12 +71,20 @@ body {
   margin: 0;
   background: var(--mist-gray);
   color: var(--ink);
-  font-family: 'helvetica';
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
   line-height: 1.6;
 }
 
+/* Bilingual Font Rule Switchers */
+body.lang-hi {
+  font-family: 'Noto Sans Devanagari', 'Inter', system-ui, sans-serif;
+}
+body.lang-hi p, body.lang-hi li, body.lang-hi span, body.lang-hi a, body.lang-hi h1, body.lang-hi h2, body.lang-hi h3, body.lang-hi h4, body.lang-hi h5, body.lang-hi h6, body.lang-hi label, body.lang-hi input, body.lang-hi select, body.lang-hi option, body.lang-hi button {
+  line-height: 1.8;
+}
+
 h1, h2, h3, h4, h5, h6, .brand-name, .brand-mark, button, .button, .eyebrow {
-  font-family: 'helvetica';
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
   font-weight: 600;
 }
 
@@ -159,7 +179,7 @@ select:focus-visible {
 }
 
 .navbar {
-  width: min(1014px, calc(100% - 2rem));
+  width: min(1200px, calc(100% - 2rem));
   min-height: 69px;
   margin: 0 auto;
   padding: 0;
@@ -202,10 +222,10 @@ select:focus-visible {
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  gap: 1.45rem;
+  gap: 1.15rem;
   flex-wrap: wrap;
   color: var(--ink);
-  font-size: 1.05rem;
+  font-size: 0.95rem;
   font-weight: 500;
 }
 
@@ -235,11 +255,11 @@ select:focus-visible {
 
 .nav-links .button {
   color: var(--white);
-  padding: 0.65rem 1.2rem;
+  padding: 0.5rem 1.1rem;
   min-width: 105px;
-  min-height: 42px;
+  min-height: 38px;
   border-radius: 8px;
-  font-size: 1.05rem;
+  font-size: 0.95rem;
 }
 
 .nav-links .button::after {
@@ -257,7 +277,7 @@ select:focus-visible {
 }
 
 .section-inner {
-  width: min(1014px, calc(100% - 2rem));
+  width: min(1200px, calc(100% - 2rem));
   margin: 0 auto;
 }
 
@@ -313,10 +333,10 @@ select:focus-visible {
 .hero h1 {
   margin: 0;
   max-width: 780px;
-  font-size: clamp(2rem, 7vw, 6rem);
-  line-height: 0.95;
-  font-weight: 600;
-  letter-spacing: -0.04em;
+  font-size: clamp(2rem, 5.5vw, 4.2rem);
+  line-height: 1.1;
+  font-weight: 800;
+  letter-spacing: -0.015em;
 }
 
 .hero h1 span {
@@ -1792,3 +1812,107 @@ select:focus {
     min-height: 220px;
   }
 }
+
+/* -------------------------------------------------------------
+   COMPLIANCE BANNER & BILINGUAL ENGINE STYLES
+   ------------------------------------------------------------- */
+.compliance-banner {
+  background: linear-gradient(135deg, var(--primary-dark) 0%, #043d2e 100%);
+  color: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  padding: 0.5rem 0;
+  width: 100%;
+}
+
+.compliance-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+}
+
+.compliance-item {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.compliance-icon {
+  width: 1rem;
+  height: 1rem;
+  opacity: 0.8;
+}
+
+.compliance-badge {
+  opacity: 0.7;
+}
+
+.compliance-value {
+  letter-spacing: 0.5px;
+}
+
+.compliance-certifications {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.cert-tag {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  padding: 0.1rem 0.5rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+}
+
+/* Language toggle container and button */
+.lang-toggle-container {
+  background: var(--surface-soft);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 0.2rem;
+  display: inline-flex;
+  align-items: center;
+}
+
+.lang-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.2rem 0.5rem;
+  border-radius: 4px;
+  color: var(--ink);
+  min-height: auto;
+}
+
+.lang-btn:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.lang-label {
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+}
+
+.lang-label.active {
+  opacity: 1;
+  color: var(--primary);
+  font-weight: 800;
+}
+
+.lang-divider {
+  opacity: 0.3;
+}
+

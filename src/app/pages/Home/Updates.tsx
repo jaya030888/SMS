@@ -1,21 +1,25 @@
-import React from 'react'
-import Image from 'next/image'
+"use client";
 
+import React from 'react'
+import { useLanguage } from "../../context/LanguageContext";
 import Updates_Card from '../../components/Updates_Card'
+import { BellRing } from 'lucide-react'
 
 const Updates = () => {
+  const { t } = useLanguage();
+
   return (
     <section className="section updates-section" id="updates">
       <div className="section-inner">
         <div className="section-title-row">
-          <Image src="/file.svg" alt="" width={24} height={24} />
-          <h1>Notices & Updates</h1>
+          <BellRing className="text-primary" size={24} />
+          <h1>{t("updates_title")}</h1>
         </div>
 
         <div className="updates-list">
-          <Updates_Card date="Jan 25, 2026" update="Admission Open for 2026-27 Batch" para ="Applications are now being accepted for all ITI courses. Apply before Feb 28, 2026." />
-          <Updates_Card date="Jan 20, 2026" update="Workshop on Modern Electrical Systems" para ="Special workshop scheduled for Electrician students on January 30, 2026." />
-          <Updates_Card date="Jan 15, 2026" update="Industrial Visit to Manufacturing Unit" para ="Fitter trade students will visit local manufacturing facility on February 5, 2026." />
+          <Updates_Card date={t("update_1_date")} update={t("update_1_title")} para={t("update_1_desc")} />
+          <Updates_Card date={t("update_2_date")} update={t("update_2_title")} para={t("update_2_desc")} />
+          <Updates_Card date={t("update_3_date")} update={t("update_3_title")} para={t("update_3_desc")} />
         </div>
       </div>
     </section>

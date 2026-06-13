@@ -2,8 +2,11 @@
 
 import Login_Card from "../../components/Chose_Login_Card";
 import { GraduationCap } from "lucide-react";
+import { useLanguage } from "../../context/LanguageContext";
 
 const Page = () => {
+  const { t } = useLanguage();
+
   return (
     <main className="flex min-h-screen flex-col justify-center items-center bg-slate-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="w-full max-w-2xl">
@@ -13,10 +16,10 @@ const Page = () => {
             <GraduationCap size={28} />
           </span>
           <h2 className="text-3xl font-extrabold tracking-tight text-slate-800 sm:text-4xl">
-            Choose your login type
+            {t("login_choose_role")}
           </h2>
           <p className="mt-2 text-sm font-semibold text-slate-500 max-w-sm mx-auto">
-            Access your personalized student or administrator dashboard workspace.
+            {t("login_choose_subtitle")}
           </p>
         </div>
 
@@ -25,16 +28,16 @@ const Page = () => {
           <Login_Card
             image="/file.svg"
             alter="Student"
-            role="Student"
-            para="Access your customized dashboard, course modules, attendance logs, and pay fees online."
+            role={t("login_role_student")}
+            para={t("login_student_desc")}
             to="/pages/Login_Page/Student_Login"
           />
 
           <Login_Card
             image="/file.svg"
             alter="Admin"
-            role="Admin"
-            para="Control admissions, review applicant entries, manage fee transactions, and log student attendance."
+            role={t("login_role_admin")}
+            para={t("login_admin_desc")}
             to="/pages/Login_Page/Admin_Login"
           />
         </div>
@@ -44,3 +47,4 @@ const Page = () => {
 };
 
 export default Page;
+

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Navbar } from "../Navbar";
 import Footer from "../../../components/Footer";
 import { CheckCircle2, FileText, Landmark } from "lucide-react";
+import { useLanguage } from "../../../context/LanguageContext";
 
 interface CourseFee {
   course: string;
@@ -16,6 +17,7 @@ interface CourseFee {
 }
 
 export default function FeeStructurePage() {
+  const { t } = useLanguage();
   const [fees, setFees] = useState<CourseFee[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -51,28 +53,28 @@ export default function FeeStructurePage() {
       <main className="form-page" style={{ display: "block", minHeight: "calc(100vh - 150px)", padding: "4rem 0" }}>
         <div className="section-inner">
           <div className="section-heading compact" style={{ textAlign: "center", margin: "0 auto 3rem" }}>
-            <p className="eyebrow">Finance</p>
-            <h1>Fee Structure</h1>
-            <p>Transparent fee structures for all our technical ITI programs, fetched in real-time from the database.</p>
+            <p className="eyebrow">{t("nav_fee_structure")}</p>
+            <h1>{t("fee_title")}</h1>
+            <p>{t("fee_subtitle")}</p>
           </div>
 
           <div style={{ display: "grid", gap: "2rem" }}>
             <div className="panel" style={{ overflowX: "auto", border: "1px solid var(--border)", borderRadius: "12px" }}>
               {loading ? (
                 <div style={{ padding: "4rem", textAlign: "center" }}>
-                  <p>Loading dynamic fee schedules...</p>
+                  <p>{t("lbl_loading_dir")}</p>
                 </div>
               ) : (
                 <table style={{ width: "100%", borderCollapse: "collapse", minWidth: "700px" }}>
                   <thead>
                     <tr style={{ background: "var(--surface-soft)", borderBottom: "2px solid var(--border)", textAlign: "left" }}>
-                      <th style={{ padding: "1.2rem 1rem", fontWeight: 700 }}>Course / Trade</th>
-                      <th style={{ padding: "1.2rem 1rem", fontWeight: 700 }}>Tuition Fee (Annual)</th>
+                      <th style={{ padding: "1.2rem 1rem", fontWeight: 700 }}>{t("fee_th_course")}</th>
+                      <th style={{ padding: "1.2rem 1rem", fontWeight: 700 }}>{t("fee_th_tuition_fee")}</th>
                       <th style={{ padding: "1.2rem 1rem", fontWeight: 700 }}>Lab Fee</th>
                       <th style={{ padding: "1.2rem 1rem", fontWeight: 700 }}>Library Fee</th>
                       <th style={{ padding: "1.2rem 1rem", fontWeight: 700 }}>Exam Fee</th>
                       <th style={{ padding: "1.2rem 1rem", fontWeight: 700 }}>Development Fee</th>
-                      <th style={{ padding: "1.2rem 1rem", fontWeight: 700, color: "var(--primary)" }}>Total Course Fee</th>
+                      <th style={{ padding: "1.2rem 1rem", fontWeight: 700, color: "var(--primary)" }}>{t("fee_th_total_fee")}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -100,9 +102,11 @@ export default function FeeStructurePage() {
                   <CheckCircle2 size={24} />
                 </span>
                 <div>
-                  <h3 style={{ margin: "0 0 0.5rem", fontSize: "1.15rem" }}>Registration Payment</h3>
+                  <h3 style={{ margin: "0 0 0.5rem", fontSize: "1.15rem" }}>{t("fee_th_reg_fee")}</h3>
                   <p style={{ margin: 0, color: "var(--muted)", fontSize: "0.95rem" }}>
-                    A one-time registration fee of ₹2,000 is required upon submitting the admission application form.
+                    {t("language") === "hi" 
+                      ? "प्रवेश आवेदन पत्र जमा करने पर ₹2,000 का एकमुश्त पंजीकरण शुल्क आवश्यक है।" 
+                      : "A one-time registration fee of ₹2,000 is required upon submitting the admission application form."}
                   </p>
                 </div>
               </div>
@@ -112,9 +116,11 @@ export default function FeeStructurePage() {
                   <Landmark size={24} />
                 </span>
                 <div>
-                  <h3 style={{ margin: "0 0 0.5rem", fontSize: "1.15rem" }}>Payment Options</h3>
+                  <h3 style={{ margin: "0 0 0.5rem", fontSize: "1.15rem" }}>{t("login_choose_role")} Options</h3>
                   <p style={{ margin: 0, color: "var(--muted)", fontSize: "0.95rem" }}>
-                    Tuition fees can be paid in installments, online via Credit/Debit card, UPI, Net Banking or in cash at the administration desk.
+                    {t("language") === "hi"
+                      ? "ट्यूशन फीस का भुगतान किश्तों में, क्रेडिट/डेबिट कार्ड, यूपीआई, नेट बैंकिंग के माध्यम से ऑनलाइन या प्रशासन डेस्क पर नकद में किया जा सकता है।"
+                      : "Tuition fees can be paid in installments, online via Credit/Debit card, UPI, Net Banking or in cash at the administration desk."}
                   </p>
                 </div>
               </div>

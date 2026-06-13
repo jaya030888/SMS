@@ -1,16 +1,22 @@
+"use client";
+
 import React from 'react'
+import { useLanguage } from "../../context/LanguageContext";
 import Features_Card from '../../components/Features_Card'
+import { Award, Wrench, ShieldCheck, Briefcase } from 'lucide-react'
 
 const Features = () => {
+  const { t } = useLanguage();
+
   return (
     <section className="section features-section">
       <div className="section-inner">
-        <h1>Why Choose Us?</h1>
+        <h1>{t("features_title")}</h1>
         <div className="card-grid features-grid">
-          <Features_Card image="/file.svg" feature="Experienced Faculty" para="Learn from industry experts with years of practical experience"/>
-          <Features_Card image="/file.svg" feature="Practical Training" para="Hands-on training with modern equipment and real-world projects"/>
-          <Features_Card image="/file.svg" feature="NCVT Approved Trades" para="All our courses are approved by National Council for Vocational Training"/>
-          <Features_Card image="/file.svg" feature="Industry Exposure" para="Industrial visits and placement assistance for better career prospects"/>
+          <Features_Card icon={Award} feature={t("feature_faculty_title")} para={t("feature_faculty_desc")}/>
+          <Features_Card icon={Wrench} feature={t("feature_practical_title")} para={t("feature_practical_desc")}/>
+          <Features_Card icon={ShieldCheck} feature={t("feature_ncvt_title")} para={t("feature_ncvt_desc")}/>
+          <Features_Card icon={Briefcase} feature={t("feature_industry_title")} para={t("feature_industry_desc")}/>
         </div>
       </div>
     </section>

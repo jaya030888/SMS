@@ -1,26 +1,28 @@
+"use client";
+
 import React from 'react'
 import Link from 'next/link'
+import { useLanguage } from "../../context/LanguageContext";
 
 const Hero = () => {
+  const { t } = useLanguage();
+
   return (
     <section className="hero section" id="home">
       <div className="section-inner hero-inner">
         <div className="hero-content">
-          <p className="eyebrow">NCVT approved skill training</p>
-          <h1>Building Future <span>Skilled Professionals</span></h1>
+          <p className="eyebrow">{t("hero_eyebrow")}</p>
+          <h1>{t("hero_title_1")} <span>{t("hero_title_2")}</span></h1>
 
-          <p>Maa Gauri Private ITI provides quality 
-            vocational training and skill development 
-            to empower youth with industry-ready expertise.
-          </p>
+          <p>{t("hero_desc")}</p>
 
           <div className="hero-actions">
             <Link href="/pages/Home/Addmission_Application_Form" className="button button-primary">
-              Apply for Admissions
+              {t("hero_btn_apply")}
             </Link>
 
             <Link href="#courses" className="button button-secondary">
-              Explore Trades
+              {t("hero_btn_explore")}
             </Link>
           </div>
         </div>
@@ -28,24 +30,24 @@ const Hero = () => {
         <div className="hero-visual" aria-label="Institute highlights">
           <div className="hero-card">
             <div className="hero-card-top">
-              <span>ITI</span>
-              <strong>2026 Admissions</strong>
+              <span>{t("hero_card_tag")}</span>
+              <strong>{t("hero_card_year")}</strong>
             </div>
-            <h2>Technical trades for real careers</h2>
-            <p>Practical labs, guided training, and placement support for every enrolled student.</p>
+            <h2>{t("hero_card_title")}</h2>
+            <p>{t("hero_card_desc")}</p>
 
             <div className="hero-badges">
               <div>
-                <strong>Govt.</strong>
-                <span>Recognized</span>
+                <strong>{t("hero_badge_govt")}</strong>
+                <span>{t("hero_badge_govt_desc")}</span>
               </div>
               <div>
-                <strong>500+</strong>
-                <span>Alumni</span>
+                <strong>{t("hero_badge_alumni")}</strong>
+                <span>{t("hero_badge_alumni_desc")}</span>
               </div>
               <div>
-                <strong>100%</strong>
-                <span>Placement Help</span>
+                <strong>{t("hero_badge_placement")}</strong>
+                <span>{t("hero_badge_placement_desc")}</span>
               </div>
             </div>
           </div>

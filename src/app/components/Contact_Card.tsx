@@ -1,24 +1,24 @@
-import Image from "next/image"
+import React from "react";
+import { LucideIcon } from "lucide-react";
 
 type ContactCardProps = {
-  image: string;
-  alter: string;
+  icon: LucideIcon;
   name: string;
   l1: string;
   l2: string;
 }
 
-const Contact_Card = (props: ContactCardProps) => {
+const Contact_Card = ({ icon: Icon, name, l1, l2 }: ContactCardProps) => {
   return (
     <div className="contact-card">
-      <div className="contact-icon">
-        <Image src = {props.image} alt={props.alter} height={20} width={20} />
+      <div className="contact-icon" style={{ display: "grid", placeItems: "center" }}>
+        <Icon size={20} className="text-primary" />
       </div>
 
       <div>
-        <h3>{props.name}</h3>
-        <p>{props.l1}</p>
-        <p>{props.l2}</p>
+        <h3>{name}</h3>
+        <p>{l1}</p>
+        <p>{l2}</p>
       </div>
     </div>
   )

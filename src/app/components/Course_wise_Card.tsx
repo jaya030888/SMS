@@ -1,8 +1,8 @@
-import Image from "next/image";
+import { Zap, Cog, Monitor, GraduationCap } from "lucide-react";
 import Info_sameliner from "./Info_sameliner";
 
 type CourseWiseCardProps = {
-  image: string;
+  image: string; // Keep for compatibility
   alter: string;
   course: string;
   totalStudents: string;
@@ -11,17 +11,24 @@ type CourseWiseCardProps = {
 };
 
 const Course_wise_Card = ({
-  image,
   alter,
   course,
   totalStudents,
   feesPaid,
   feesPending,
 }: CourseWiseCardProps) => {
+  const getIcon = (courseName: string) => {
+    const c = courseName.toLowerCase();
+    if (c.includes("electrician")) return <Zap size={20} className="text-primary" />;
+    if (c.includes("fitter")) return <Cog size={20} className="text-primary" />;
+    if (c.includes("copa")) return <Monitor size={20} className="text-primary" />;
+    return <GraduationCap size={20} className="text-primary" />;
+  };
+
   return (
     <div className="course-summary">
       <div className="panel-heading">
-        <Image src={image} alt={alter} width={20} height={20} />
+        {getIcon(course)}
         <h2>{course}</h2>
       </div>
 

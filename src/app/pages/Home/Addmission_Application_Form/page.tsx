@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Navbar } from "../Navbar";
 import Footer from "../../../components/Footer";
+import { useLanguage } from "../../../context/LanguageContext";
 
 interface Applicants {
   id: number;
@@ -17,6 +18,7 @@ interface Applicants {
 }
 
 export default function Page() {
+  const { t } = useLanguage();
   const [applicants, setApplicants] = useState<Applicants[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
@@ -194,41 +196,41 @@ export default function Page() {
             {/* Form Section */}
             <section className="panel">
               <div className="section-heading compact">
-                <p className="eyebrow">Admissions</p>
-                <h1>Register Student</h1>
-                <p>Enter student details below to save directly to the database.</p>
+                <p className="eyebrow">{t("nav_admissions")}</p>
+                <h1>{t("admissions_form_title")}</h1>
+                <p>{t("admissions_form_desc")}</p>
               </div>
 
               <form onSubmit={handleProceedToPayment} className="admission-form">
                 <div className="form-grid">
                   <div className="field">
-                    <label htmlFor="name">Full Name <span className="text-rose-500" style={{ color: "#dc2626" }}>*</span></label>
+                    <label htmlFor="name">{t("lbl_fullname")} <span className="text-rose-500" style={{ color: "#dc2626" }}>*</span></label>
                     <input
                       type="text"
                       name="name"
                       id="name"
                       required
-                      placeholder="Jaya Sharma"
+                      placeholder="e.g. Jaya Sharma"
                       value={formData.name}
                       onChange={handleChange}
                     />
                   </div>
 
                   <div className="field">
-                    <label htmlFor="fatherName">Father&apos;s Name <span className="text-rose-500" style={{ color: "#dc2626" }}>*</span></label>
+                    <label htmlFor="fatherName">{t("lbl_fathername")} <span className="text-rose-500" style={{ color: "#dc2626" }}>*</span></label>
                     <input
                       type="text"
                       name="fatherName"
                       id="fatherName"
                       required
-                      placeholder="Suresh Sharma"
+                      placeholder="e.g. Suresh Sharma"
                       value={formData.fatherName}
                       onChange={handleChange}
                     />
                   </div>
 
                   <div className="field">
-                    <label htmlFor="email">Email Address <span className="text-rose-500" style={{ color: "#dc2626" }}>*</span></label>
+                    <label htmlFor="email">{t("lbl_email")} <span className="text-rose-500" style={{ color: "#dc2626" }}>*</span></label>
                     <input
                       type="email"
                       name="email"
@@ -241,7 +243,7 @@ export default function Page() {
                   </div>
 
                   <div className="field">
-                    <label htmlFor="DOB">Date of Birth <span className="text-rose-500" style={{ color: "#dc2626" }}>*</span></label>
+                    <label htmlFor="DOB">{t("lbl_dob")} <span className="text-rose-500" style={{ color: "#dc2626" }}>*</span></label>
                     <input
                       type="date"
                       name="DOB"
@@ -253,7 +255,7 @@ export default function Page() {
                   </div>
 
                   <div className="field">
-                    <label htmlFor="phone">Phone Number <span className="text-rose-500" style={{ color: "#dc2626" }}>*</span></label>
+                    <label htmlFor="phone">{t("lbl_phone")} <span className="text-rose-500" style={{ color: "#dc2626" }}>*</span></label>
                     <input
                       type="tel"
                       name="phone"
@@ -266,20 +268,20 @@ export default function Page() {
                   </div>
 
                   <div className="field">
-                    <label htmlFor="Address">Address <span className="text-rose-500" style={{ color: "#dc2626" }}>*</span></label>
+                    <label htmlFor="Address">{t("lbl_address")} <span className="text-rose-500" style={{ color: "#dc2626" }}>*</span></label>
                     <input
                       type="text"
                       name="Address"
                       id="Address"
                       required
-                      placeholder="City, State"
+                      placeholder="e.g. Bhopal, MP"
                       value={formData.Address}
                       onChange={handleChange}
                     />
                   </div>
                   <div className="field">
                     <label htmlFor="course">
-                      Course
+                      {t("lbl_course")}
                       <span
                         className="text-rose-500"
                         style={{ color: "#dc2626" }}
@@ -295,7 +297,7 @@ export default function Page() {
                       value={formData.course}
                       onChange={handleChange}
                     >
-                      <option value="">Select Course</option>
+                      <option value="">{t("opt_select_course")}</option>
                       <option value="COPA">COPA</option>
                       <option value="Electrician">Electrician</option>
                       <option value="Fitter">Fitter</option>
@@ -304,7 +306,7 @@ export default function Page() {
                   
                   <div className="field">
                     <label htmlFor="Qualification">
-                      Qualification
+                      {t("lbl_qualification")}
                       <span
                         className="text-rose-500"
                         style={{ color: "#dc2626" }}
@@ -320,7 +322,7 @@ export default function Page() {
                       value={formData.Qualification}
                       onChange={handleChange}
                     >
-                      <option value="">Select Qualification</option>
+                      <option value="">{t("opt_select_qual")}</option>
                       <option value="10th Pass">10th Pass</option>
                       <option value="12th Pass">12th Pass</option>
                     </select>
@@ -333,7 +335,7 @@ export default function Page() {
                   className="button button-primary"
                   style={{ width: "100%", marginTop: "1rem" }}
                 >
-                  {submitting ? "Registering..." : "Pay ₹2,000 & Register"}
+                  {submitting ? t("btn_registering") : t("btn_pay_register")}
                 </button>
               </form>
             </section>
@@ -341,28 +343,28 @@ export default function Page() {
             {/* Directory Section */}
             <section className="panel" style={{ display: "flex", flexDirection: "column" }}>
               <div className="section-title-row" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
-                <h2>Registered Students</h2>
+                <h2>{t("admissions_list_title")}</h2>
                 <button
                   onClick={fetchApplicants}
                   className="button button-secondary"
                   style={{ minHeight: "36px", padding: "0.5rem 1rem" }}
                 >
-                  Refresh
+                  {t("lbl_refresh")}
                 </button>
               </div>
               <p style={{ color: "var(--muted)", margin: "0 0 1.5rem" }}>
-                Real-time database sync directory
+                {t("admissions_list_subtitle")}
               </p>
 
               {/* List */}
               <div style={{ flex: 1, overflowY: "auto", maxHeight: "480px", display: "grid", gap: "0.75rem" }}>
                 {loading ? (
-                  <div style={{ textAlign: "center", padding: "2rem" }}>Loading directory...</div>
+                  <div style={{ textAlign: "center", padding: "2rem" }}>{t("lbl_loading_dir")}</div>
                 ) : applicants.length === 0 ? (
                   <div style={{ textAlign: "center", padding: "3rem 1rem" }}>
-                    <h3 style={{ margin: 0 }}>No Student Records Found</h3>
+                    <h3 style={{ margin: 0 }}>{t("lbl_no_records")}</h3>
                     <p style={{ color: "var(--muted)", marginTop: "0.5rem" }}>
-                      The database table is empty. Add a student using the form.
+                      {t("lbl_table_empty")}
                     </p>
                   </div>
                 ) : (
