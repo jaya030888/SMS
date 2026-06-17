@@ -53,28 +53,27 @@ export default function Page() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const storedId = localStorage.getItem("currentStudentId") || "1";
-      
-      Promise.all([
-        fetch("/api/applicants").then((res) => {
-          if (res.ok) return res.json();
-          throw new Error("Failed to fetch applicants");
-        }),
-        fetch("/api/course_fees").then((res) => {
-          if (res.ok) return res.json();
-          throw new Error("Failed to fetch course fees");
-        })
-      ])
-      .then(([applicants, feesData]) => {
+    fetch("/api/auth/session")
+      .then((res) => {
+        if (res.ok) return res.json();
+        throw new Error("No session");
+      })
+      .then((session) => {
+        const studentId = session.studentId;
+        return Promise.all([
+          fetch(`/api/applicants?id=${studentId}`).then((res) => {
+            if (res.ok) return res.json();
+            throw new Error("Failed to fetch applicant details");
+          }),
+          fetch("/api/course_fees").then((res) => {
+            if (res.ok) return res.json();
+            throw new Error("Failed to fetch course fees");
+          })
+        ]);
+      })
+      .then(([applicant, feesData]) => {
         setCourseFees(feesData);
-        const matched = applicants.find((a: any) => String(a.id) === String(storedId));
-        if (matched) {
-          setStudent(matched);
-        } else if (applicants.length > 0) {
-          // Fallback to first applicant in database if the stored ID wasn't found
-          setStudent(applicants[applicants.length - 1]);
-        }
+        setStudent(applicant);
       })
       .catch((err) => {
         console.error("Error fetching student details:", err);
@@ -82,7 +81,6 @@ export default function Page() {
       .finally(() => {
         setLoading(false);
       });
-    }
   }, []);
 
   const getSubjects = (courseName: string) => {

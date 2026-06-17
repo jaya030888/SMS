@@ -20,6 +20,7 @@ interface Applicants {
 export default function Page() {
   const { t } = useLanguage();
   const [applicants, setApplicants] = useState<Applicants[]>([]);
+  const [courses, setCourses] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = useState({
@@ -47,10 +48,23 @@ export default function Page() {
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
 
-  // Fetch students on mount
+  // Fetch students and courses on mount
   useEffect(() => {
     fetchApplicants();
+    fetchCourses();
   }, []);
+
+  async function fetchCourses() {
+    try {
+      const res = await fetch("/api/course_fees");
+      if (res.ok) {
+        const data = await res.json();
+        setCourses(data);
+      }
+    } catch (e) {
+      console.error("Failed to fetch courses:", e);
+    }
+  }
 
   async function fetchApplicants() {
     try {
@@ -298,9 +312,11 @@ export default function Page() {
                       onChange={handleChange}
                     >
                       <option value="">{t("opt_select_course")}</option>
-                      <option value="COPA">COPA</option>
-                      <option value="Electrician">Electrician</option>
-                      <option value="Fitter">Fitter</option>
+                      {courses.map((c) => (
+                        <option key={c.course} value={c.course}>
+                          {c.course}
+                        </option>
+                      ))}
                     </select>
                   </div>
                   

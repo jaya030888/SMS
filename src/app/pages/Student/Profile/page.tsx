@@ -37,29 +37,28 @@ export default function Page() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const storedId = localStorage.getItem("currentStudentId") || "1";
-
-      fetch("/api/applicants")
-        .then((res) => {
-          if (res.ok) return res.json();
-          throw new Error("Failed to fetch");
-        })
-        .then((applicants: StudentData[]) => {
-          const matched = applicants.find((a) => String(a.id) === String(storedId));
-          if (matched) {
-            setStudent(matched);
-          } else if (applicants.length > 0) {
-            setStudent(applicants[applicants.length - 1]);
-          }
-        })
-        .catch((err) => {
-          console.error("Error fetching student profile:", err);
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    }
+    fetch("/api/auth/session")
+      .then((res) => {
+        if (res.ok) return res.json();
+        throw new Error("No session");
+      })
+      .then((session) => {
+        const studentId = session.studentId;
+        return fetch(`/api/applicants?id=${studentId}`);
+      })
+      .then((res) => {
+        if (res.ok) return res.json();
+        throw new Error("Failed to fetch student profile");
+      })
+      .then((data: StudentData) => {
+        setStudent(data);
+      })
+      .catch((err) => {
+        console.error("Error fetching student profile:", err);
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }, []);
 
   const formatDate = (dateStr?: string) => {

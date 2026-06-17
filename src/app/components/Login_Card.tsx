@@ -77,41 +77,30 @@ const Login_Card = (props: LoginCardProps) => {
     setError("");
 
     try {
-      if (props.role === "Student") {
-        const res = await fetch("/api/applicants");
+      const loginRole = props.role === "Student" ? "student" : "admin";
+      const res = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          username: loginId,
+          password: password,
+          role: loginRole,
+        }),
+      });
 
-        if (!res.ok) {
-          throw new Error("Failed to fetch applicants");
-        }
-
-        const applicants = await res.json();
-
-        const applicant = applicants.find(
-          (a: { id: number }) => a.id === Number(loginId)
-        );
-
-        if (!applicant) {
-          setError(t("language") === "hi" ? "छात्र आईडी नहीं मिली" : "Student ID not found");
-          return;
-        }
-
-        if (password !== "10" + String(applicant.id)) {
-          setError(t("language") === "hi" ? "अमान्य पासवर्ड" : "Invalid Password");
-          return;
-        }
-
-        localStorage.setItem("currentStudentId", loginId);
-        localStorage.setItem("currentRole", "student");
-
-        router.push(props.dashboardPath);
-      } else {
-        if (loginId === "jayamyname19@gmail.com" && password === "12345") {
-          localStorage.setItem("currentRole", "admin");
-          router.push(props.dashboardPath);
-        } else {
-          setError(t("language") === "hi" ? "अमान्य एडमिन ईमेल या पासवर्ड" : "Invalid admin email or password");
-        }
+      if (!res.ok) {
+        const errData = await res.json();
+        setError(errData.error || (t("language") === "hi" ? "लॉगिन विफल रहा" : "Login failed"));
+        return;
       }
+
+      const data = await res.json();
+      localStorage.setItem("currentRole", data.role);
+      if (data.role === "student") {
+        localStorage.setItem("currentStudentId", String(data.studentId));
+      }
+
+      router.push(props.dashboardPath);
     } catch (err) {
       console.error(err);
       setError(t("language") === "hi" ? "एक त्रुटि हुई। कृपया पुन: प्रयास करें।" : "An error occurred. Please try again.");

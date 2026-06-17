@@ -92,10 +92,19 @@ const Page = () => {
   };
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const storedId = localStorage.getItem("currentStudentId") || "1";
-      loadFeeDetails(storedId);
-    }
+    fetch("/api/auth/session")
+      .then((res) => {
+        if (res.ok) return res.json();
+        throw new Error("No session");
+      })
+      .then((session) => {
+        const studentId = session.studentId;
+        loadFeeDetails(String(studentId));
+      })
+      .catch((err) => {
+        console.error("Session fetch failed on fee portal page:", err);
+        setLoading(false);
+      });
   }, []);
 
   const formatCurrency = (val: number) => {

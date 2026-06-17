@@ -14,7 +14,8 @@ import {
   FileText, 
   Home, 
   LogOut,
-  GraduationCap
+  GraduationCap,
+  BookOpen
 } from "lucide-react";
 
 type StuNavProps = {
@@ -67,6 +68,7 @@ const StuNav = (props: StuNavProps) => {
     ? [
         { name: "Dashboard", href: "/pages/Admin/DashBoard", icon: LayoutDashboard },
         { name: "Students", href: "/pages/Admin/Student", icon: Users },
+        { name: "Courses", href: "/pages/Admin/Courses", icon: BookOpen },
         { name: "Attendance", href: "/pages/Admin/Attendance", icon: CalendarCheck },
         { name: "Fee Management", href: "/pages/Admin/FeeDetails", icon: CreditCard },
         { name: "Admissions", href: "/pages/Home/Addmission_Application_Form", icon: FileText },
@@ -81,7 +83,7 @@ const StuNav = (props: StuNavProps) => {
   const sidebarItems = [
     ...navItems,
     { name: "Home", href: "/", icon: Home },
-    { name: "Logout", href: "/pages/Chose_Login", icon: LogOut },
+    { name: "Logout", href: "#", icon: LogOut },
   ];
 
   // Get user initials for avatar
@@ -92,6 +94,17 @@ const StuNav = (props: StuNavProps) => {
       .slice(0, 2)
       .join("")
       .toUpperCase();
+  };
+
+  const handleLogout = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } catch (err) {
+      console.error("Logout API failed:", err);
+    }
+    localStorage.clear();
+    window.location.href = "/pages/Chose_Login";
   };
 
   return (
@@ -152,6 +165,14 @@ const StuNav = (props: StuNavProps) => {
                   {role === "admin" ? "Admin Portal" : userName}
                 </span>
               </div>
+              <button 
+                onClick={handleLogout}
+                className="hidden md:flex h-9 w-9 items-center justify-center rounded-full bg-slate-50 hover:bg-red-50 text-slate-500 hover:text-red-600 border border-slate-200 transition-colors cursor-pointer"
+                title="Logout"
+                style={{ minHeight: "auto", padding: 0 }}
+              >
+                <LogOut size={15} />
+              </button>
             </div>
           </div>
         </div>
@@ -201,11 +222,15 @@ const StuNav = (props: StuNavProps) => {
               {sidebarItems.map((item) => {
                 const isActive = pathname === item.href;
                 const Icon = item.icon;
+                const isLogout = item.name === "Logout";
                 return (
                   <Link
-                    key={item.href}
+                    key={item.name}
                     href={item.href}
-                    onClick={() => setOpen(false)}
+                    onClick={(e) => {
+                      setOpen(false);
+                      if (isLogout) handleLogout(e);
+                    }}
                     className={`flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-bold transition-all duration-150 ${
                       isActive
                         ? "bg-primary/10 text-primary border-l-4 border-primary pl-2.5"

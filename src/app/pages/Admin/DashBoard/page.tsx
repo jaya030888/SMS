@@ -1,15 +1,27 @@
 "use client";
 
-import All from "@/src/app/components/All";
-import COPA from "@/src/app/components/COPA";
-import Electrician from "@/src/app/components/Electrician";
-import Fitter from "@/src/app/components/Fitter";
+import { useEffect, useState } from "react";
 import StuNav from "@/src/app/components/StuNav";
-import { useState } from "react";
+import CourseDashboard from "@/src/app/components/CourseDashboard";
 import { Filter } from "lucide-react";
 
-const Page = () => {
+export default function AdminDashboardPage() {
   const [course, setCourse] = useState("All");
+  const [courseTabs, setCourseTabs] = useState<string[]>(["All"]);
+
+  useEffect(() => {
+    // Fetch courses dynamically to populate filter buttons
+    fetch("/api/course_fees")
+      .then((res) => {
+        if (res.ok) return res.json();
+        return [];
+      })
+      .then((data) => {
+        const list = ["All", ...data.map((c: any) => c.course)];
+        setCourseTabs(list);
+      })
+      .catch((err) => console.error("Error loading dashboard tabs:", err));
+  }, []);
 
   return (
     <>
@@ -24,12 +36,12 @@ const Page = () => {
           </div>
 
           <div className="inline-flex flex-wrap gap-1.5 p-1 bg-slate-100/70 border border-slate-200/40 rounded-xl">
-            {["All", "Electrician", "COPA", "Fitter"].map((item) => (
+            {courseTabs.map((item) => (
               <button
                 key={item}
                 onClick={() => setCourse(item)}
                 className={`px-4 py-2 rounded-lg text-xs font-bold tracking-wide uppercase transition-all duration-150 cursor-pointer ${
-                  course === item 
+                  course.toLowerCase() === item.toLowerCase() 
                     ? "bg-white text-primary shadow-sm"
                     : "text-slate-500 hover:text-slate-800"
                 }`}
@@ -40,16 +52,11 @@ const Page = () => {
           </div>
         </section>
 
-        {/* Dynamic Course-Specific Dashboard Content */}
+        {/* Dynamic Consolidated Dashboard Content */}
         <section className="space-y-8">
-          {course === "All" && <All />}
-          {course === "Electrician" && <Electrician />}
-          {course === "COPA" && <COPA />}
-          {course === "Fitter" && <Fitter />}
+          <CourseDashboard courseName={course} />
         </section>
       </main>
     </>
   );
-};
-
-export default Page;
+}
