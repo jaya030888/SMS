@@ -10,7 +10,7 @@ async function ensureAttendanceTable() {
       status VARCHAR(10) NOT NULL, -- 'Present' or 'Absent'
       date DATE NOT NULL,
       remarks VARCHAR(255) NULL,
-      FOREIGN KEY (student_id) REFERENCES Applicants(id) ON DELETE CASCADE,
+      FOREIGN KEY (student_id) REFERENCES applicants(id) ON DELETE CASCADE,
       UNIQUE KEY uniq_student_date (student_id, date)
     )
   `);
@@ -52,7 +52,7 @@ export async function GET(req: Request) {
     if (date && course) {
       // Get all students enrolled in the course
       const [students]: any = await db.query(
-        "SELECT id, name FROM Applicants WHERE LOWER(course) = LOWER(?) ORDER BY name ASC",
+        "SELECT id, name FROM applicants WHERE LOWER(course) = LOWER(?) ORDER BY name ASC",
         [course]
       );
 

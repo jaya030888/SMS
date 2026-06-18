@@ -15,7 +15,7 @@ export async function GET() {
         a.id,
         COALESCE(cf.total_fee, 15000) AS total_fee,
         COALESCE(SUM(p.amount), 0) AS total_paid
-      FROM Applicants a
+      FROM applicants a
       LEFT JOIN payments p ON a.id = p.student_id AND p.payment_status = 'Success'
       LEFT JOIN course_fees cf ON LOWER(a.course) = LOWER(cf.course)
       GROUP BY a.id, cf.total_fee
@@ -53,7 +53,7 @@ export async function GET() {
         a.name AS student_name,
         a.course AS student_course
       FROM payments p
-      JOIN Applicants a ON p.student_id = a.id
+      JOIN applicants a ON p.student_id = a.id
       ORDER BY p.payment_date DESC
       LIMIT 100
     `);
