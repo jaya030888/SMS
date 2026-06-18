@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import Login_Card from "../../components/Chose_Login_Card";
 import { GraduationCap } from "lucide-react";
 import { useLanguage } from "../../context/LanguageContext";
@@ -40,6 +41,16 @@ const Page = () => {
             para={t("login_admin_desc")}
             to="/pages/Login_Page/Admin_Login"
           />
+        </div>
+
+        {/* Back to Homepage Link */}
+        <div className="text-center mt-8">
+          <Link 
+            href="/" 
+            className="inline-flex items-center gap-2 text-sm font-bold text-primary hover:text-primary-dark hover:underline transition-colors"
+          >
+            &larr; {t("login_btn_home")}
+          </Link>
         </div>
       </div>
     </main>

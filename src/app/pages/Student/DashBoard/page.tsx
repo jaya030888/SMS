@@ -33,6 +33,7 @@ interface StudentData {
   Qualification: string;
   amount_paid?: number;
   payment_status?: string;
+  profile_photo?: string;
 }
 
 const defaultStudent: StudentData = {
@@ -151,14 +152,22 @@ export default function Page() {
       <StuNav name="Dashboard" />
 
       <main className="dashboard-page">
-        <section className="dashboard-hero">
-          <div className="course-badge">
-            <GraduationCap size={22} className="text-primary" />
-          </div>
+        <section className="dashboard-hero" style={{ display: "flex", alignItems: "center", gap: "1.5rem", flexWrap: "wrap" }}>
+          {student.profile_photo ? (
+            <img
+              src={student.profile_photo}
+              alt={student.name}
+              style={{ width: "64px", height: "64px", borderRadius: "50%", objectFit: "cover", border: "2.5px solid rgba(255,255,255,0.25)" }}
+            />
+          ) : (
+            <div className="course-badge" style={{ display: "grid", placeItems: "center", width: "64px", height: "64px", borderRadius: "50%", background: "rgba(255,255,255,0.12)", color: "#fff", padding: 0 }}>
+              <User size={30} />
+            </div>
+          )}
           <div>
-            <p className="eyebrow" style={{ color: "rgba(255, 255, 255, 0.78)" }}>Your enrolled course</p>
-            <h2 style={{ color: "white" }}>{student.course}</h2>
-            <p style={{ color: "rgba(255, 255, 255, 0.78)" }}>Track subjects, attendance, fees, and institute updates from one place.</p>
+            <p className="eyebrow" style={{ color: "rgba(255, 255, 255, 0.78)", margin: 0 }}>Welcome back,</p>
+            <h2 style={{ color: "white", fontSize: "1.85rem", margin: "0.15rem 0", fontWeight: 800 }}>{student.name}</h2>
+            <p style={{ color: "rgba(255, 255, 255, 0.78)", margin: 0, fontSize: "0.9rem" }}>Track subjects, attendance, fees, and institute updates from one place.</p>
           </div>
         </section>
 

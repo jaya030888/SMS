@@ -57,12 +57,36 @@ async function main() {
     console.log("Course fees seeded successfully.");
 
     // 3. Ensure applicants table has proper column sizes and keys
+    console.log("Checking/creating 'applicants' table...");
+    await connection.query(`
+      CREATE TABLE IF NOT EXISTS applicants (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(100) NOT NULL,
+        fatherName VARCHAR(100) NOT NULL,
+        email VARCHAR(100) NOT NULL,
+        DOB DATE NOT NULL,
+        phone VARCHAR(15) NOT NULL,
+        Address TEXT NOT NULL,
+        course VARCHAR(50) NULL,
+        Qualification VARCHAR(50) NOT NULL,
+        Enrollment_Date DATE DEFAULT (CURRENT_DATE)
+      )
+    `);
+
     console.log("Adjusting 'applicants' table columns...");
     await connection.query("ALTER TABLE applicants MODIFY COLUMN name VARCHAR(100) NOT NULL");
     await connection.query("ALTER TABLE applicants MODIFY COLUMN fatherName VARCHAR(100) NOT NULL");
     await connection.query("ALTER TABLE applicants MODIFY COLUMN email VARCHAR(100) NOT NULL");
     await connection.query("ALTER TABLE applicants MODIFY COLUMN phone VARCHAR(15) NOT NULL");
     await connection.query("ALTER TABLE applicants MODIFY COLUMN course VARCHAR(50) NULL");
+
+    // Add profile_photo column if it does not exist
+    try {
+      await connection.query("ALTER TABLE applicants ADD COLUMN profile_photo LONGTEXT NULL");
+      console.log("Column 'profile_photo' verified/added.");
+    } catch (e) {
+      // Column already exists
+    }
 
     // Add unique index on email if not exists
     try {

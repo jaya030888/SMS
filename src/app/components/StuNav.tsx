@@ -15,7 +15,8 @@ import {
   Home, 
   LogOut,
   GraduationCap,
-  BookOpen
+  BookOpen,
+  ClipboardList
 } from "lucide-react";
 
 type StuNavProps = {
@@ -71,6 +72,7 @@ const StuNav = (props: StuNavProps) => {
         { name: "Courses", href: "/pages/Admin/Courses", icon: BookOpen },
         { name: "Attendance", href: "/pages/Admin/Attendance", icon: CalendarCheck },
         { name: "Fee Management", href: "/pages/Admin/FeeDetails", icon: CreditCard },
+        { name: "Reports", href: "/pages/Admin/Reports", icon: ClipboardList },
         { name: "Admissions", href: "/pages/Home/Addmission_Application_Form", icon: FileText },
       ]
     : [
@@ -123,14 +125,14 @@ const StuNav = (props: StuNavProps) => {
                 <Menu size={20} />
               </button>
 
-              <div className="flex items-center gap-2">
+              <Link href="/" className="flex items-center gap-2 hover:opacity-85 transition-opacity">
                 <span className="hidden sm:flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-white shadow-sm shadow-primary/20">
                   <GraduationCap size={20} />
                 </span>
                 <h1 className="text-lg font-bold text-slate-800 tracking-tight sm:text-xl">
                   {props.name}
                 </h1>
-              </div>
+              </Link>
             </div>
 
             {/* Middle side: Desktop Nav Links */}
@@ -165,6 +167,14 @@ const StuNav = (props: StuNavProps) => {
                   {role === "admin" ? "Admin Portal" : userName}
                 </span>
               </div>
+              <Link 
+                href="/"
+                className="hidden md:flex h-9 w-9 items-center justify-center rounded-full bg-slate-50 hover:bg-slate-100 text-slate-500 hover:text-primary border border-slate-200 transition-colors"
+                title="Go to Homepage"
+                style={{ minHeight: "auto" }}
+              >
+                <Home size={15} />
+              </Link>
               <button 
                 onClick={handleLogout}
                 className="hidden md:flex h-9 w-9 items-center justify-center rounded-full bg-slate-50 hover:bg-red-50 text-slate-500 hover:text-red-600 border border-slate-200 transition-colors cursor-pointer"

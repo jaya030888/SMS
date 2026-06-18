@@ -19,9 +19,7 @@ interface Applicants {
 
 export default function Page() {
   const { t } = useLanguage();
-  const [applicants, setApplicants] = useState<Applicants[]>([]);
   const [courses, setCourses] = useState<any[]>([]);
-  const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
@@ -48,9 +46,8 @@ export default function Page() {
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
 
-  // Fetch students and courses on mount
+  // Fetch courses on mount
   useEffect(() => {
-    fetchApplicants();
     fetchCourses();
   }, []);
 
@@ -63,23 +60,6 @@ export default function Page() {
       }
     } catch (e) {
       console.error("Failed to fetch courses:", e);
-    }
-  }
-
-  async function fetchApplicants() {
-    try {
-      setLoading(true);
-      const res = await fetch("/api/applicants");
-      if (res.ok) {
-        const data = await res.json();
-        setApplicants(data);
-      } else {
-        console.error("Failed to fetch students");
-      }
-    } catch (err) {
-      console.error("Error fetching students:", err);
-    } finally {
-      setLoading(false);
     }
   }
 
@@ -158,9 +138,6 @@ export default function Page() {
           course: "",
           Qualification: "",
         });
-
-        // Refresh the list
-        fetchApplicants();
       } else {
         showNotification("error", data.error || "Failed to save student details.");
       }
@@ -206,7 +183,7 @@ export default function Page() {
             </div>
           )}
 
-          <div className="dashboard-grid two">
+          <div style={{ maxWidth: "680px", margin: "0 auto" }}>
             {/* Form Section */}
             <section className="panel">
               <div className="section-heading compact">
@@ -354,55 +331,6 @@ export default function Page() {
                   {submitting ? t("btn_registering") : t("btn_pay_register")}
                 </button>
               </form>
-            </section>
-
-            {/* Directory Section */}
-            <section className="panel" style={{ display: "flex", flexDirection: "column" }}>
-              <div className="section-title-row" style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "1rem" }}>
-                <h2>{t("admissions_list_title")}</h2>
-                <button
-                  onClick={fetchApplicants}
-                  className="button button-secondary"
-                  style={{ minHeight: "36px", padding: "0.5rem 1rem" }}
-                >
-                  {t("lbl_refresh")}
-                </button>
-              </div>
-              <p style={{ color: "var(--muted)", margin: "0 0 1.5rem" }}>
-                {t("admissions_list_subtitle")}
-              </p>
-
-              {/* List */}
-              <div style={{ flex: 1, overflowY: "auto", maxHeight: "480px", display: "grid", gap: "0.75rem" }}>
-                {loading ? (
-                  <div style={{ textAlign: "center", padding: "2rem" }}>{t("lbl_loading_dir")}</div>
-                ) : applicants.length === 0 ? (
-                  <div style={{ textAlign: "center", padding: "3rem 1rem" }}>
-                    <h3 style={{ margin: 0 }}>{t("lbl_no_records")}</h3>
-                    <p style={{ color: "var(--muted)", marginTop: "0.5rem" }}>
-                      {t("lbl_table_empty")}
-                    </p>
-                  </div>
-                ) : (
-                  applicants.map((applicant) => (
-                    <div
-                      key={applicant.id}
-                      className="application-row"
-                      style={{ padding: "0.95rem 1rem" }}
-                    >
-                      <div>
-                        <p style={{ margin: 0, fontWeight: 800 }}>{applicant.name}</p>
-                        <span style={{ color: "var(--muted)", fontSize: "0.82rem" }}>
-                          {applicant.course} | {applicant.email}
-                        </span>
-                      </div>
-                      <span className="status-pill paid" style={{ flexShrink: 0 }}>
-                        ID: #{applicant.id}
-                      </span>
-                    </div>
-                  ))
-                )}
-              </div>
             </section>
           </div>
         </div>

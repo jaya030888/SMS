@@ -45,11 +45,12 @@ const Page = () => {
   const [filterCourse, setFilterCourse] = useState("All");
   const [filterStatus, setFilterStatus] = useState("All");
 
-  // Offline Payment Form States
+  // Payment Form States
   const [showOfflineModal, setShowOfflineModal] = useState(false);
   const [selectedStudentId, setSelectedStudentId] = useState<number | "">("");
   const [paymentAmount, setPaymentAmount] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("Cash"); // Cash, Cheque, Bank Transfer
+  const [paymentMode, setPaymentMode] = useState<"Online" | "Offline">("Offline");
+  const [paymentMethod, setPaymentMethod] = useState("Cash"); // Offline: Cash, Cheque, Bank Transfer | Online: UPI, Card, NetBanking
   const [paymentRemarks, setPaymentRemarks] = useState("");
   const [formSubmitting, setFormSubmitting] = useState(false);
 
@@ -91,8 +92,8 @@ const Page = () => {
     }).format(val);
   };
 
-  // Handle Offline Payment Submission
-  const handleRecordOfflinePayment = async (e: React.FormEvent) => {
+  // Handle Admin Payment Submission (Support both Online/Offline)
+  const handleRecordPayment = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedStudentId || !paymentAmount) {
       alert("Please select a student and enter the payment amount.");
@@ -108,16 +109,19 @@ const Page = () => {
     setFormSubmitting(true);
 
     try {
-      const generatedTxn = `TXN-OFF-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
+      const isOnline = paymentMode === "Online";
+      const generatedTxn = isOnline
+        ? `TXN-ON-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`
+        : `TXN-OFF-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
       
       const payload = {
         student_id: Number(selectedStudentId),
         amount: Number(paymentAmount),
         payment_method: paymentMethod,
         transaction_id: generatedTxn,
-        payment_mode: "Offline",
-        payment_status: "Success",
-        remarks: paymentRemarks || "Offline payment recorded by admin"
+        payment_mode: paymentMode,
+        payment_status: "Success", // Admin-logged payments are immediately success
+        remarks: paymentRemarks || `${paymentMode} payment recorded by admin`
       };
 
       const res = await fetch("/api/payments", {
@@ -127,7 +131,7 @@ const Page = () => {
       });
 
       if (res.ok) {
-        alert("Offline payment recorded successfully!");
+        alert("Payment recorded successfully!");
         setShowOfflineModal(false);
         setSelectedStudentId("");
         setPaymentAmount("");
@@ -143,6 +147,63 @@ const Page = () => {
       alert("An unexpected error occurred.");
     } finally {
       setFormSubmitting(false);
+    }
+  };
+
+  // Approve a pending transaction
+  const handleApprovePayment = async (paymentId: number) => {
+    if (!confirm("Are you sure you want to approve this payment transaction? This will clear the student's dues accordingly.")) {
+      return;
+    }
+
+    try {
+      const res = await fetch("/api/payments", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          id: paymentId,
+          payment_status: "Success"
+        })
+      });
+
+      if (res.ok) {
+        alert("Payment approved successfully!");
+        fetchData();
+      } else {
+        const err = await res.json();
+        alert(`Approval failed: ${err.error || 'Server error'}`);
+      }
+    } catch (err) {
+      console.error("Approve payment error:", err);
+      alert("An unexpected error occurred.");
+    }
+  };
+
+  // Reject/Delete a payment transaction
+  const handleRejectOrDeletePayment = async (paymentId: number, isPending: boolean) => {
+    const message = isPending
+      ? "Are you sure you want to reject this pending payment? This will delete the request."
+      : "Are you sure you want to refund/delete this successful transaction? This will re-add outstanding dues to the student.";
+      
+    if (!confirm(message)) {
+      return;
+    }
+
+    try {
+      const res = await fetch(`/api/payments?id=${paymentId}`, {
+        method: "DELETE"
+      });
+
+      if (res.ok) {
+        alert(isPending ? "Pending payment rejected." : "Transaction deleted successfully.");
+        fetchData();
+      } else {
+        const err = await res.json();
+        alert(`Deletion failed: ${err.error || 'Server error'}`);
+      }
+    } catch (err) {
+      console.error("Delete payment error:", err);
+      alert("An unexpected error occurred.");
     }
   };
 
@@ -534,7 +595,8 @@ const Page = () => {
                     <th style={{ padding: "1rem", fontSize: "0.85rem", fontWeight: 700 }}>Txn ID</th>
                     <th style={{ padding: "1rem", fontSize: "0.85rem", fontWeight: 700 }}>Mode (Method)</th>
                     <th style={{ padding: "1rem", fontSize: "0.85rem", fontWeight: 700 }}>Amount</th>
-                    <th style={{ padding: "1rem", fontSize: "0.85rem", fontWeight: 700, textAlign: "center" }}>Receipt</th>
+                    <th style={{ padding: "1rem", fontSize: "0.85rem", fontWeight: 700 }}>Status</th>
+                    <th style={{ padding: "1rem", fontSize: "0.85rem", fontWeight: 700, textAlign: "center" }}>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -554,14 +616,48 @@ const Page = () => {
                           <strong>{p.payment_mode}</strong> ({p.payment_method})
                         </td>
                         <td style={{ padding: "1rem", fontWeight: 700, color: "var(--primary)" }}>{formatCurrency(p.amount)}</td>
+                        <td style={{ padding: "1rem" }}>
+                          <span className={`status-pill ${p.payment_status.toLowerCase() === 'success' ? 'paid' : p.payment_status.toLowerCase() === 'pending' ? 'pending' : 'failed'}`}>
+                            {p.payment_status}
+                          </span>
+                        </td>
                         <td style={{ padding: "1rem", textAlign: "center" }}>
-                          <button 
-                            onClick={() => handlePrintReceipt(p)}
-                            className="button button-secondary"
-                            style={{ minHeight: "32px", padding: "0.35rem 0.75rem", borderRadius: "6px", fontSize: "0.8rem", gap: "0.35rem" }}
-                          >
-                            <Printer size={12} /> Receipt
-                          </button>
+                          <div style={{ display: "flex", justifyContent: "center", gap: "0.5rem", flexWrap: "wrap" }}>
+                            <button 
+                              onClick={() => handlePrintReceipt(p)}
+                              className="button button-secondary"
+                              style={{ minHeight: "32px", padding: "0.35rem 0.75rem", borderRadius: "6px", fontSize: "0.8rem", gap: "0.35rem" }}
+                            >
+                              <Printer size={12} /> Receipt
+                            </button>
+                            {p.payment_status === "Pending" ? (
+                              <>
+                                <button 
+                                  onClick={() => handleApprovePayment(p.id)}
+                                  className="button button-primary"
+                                  style={{ minHeight: "32px", padding: "0.35rem 0.75rem", borderRadius: "6px", fontSize: "0.8rem", background: "var(--success)", borderColor: "var(--success)" }}
+                                >
+                                  Approve
+                                </button>
+                                <button 
+                                  onClick={() => handleRejectOrDeletePayment(p.id, true)}
+                                  className="button button-secondary"
+                                  style={{ minHeight: "32px", padding: "0.35rem 0.75rem", borderRadius: "6px", fontSize: "0.8rem", color: "var(--danger)", borderColor: "var(--danger)" }}
+                                >
+                                  Reject
+                                </button>
+                              </>
+                            ) : (
+                              <button 
+                                onClick={() => handleRejectOrDeletePayment(p.id, false)}
+                                className="button button-secondary"
+                                style={{ minHeight: "32px", padding: "0.35rem 0.75rem", borderRadius: "6px", fontSize: "0.8rem", color: "var(--danger)", borderColor: "var(--danger)" }}
+                                title="Refund / Delete transaction"
+                              >
+                                <Trash2 size={12} /> Delete
+                              </button>
+                            )}
+                          </div>
                         </td>
                       </tr>
                     );
@@ -573,7 +669,7 @@ const Page = () => {
         </section>
       </main>
 
-      {/* Record Offline Payment Modal */}
+      {/* Record Payment Modal */}
       {showOfflineModal && (
         <div style={{
           position: "fixed",
@@ -594,13 +690,15 @@ const Page = () => {
             boxShadow: "var(--shadow-hard)",
             padding: "2rem",
             position: "relative",
-            border: "1px solid var(--border)"
+            border: "1px solid var(--border)",
+            color: "var(--ink)"
           }}>
             <button 
               onClick={() => {
                 setShowOfflineModal(false);
                 setSelectedStudentId("");
                 setPaymentAmount("");
+                setPaymentRemarks("");
               }}
               className="icon-button"
               style={{ position: "absolute", top: "1rem", right: "1rem", minHeight: "32px", width: "32px", borderRadius: "50%", padding: 0 }}
@@ -610,11 +708,11 @@ const Page = () => {
               <X size={16} />
             </button>
 
-            <form onSubmit={handleRecordOfflinePayment}>
+            <form onSubmit={handleRecordPayment}>
               <h3 style={{ color: "var(--primary)", fontSize: "1.35rem", fontWeight: 700, margin: "0 0 0.25rem", display: "flex", alignItems: "center", gap: "0.5rem" }}>
-                <Landmark size={22} /> Record Offline Payment
+                <Landmark size={22} /> Record Student Payment
               </h3>
-              <p style={{ color: "var(--muted)", fontSize: "0.88rem", margin: "0 0 1.5rem" }}>Record a manual cash, cheque, or bank draft payment paid by a student.</p>
+              <p style={{ color: "var(--muted)", fontSize: "0.88rem", margin: "0 0 1.5rem" }}>Record a manual online or offline payment collection from a student.</p>
 
               <div style={{ display: "grid", gap: "1rem" }}>
                 <div className="field">
@@ -660,12 +758,41 @@ const Page = () => {
                 </div>
 
                 <div className="field">
+                  <label>Select Payment Mode *</label>
+                  <div className="segment-control" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", padding: "0.25rem", width: "100%", marginBottom: "0.25rem" }}>
+                    {(["Online", "Offline"] as const).map((mode) => (
+                      <button
+                        type="button"
+                        key={mode}
+                        className={paymentMode === mode ? "active" : ""}
+                        onClick={() => {
+                          setPaymentMode(mode);
+                          setPaymentMethod(mode === "Online" ? "UPI" : "Cash");
+                        }}
+                        style={{ minHeight: "36px", padding: 0, fontSize: "0.88rem" }}
+                      >
+                        {mode}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="field">
                   <label>Payment Method *</label>
                   <select value={paymentMethod} onChange={(e) => setPaymentMethod(e.target.value)}>
-                    <option value="Cash">Cash</option>
-                    <option value="Cheque">Cheque / Demand Draft</option>
-                    <option value="Bank Transfer">Direct Bank Transfer (IMPS/NEFT)</option>
-                    <option value="UPI">UPI Desk QR</option>
+                    {paymentMode === "Online" ? (
+                      <>
+                        <option value="UPI">UPI Desk QR</option>
+                        <option value="Card">Credit/Debit Card</option>
+                        <option value="NetBanking">NetBanking / Gateway</option>
+                      </>
+                    ) : (
+                      <>
+                        <option value="Cash">Cash</option>
+                        <option value="Cheque">Cheque / Demand Draft</option>
+                        <option value="Bank Transfer">Direct Bank Transfer (IMPS/NEFT)</option>
+                      </>
+                    )}
                   </select>
                 </div>
 
@@ -675,7 +802,7 @@ const Page = () => {
                     type="text"
                     value={paymentRemarks}
                     onChange={(e) => setPaymentRemarks(e.target.value)}
-                    placeholder="e.g. Cleared semester dues in cash"
+                    placeholder="e.g. Cleared semester dues"
                   />
                 </div>
               </div>

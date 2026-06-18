@@ -35,6 +35,7 @@ interface StudentData {
   amount_paid?: number;
   remaining_balance?: number;
   Enrollment_Date?: string;
+  profile_photo?: string;
 }
 
 export default function StudentManagementPage() {
@@ -64,6 +65,7 @@ export default function StudentManagementPage() {
   const [address, setAddress] = useState("");
   const [course, setCourse] = useState("");
   const [qualification, setQualification] = useState("");
+  const [profilePhoto, setProfilePhoto] = useState("");
 
   const fetchData = async () => {
     try {
@@ -105,7 +107,23 @@ export default function StudentManagementPage() {
     setAddress("");
     setCourse("");
     setQualification("");
+    setProfilePhoto("");
     setSelectedStudent(null);
+  };
+
+  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 1.5 * 1024 * 1024) {
+        alert("Image size must be less than 1.5MB for server constraints.");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setProfilePhoto(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleAddStudent = async (e: React.FormEvent) => {
@@ -129,6 +147,7 @@ export default function StudentManagementPage() {
           course,
           Qualification: qualification,
           amount_paid: 2000, // standard admission registration fee
+          profile_photo: profilePhoto,
         }),
       });
 
@@ -164,6 +183,7 @@ export default function StudentManagementPage() {
     setAddress(student.Address);
     setCourse(student.course);
     setQualification(student.Qualification);
+    setProfilePhoto(student.profile_photo || "");
     setShowEditModal(true);
   };
 
@@ -185,6 +205,7 @@ export default function StudentManagementPage() {
           Address: address.trim(),
           course,
           Qualification: qualification,
+          profile_photo: profilePhoto,
         }),
       });
 
@@ -482,9 +503,17 @@ export default function StudentManagementPage() {
             <div className="space-y-6">
               {/* Main Info */}
               <div className="bg-slate-50 rounded-xl p-4 flex gap-4 items-center border border-slate-150">
-                <div className="h-12 w-12 rounded-full bg-primary text-white flex items-center justify-center text-lg font-black">
-                  {selectedStudent.name[0]}
-                </div>
+                {selectedStudent.profile_photo ? (
+                  <img 
+                    src={selectedStudent.profile_photo} 
+                    alt={selectedStudent.name} 
+                    className="h-16 w-16 rounded-full object-cover border border-slate-200 shadow-sm"
+                  />
+                ) : (
+                  <div className="h-16 w-16 rounded-full bg-primary text-white flex items-center justify-center text-lg font-black shadow-sm shadow-primary/20">
+                    {selectedStudent.name[0]}
+                  </div>
+                )}
                 <div>
                   <h4 className="text-base font-extrabold text-slate-850 tracking-tight">{selectedStudent.name}</h4>
                   <p className="text-xs text-slate-400 font-bold uppercase tracking-wider mt-0.5">ID: #{selectedStudent.id} • Enrolled in {selectedStudent.course}</p>
@@ -605,6 +634,41 @@ export default function StudentManagementPage() {
               <p className="text-xs text-slate-500 mb-6 font-semibold">Submit basic details. Credential username/password will auto-generate.</p>
 
               <div className="space-y-4">
+                {/* Profile Photo Selector */}
+                <div className="flex flex-col gap-1 mb-2">
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-500">Profile Photo</label>
+                  <div className="flex items-center gap-3 mt-1">
+                    {profilePhoto ? (
+                      <div className="relative">
+                        <img 
+                          src={profilePhoto} 
+                          alt="Preview" 
+                          className="h-16 w-16 rounded-full object-cover border border-slate-200"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setProfilePhoto("")}
+                          className="absolute -top-1 -right-1 bg-red-100 text-red-600 rounded-full p-0.5 border border-red-200 hover:bg-red-200 flex items-center justify-center"
+                          style={{ width: "16px", height: "16px" }}
+                          title="Remove photo"
+                        >
+                          <X size={10} />
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="h-16 w-16 rounded-full bg-slate-100 border border-slate-200 border-dashed flex items-center justify-center text-[10px] text-slate-450 font-bold">
+                        NO PHOTO
+                      </div>
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handlePhotoChange}
+                      className="block w-full text-xs text-slate-500 file:mr-4 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-primary/10 file:text-primary file:cursor-pointer hover:file:bg-primary/20"
+                    />
+                  </div>
+                </div>
+
                 <div className="grid grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1">
                     <label className="text-xs font-bold uppercase tracking-wider text-slate-500">Student Name *</label>
@@ -746,6 +810,41 @@ export default function StudentManagementPage() {
               <p className="text-xs text-slate-500 mb-6 font-semibold">Modify student profile information (ID: #{selectedStudent?.id}).</p>
 
               <div className="space-y-4">
+                {/* Profile Photo Selector */}
+                <div className="flex flex-col gap-1 mb-2">
+                  <label className="text-xs font-bold uppercase tracking-wider text-slate-500">Profile Photo</label>
+                  <div className="flex items-center gap-3 mt-1">
+                    {profilePhoto ? (
+                      <div className="relative">
+                        <img 
+                          src={profilePhoto} 
+                          alt="Preview" 
+                          className="h-16 w-16 rounded-full object-cover border border-slate-200"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setProfilePhoto("")}
+                          className="absolute -top-1 -right-1 bg-red-100 text-red-600 rounded-full p-0.5 border border-red-200 hover:bg-red-200 flex items-center justify-center"
+                          style={{ width: "16px", height: "16px" }}
+                          title="Remove photo"
+                        >
+                          <X size={10} />
+                        </button>
+                      </div>
+                    ) : (
+                      <div className="h-16 w-16 rounded-full bg-slate-100 border border-slate-200 border-dashed flex items-center justify-center text-[10px] text-slate-450 font-bold">
+                        NO PHOTO
+                      </div>
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handlePhotoChange}
+                      className="block w-full text-xs text-slate-500 file:mr-4 file:py-1.5 file:px-3 file:rounded-xl file:border-0 file:text-xs file:font-bold file:bg-primary/10 file:text-primary file:cursor-pointer hover:file:bg-primary/20"
+                    />
+                  </div>
+                </div>
+
                 <div className="grid grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1">
                     <label className="text-xs font-bold uppercase tracking-wider text-slate-500">Student Name *</label>

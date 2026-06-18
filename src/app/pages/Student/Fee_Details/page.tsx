@@ -46,16 +46,20 @@ const Page = () => {
   // Payment portal modal states
   const [showPayModal, setShowPayModal] = useState(false);
   const [payAmount, setPayAmount] = useState("");
-  const [payMethod, setPayMethod] = useState("UPI"); // UPI, Card, NetBanking
+  const [payMode, setPayMode] = useState<"Online" | "Offline">("Online");
+  const [payMethod, setPayMethod] = useState("UPI"); // Online: UPI, Card, NetBanking | Offline: Cash, Cheque, Bank Transfer
   const [payRemarks, setPayRemarks] = useState("");
-  const [paymentStep, setPaymentStep] = useState(1); // 1: Setup, 2: Gateway Details, 3: Processing, 4: Success
+  const [paymentStep, setPaymentStep] = useState(1); // 1: Setup, 2: Gateway/Instructions Details, 3: Processing, 4: Success
 
-  // Gateway Simulation Fields
+  // Gateway / Offline Fields
   const [upiId, setUpiId] = useState("");
   const [cardNumber, setCardNumber] = useState("");
   const [cardExpiry, setCardExpiry] = useState("");
   const [cardCvv, setCardCvv] = useState("");
   const [selectedBank, setSelectedBank] = useState("SBI");
+  const [chequeNo, setChequeNo] = useState("");
+  const [draweeBank, setDraweeBank] = useState("");
+  const [utrRef, setUtrRef] = useState("");
   const [simulatedTxnId, setSimulatedTxnId] = useState("");
 
   const loadFeeDetails = (storedId: string) => {
@@ -244,6 +248,11 @@ const Page = () => {
     if (!student) return;
     setPayAmount(String(student.remaining_balance));
     setPayRemarks("Installment payment");
+    setPayMode("Online");
+    setPayMethod("UPI");
+    setChequeNo("");
+    setDraweeBank("");
+    setUtrRef("");
     setPaymentStep(1);
     setShowPayModal(true);
   };
@@ -273,24 +282,59 @@ const Page = () => {
   const handleSimulatePayment = async () => {
     if (!student) return;
     
+    // Validations based on mode and method
+    if (payMode === "Offline") {
+      if (payMethod === "Cheque" && (!chequeNo.trim() || !draweeBank.trim())) {
+        alert("Please enter both Cheque Number and Drawee Bank.");
+        return;
+      }
+      if (payMethod === "Bank Transfer" && !utrRef.trim()) {
+        alert("Please enter the Bank Transfer UTR / Transaction Reference Number.");
+        return;
+      }
+    } else {
+      if (payMethod === "UPI" && !upiId.trim()) {
+        alert("Please enter your UPI ID.");
+        return;
+      }
+      if (payMethod === "Card" && (!cardNumber.trim() || !cardExpiry.trim() || !cardCvv.trim())) {
+        alert("Please enter all Credit/Debit Card details.");
+        return;
+      }
+    }
+
     // Move to step 3 (loader animation)
     setPaymentStep(3);
     
-    const generatedTxn = `TXN-ON-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
+    const isOnline = payMode === "Online";
+    const generatedTxn = isOnline
+      ? `TXN-ON-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`
+      : `TXN-OFF-${Date.now()}-${Math.floor(1000 + Math.random() * 9000)}`;
     setSimulatedTxnId(generatedTxn);
 
     try {
       // Delay to simulate validation & bank processing (1.8s)
       await new Promise(resolve => setTimeout(resolve, 1800));
 
+      let finalRemarks = payRemarks;
+      if (payMode === "Offline") {
+        if (payMethod === "Cheque") {
+          finalRemarks = `Cheque No: ${chequeNo} | Bank: ${draweeBank} (${payRemarks || 'Installment'})`;
+        } else if (payMethod === "Bank Transfer") {
+          finalRemarks = `Bank Transfer UTR: ${utrRef} (${payRemarks || 'Installment'})`;
+        } else {
+          finalRemarks = `Cash payment counter declaration (${payRemarks || 'Installment'})`;
+        }
+      }
+
       const payload = {
         student_id: student.id,
         amount: Number(payAmount),
         payment_method: payMethod,
         transaction_id: generatedTxn,
-        payment_mode: "Online",
-        payment_status: "Success",
-        remarks: payRemarks || "Online fee portal payment"
+        payment_mode: payMode,
+        payment_status: isOnline ? "Success" : "Pending",
+        remarks: finalRemarks || `${payMode} fee portal payment`
       };
 
       const res = await fetch("/api/payments", {
@@ -535,7 +579,7 @@ const Page = () => {
         </section>
       </main>
 
-      {/* Simulated Online Payment Modal Gate */}
+      {/* Simulated Online/Offline Payment Modal Gate */}
       {showPayModal && (
         <div style={{
           position: "fixed",
@@ -556,7 +600,8 @@ const Page = () => {
             boxShadow: "var(--shadow-hard)",
             padding: "2rem",
             position: "relative",
-            border: "1px solid var(--border)"
+            border: "1px solid var(--border)",
+            color: "var(--ink)"
           }}>
             {/* Close button (only visible during setup/success, not loader) */}
             {paymentStep !== 3 && (
@@ -574,7 +619,7 @@ const Page = () => {
             {paymentStep === 1 && (
               <form onSubmit={handleProceedToGateway}>
                 <h3 style={{ color: "var(--primary)", fontSize: "1.35rem", fontWeight: 700, margin: "0 0 0.25rem" }}>Institute Fee Payment</h3>
-                <p style={{ color: "var(--muted)", fontSize: "0.88rem", margin: "0 0 1.5rem" }}>Pay outstanding dues securely via simulated payment gateway.</p>
+                <p style={{ color: "var(--muted)", fontSize: "0.88rem", margin: "0 0 1.5rem" }}>Pay outstanding dues securely via ERP Payment Portal.</p>
                 
                 <div style={{ display: "grid", gap: "1rem" }}>
                   <div className="field">
@@ -592,27 +637,60 @@ const Page = () => {
                   </div>
 
                   <div className="field">
-                    <label>Select Online Payment Mode *</label>
-                    <div className="segment-control" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", padding: "0.25rem", width: "100%" }}>
-                      {["UPI", "Card", "NetBanking"].map((m) => (
+                    <label>Select Payment Mode *</label>
+                    <div className="segment-control" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", padding: "0.25rem", width: "100%", marginBottom: "0.25rem" }}>
+                      {(["Online", "Offline"] as const).map((mode) => (
                         <button
                           type="button"
-                          key={m}
-                          className={payMethod === m ? "active" : ""}
-                          onClick={() => setPayMethod(m)}
+                          key={mode}
+                          className={payMode === mode ? "active" : ""}
+                          onClick={() => {
+                            setPayMode(mode);
+                            setPayMethod(mode === "Online" ? "UPI" : "Cash");
+                          }}
                           style={{ minHeight: "36px", padding: 0, fontSize: "0.88rem" }}
                         >
-                          {m}
+                          {mode}
                         </button>
                       ))}
                     </div>
                   </div>
 
                   <div className="field">
-                    <label>Remarks / Remarks *</label>
+                    <label>Select Payment Method *</label>
+                    <div className="segment-control" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", padding: "0.25rem", width: "100%" }}>
+                      {payMode === "Online" ? (
+                        ["UPI", "Card", "NetBanking"].map((m) => (
+                          <button
+                            type="button"
+                            key={m}
+                            className={payMethod === m ? "active" : ""}
+                            onClick={() => setPayMethod(m)}
+                            style={{ minHeight: "36px", padding: 0, fontSize: "0.88rem" }}
+                          >
+                            {m}
+                          </button>
+                        ))
+                      ) : (
+                        ["Cash", "Cheque", "Bank Transfer"].map((m) => (
+                          <button
+                            type="button"
+                            key={m}
+                            className={payMethod === m ? "active" : ""}
+                            onClick={() => setPayMethod(m)}
+                            style={{ minHeight: "36px", padding: 0, fontSize: "0.88rem" }}
+                          >
+                            {m === "Bank Transfer" ? "Bank" : m}
+                          </button>
+                        ))
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="field">
+                    <label>Remarks / Notes</label>
                     <input 
                       type="text"
-                      required
                       value={payRemarks}
                       onChange={(e) => setPayRemarks(e.target.value)}
                       placeholder="e.g. Semester installment, Exam fees"
@@ -625,17 +703,19 @@ const Page = () => {
                   className="button button-primary"
                   style={{ width: "100%", marginTop: "1.75rem", height: "46px", gap: "0.5rem" }}
                 >
-                  Proceed to Secure Gateway <ArrowRight size={16} />
+                  Proceed to Payment <ArrowRight size={16} />
                 </button>
               </form>
             )}
 
-            {/* Step 2: Simulated Bank Interface */}
+            {/* Step 2: Simulated Bank Interface / Offline Instructions */}
             {paymentStep === 2 && (
               <div>
-                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", background: "var(--surface-soft)", padding: "0.75rem 1rem", borderRadius: "8px", marginBottom: "1.5rem" }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "0.5rem", background: "var(--surface-soft)", padding: "0.75rem 1rem", borderRadius: "8px", marginBottom: "1.5rem", border: "1px solid var(--border)" }}>
                   <ShieldCheck size={20} style={{ color: "var(--success)" }} />
-                  <span style={{ fontSize: "0.88rem", fontWeight: 600 }}>Simulated Secure Bank Gateway</span>
+                  <span style={{ fontSize: "0.88rem", fontWeight: 600 }}>
+                    {payMode === "Online" ? "Simulated Secure Bank Gateway" : "Offline Payment Details"}
+                  </span>
                 </div>
 
                 <div style={{ marginBottom: "1.5rem", textAlign: "center" }}>
@@ -643,67 +723,298 @@ const Page = () => {
                   <div style={{ fontSize: "2rem", fontWeight: 800, color: "var(--primary)", marginTop: "0.25rem" }}>{formatCurrency(Number(payAmount))}</div>
                 </div>
 
-                {payMethod === "UPI" && (
+                {/* ONLINE METHOD INTERFACES */}
+                {payMode === "Online" && payMethod === "UPI" && (
                   <div style={{ display: "grid", gap: "1rem" }}>
+                    {/* Visual QR Code Generator */}
+                    <div style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      alignItems: "center",
+                      background: "white",
+                      border: "1.5px solid var(--border)",
+                      borderRadius: "12px",
+                      padding: "1.25rem",
+                      margin: "0 auto",
+                      boxShadow: "0 4px 6px -1px rgba(0,0,0,0.05)"
+                    }}>
+                      <div style={{
+                        width: "150px",
+                        height: "150px",
+                        background: "#fafafa",
+                        border: "1px solid #e2e8f0",
+                        borderRadius: "8px",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        position: "relative"
+                      }}>
+                        <svg width="125" height="125" viewBox="0 0 100 100" style={{ shapeRendering: "crispEdges" }}>
+                          {/* Top-left position marker */}
+                          <rect x="0" y="0" width="28" height="28" fill="var(--primary)" />
+                          <rect x="4" y="4" width="20" height="20" fill="white" />
+                          <rect x="8" y="8" width="12" height="12" fill="var(--primary)" />
+
+                          {/* Top-right position marker */}
+                          <rect x="72" y="0" width="28" height="28" fill="var(--primary)" />
+                          <rect x="76" y="4" width="20" height="20" fill="white" />
+                          <rect x="80" y="8" width="12" height="12" fill="var(--primary)" />
+
+                          {/* Bottom-left position marker */}
+                          <rect x="0" y="72" width="28" height="28" fill="var(--primary)" />
+                          <rect x="4" y="76" width="20" height="20" fill="white" />
+                          <rect x="8" y="80" width="12" height="12" fill="var(--primary)" />
+
+                          {/* Center scan ITI brand overlay */}
+                          <rect x="42" y="42" width="16" height="16" fill="var(--secondary)" />
+                          <rect x="45" y="45" width="10" height="10" fill="white" />
+
+                          {/* Pseudo random QR pixels representation */}
+                          <rect x="36" y="0" width="8" height="8" fill="#1e293b" />
+                          <rect x="52" y="0" width="8" height="16" fill="#1e293b" />
+                          <rect x="36" y="24" width="16" height="8" fill="#1e293b" />
+                          
+                          <rect x="0" y="36" width="8" height="8" fill="#1e293b" />
+                          <rect x="24" y="36" width="8" height="16" fill="#1e293b" />
+                          <rect x="0" y="52" width="16" height="8" fill="#1e293b" />
+
+                          <rect x="68" y="36" width="16" height="8" fill="#1e293b" />
+                          <rect x="88" y="36" width="12" height="16" fill="#1e293b" />
+                          <rect x="76" y="52" width="8" height="12" fill="#1e293b" />
+
+                          <rect x="36" y="68" width="8" height="16" fill="#1e293b" />
+                          <rect x="52" y="76" width="16" height="8" fill="#1e293b" />
+                          <rect x="44" y="88" width="8" height="8" fill="#1e293b" />
+
+                          <rect x="68" y="68" width="16" height="8" fill="#1e293b" />
+                          <rect x="88" y="68" width="12" height="12" fill="#1e293b" />
+                          <rect x="76" y="84" width="16" height="12" fill="#1e293b" />
+                        </svg>
+                        <div style={{
+                          position: "absolute",
+                          background: "var(--primary)",
+                          color: "white",
+                          borderRadius: "4px",
+                          padding: "2px 4px",
+                          fontSize: "8px",
+                          fontWeight: 900
+                        }}>
+                          ITI
+                        </div>
+                      </div>
+                      <span style={{ fontSize: "0.72rem", color: "var(--muted)", fontWeight: 700, marginTop: "0.6rem", letterSpacing: "0.08em" }}>
+                        SCAN QR CODE TO INSTANTLY PAY
+                      </span>
+                    </div>
+
                     <div className="field">
-                      <label>Enter Virtual Payment Address (VPA) / UPI ID</label>
+                      <label>Enter UPI ID (VPA) *</label>
                       <input 
                         type="text" 
                         value={upiId} 
                         onChange={(e) => setUpiId(e.target.value)}
-                        placeholder="e.g. studentname@upi"
+                        placeholder="e.g. studentname@okaxis"
+                        required
                       />
                     </div>
                   </div>
                 )}
 
-                {payMethod === "Card" && (
+                {payMode === "Online" && payMethod === "Card" && (
                   <div style={{ display: "grid", gap: "1rem" }}>
+                    {/* Interactive credit card preview */}
+                    <div style={{
+                      background: "linear-gradient(135deg, #1e293b 0%, #0f172a 100%)",
+                      borderRadius: "16px",
+                      padding: "1.25rem 1.5rem",
+                      color: "white",
+                      boxShadow: "0 8px 16px rgba(0,0,0,0.12)",
+                      display: "flex",
+                      flexDirection: "column",
+                      justifyContent: "space-between",
+                      height: "160px",
+                      position: "relative",
+                      overflow: "hidden"
+                    }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "start" }}>
+                        {/* Chip */}
+                        <div style={{
+                          width: "36px",
+                          height: "26px",
+                          background: "#cbd5e1",
+                          borderRadius: "4px",
+                          opacity: 0.85
+                        }}></div>
+                        <span style={{ fontSize: "1.1rem", fontWeight: 900, fontStyle: "italic", color: "#e2e8f0" }}>VISA</span>
+                      </div>
+                      <div style={{
+                        fontSize: "1.2rem",
+                        fontFamily: "monospace",
+                        letterSpacing: "0.15em",
+                        margin: "0.85rem 0"
+                      }}>
+                        {cardNumber || "•••• •••• •••• ••••"}
+                      </div>
+                      <div style={{ display: "flex", justifyContent: "space-between" }}>
+                        <div>
+                          <span style={{ fontSize: "0.55rem", textTransform: "uppercase", color: "#94a3b8", display: "block" }}>Card Holder</span>
+                          <strong style={{ fontSize: "0.8rem", textTransform: "uppercase" }}>{student?.name || "STUDENT NAME"}</strong>
+                        </div>
+                        <div style={{ textAlign: "right" }}>
+                          <span style={{ fontSize: "0.55rem", textTransform: "uppercase", color: "#94a3b8", display: "block" }}>Expires</span>
+                          <strong style={{ fontSize: "0.8rem" }}>{cardExpiry || "MM/YY"}</strong>
+                        </div>
+                      </div>
+                    </div>
+
                     <div className="field">
-                      <label>Credit / Debit Card Number</label>
+                      <label>Credit / Debit Card Number *</label>
                       <input 
                         type="text" 
                         value={cardNumber} 
                         maxLength={19}
-                        onChange={(e) => setCardNumber(e.target.value)}
+                        onChange={(e) => {
+                          let val = e.target.value.replace(/\s+/g, "").replace(/[^0-9]/gi, "");
+                          let matches = val.match(/\d{4,16}/g);
+                          let match = (matches && matches[0]) || "";
+                          let parts = [];
+                          for (let i=0, len=match.length; i<len; i+=4) {
+                            parts.push(match.substring(i, i+4));
+                          }
+                          setCardNumber(parts.length > 0 ? parts.join(" ") : val);
+                        }}
                         placeholder="4321 9876 5432 1098"
+                        required
                       />
                     </div>
                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "1rem" }}>
                       <div className="field">
-                        <label>Expiry Date</label>
+                        <label>Expiry Date *</label>
                         <input 
                           type="text" 
                           value={cardExpiry} 
                           maxLength={5}
-                          onChange={(e) => setCardExpiry(e.target.value)}
+                          onChange={(e) => {
+                            let val = e.target.value.replace(/\//g, "").replace(/[^0-9]/gi, "");
+                            if (val.length >= 2) {
+                              setCardExpiry(val.substring(0, 2) + "/" + val.substring(2, 4));
+                            } else {
+                              setCardExpiry(val);
+                            }
+                          }}
                           placeholder="MM/YY"
+                          required
                         />
                       </div>
                       <div className="field">
-                        <label>CVV</label>
+                        <label>CVV *</label>
                         <input 
                           type="password" 
                           value={cardCvv} 
                           maxLength={3}
-                          onChange={(e) => setCardCvv(e.target.value)}
+                          onChange={(e) => setCardCvv(e.target.value.replace(/[^0-9]/gi, ""))}
                           placeholder="***"
+                          required
                         />
                       </div>
                     </div>
                   </div>
                 )}
 
-                {payMethod === "NetBanking" && (
+                {payMode === "Online" && payMethod === "NetBanking" && (
                   <div className="field">
-                    <label>Select Retail NetBanking Bank</label>
-                    <select value={selectedBank} onChange={(e) => setSelectedBank(e.target.value)}>
+                    <label>Select Retail Bank *</label>
+                    <select value={selectedBank} onChange={(e) => setSelectedBank(e.target.value)} required>
                       <option value="SBI">State Bank of India (SBI)</option>
                       <option value="HDFC">HDFC Bank</option>
                       <option value="ICICI">ICICI Bank Ltd.</option>
                       <option value="AXIS">Axis Bank</option>
                       <option value="PNB">Punjab National Bank</option>
                     </select>
+                  </div>
+                )}
+
+                {/* OFFLINE METHOD INTERFACES */}
+                {payMode === "Offline" && payMethod === "Cash" && (
+                  <div style={{ background: "var(--surface-soft)", border: "1.5px dashed var(--border)", borderRadius: "12px", padding: "1.5rem", textAlign: "center" }}>
+                    <p style={{ fontWeight: 700, color: "var(--primary)", margin: "0 0 0.5rem" }}>Deposit Cash at Counters</p>
+                    <p style={{ fontSize: "0.85rem", color: "var(--muted)", margin: 0, lineHeight: 1.5 }}>
+                      Please visit the accounts window at the institute main campus to submit cash. Click "Submit Reference" below to register this cash transaction under pending approval.
+                    </p>
+                  </div>
+                )}
+
+                {payMode === "Offline" && payMethod === "Cheque" && (
+                  <div style={{ display: "grid", gap: "1rem" }}>
+                    <div className="field">
+                      <label>Cheque / DD Number *</label>
+                      <input 
+                        type="text" 
+                        value={chequeNo}
+                        onChange={(e) => setChequeNo(e.target.value)}
+                        placeholder="e.g. 100023"
+                        required
+                      />
+                    </div>
+                    <div className="field">
+                      <label>Drawee Bank Name *</label>
+                      <input 
+                        type="text" 
+                        value={draweeBank}
+                        onChange={(e) => setDraweeBank(e.target.value)}
+                        placeholder="e.g. State Bank of India"
+                        required
+                      />
+                    </div>
+                    <p style={{ fontSize: "0.8rem", color: "var(--muted)", margin: 0, lineHeight: 1.4 }}>
+                      Drawn cheque should be in favor of <strong>"Maa Gauri ITI"</strong>. Please hand over the physical cheque/DD to the Accounts counter.
+                    </p>
+                  </div>
+                )}
+
+                {payMode === "Offline" && payMethod === "Bank Transfer" && (
+                  <div style={{ display: "grid", gap: "1rem" }}>
+                    <div style={{
+                      background: "linear-gradient(135deg, #191970 0%, #11114f 100%)",
+                      borderRadius: "12px",
+                      padding: "1.25rem",
+                      color: "white",
+                      fontSize: "0.85rem"
+                    }}>
+                      <strong style={{ fontSize: "0.95rem", display: "block", marginBottom: "0.75rem", borderBottom: "1px solid rgba(255,255,255,0.15)", paddingBottom: "0.5rem" }}>
+                        Maa Gauri ITI - Bank Account Info
+                      </strong>
+                      <div style={{ display: "grid", gap: "0.4rem" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between" }}>
+                          <span style={{ opacity: 0.7 }}>Account Name:</span>
+                          <strong>Maa Gauri Private ITI</strong>
+                        </div>
+                        <div style={{ display: "flex", justifyContent: "space-between" }}>
+                          <span style={{ opacity: 0.7 }}>Account Number:</span>
+                          <strong>987601234567</strong>
+                        </div>
+                        <div style={{ display: "flex", justifyContent: "space-between" }}>
+                          <span style={{ opacity: 0.7 }}>IFSC Code:</span>
+                          <strong>UTIB0001234</strong>
+                        </div>
+                        <div style={{ display: "flex", justifyContent: "space-between" }}>
+                          <span style={{ opacity: 0.7 }}>Bank / Branch:</span>
+                          <strong>Axis Bank Ltd.</strong>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="field">
+                      <label>UTR Reference / UTR Number *</label>
+                      <input 
+                        type="text" 
+                        value={utrRef}
+                        onChange={(e) => setUtrRef(e.target.value)}
+                        placeholder="e.g. AXISN26738927"
+                        required
+                      />
+                      <span style={{ fontSize: "0.8rem", color: "var(--muted)" }}>Enter the bank transfer transaction code generated after dispatching funds.</span>
+                    </div>
                   </div>
                 )}
 
@@ -720,7 +1031,7 @@ const Page = () => {
                     className="button button-primary"
                     style={{ flex: 1, height: "46px" }}
                   >
-                    Confirm Payment
+                    {payMode === "Online" ? "Confirm Payment" : "Submit Reference"}
                   </button>
                 </div>
               </div>
@@ -738,8 +1049,8 @@ const Page = () => {
                   animation: "spin 1s linear infinite",
                   margin: "0 auto 1.5rem"
                 }}></div>
-                <h3>Verifying Transaction...</h3>
-                <p style={{ color: "var(--muted)", fontSize: "0.9rem" }}>Contacting your bank securely. Do not close this browser tab.</p>
+                <h3>{payMode === "Online" ? "Verifying Transaction..." : "Logging Request..."}</h3>
+                <p style={{ color: "var(--muted)", fontSize: "0.9rem" }}>Contacting servers securely. Do not close this browser window.</p>
               </div>
             )}
 
@@ -750,19 +1061,24 @@ const Page = () => {
                   width: "64px",
                   height: "64px",
                   borderRadius: "50%",
-                  background: "#EAF7F3",
-                  color: "var(--success)",
+                  background: payMode === "Online" ? "#EAF7F3" : "#FFF7E8",
+                  color: payMode === "Online" ? "var(--success)" : "var(--warning)",
                   display: "grid",
                   placeItems: "center",
                   fontSize: "1.8rem",
                   margin: "0 auto 1.25rem",
-                  border: "1px solid rgba(22, 115, 91, 0.2)"
+                  border: payMode === "Online" ? "1px solid rgba(22, 115, 91, 0.2)" : "1px solid rgba(161, 98, 7, 0.2)"
                 }}>
-                  ✓
+                  {payMode === "Online" ? "✓" : "⏰"}
                 </div>
-                <h3 style={{ fontSize: "1.35rem", fontWeight: 700, color: "var(--success)" }}>Transaction Successful!</h3>
-                <p style={{ color: "var(--muted)", fontSize: "0.9rem", margin: "0.5rem 0 1.5rem" }}>
-                  Your payment of {formatCurrency(Number(payAmount))} has been recorded in the database.
+                <h3 style={{ fontSize: "1.35rem", fontWeight: 700, color: payMode === "Online" ? "var(--success)" : "var(--warning)" }}>
+                  {payMode === "Online" ? "Transaction Successful!" : "Payment Logged Successfully!"}
+                </h3>
+                <p style={{ color: "var(--muted)", fontSize: "0.9rem", margin: "0.5rem 0 1.5rem", lineHeight: 1.4 }}>
+                  {payMode === "Online" 
+                    ? `Your payment of ${formatCurrency(Number(payAmount))} has been recorded in the database.`
+                    : `Your offline installment of ${formatCurrency(Number(payAmount))} has been sent for admin verification.`
+                  }
                 </p>
                 
                 <div style={{
@@ -779,8 +1095,14 @@ const Page = () => {
                     <strong style={{ fontFamily: "monospace" }}>{simulatedTxnId}</strong>
                   </div>
                   <div style={{ display: "flex", justifyContent: "space-between", margin: "0.25rem 0" }}>
-                    <span style={{ color: "var(--muted)" }}>Method / Mode:</span>
-                    <strong>{payMethod} / Online</strong>
+                    <span style={{ color: "var(--muted)" }}>Mode / Method:</span>
+                    <strong>{payMode} ({payMethod})</strong>
+                  </div>
+                  <div style={{ display: "flex", justifyContent: "space-between", margin: "0.25rem 0" }}>
+                    <span style={{ color: "var(--muted)" }}>Status:</span>
+                    <strong style={{ color: payMode === "Online" ? "var(--success)" : "var(--warning)" }}>
+                      {payMode === "Online" ? "Success" : "Pending Verification"}
+                    </strong>
                   </div>
                 </div>
 

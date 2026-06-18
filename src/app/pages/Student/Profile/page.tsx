@@ -17,6 +17,7 @@ interface StudentData {
   course: string;
   Qualification: string;
   Enrollment_Date?: string;
+  profile_photo?: string;
 }
 
 const defaultStudent: StudentData = {
@@ -88,20 +89,66 @@ export default function Page() {
       <StuNav name="My Profile" />
 
       <main className="dashboard-page">
-        <section className="profile-hero panel">
-          <div className="avatar">
-            <User size={34} className="text-primary" />
+        <section className="profile-hero panel" style={{ display: "flex", alignItems: "center", gap: "1.5rem", flexWrap: "wrap" }}>
+          {student.profile_photo ? (
+            <img
+              src={student.profile_photo}
+              alt={student.name}
+              style={{ width: "90px", height: "90px", borderRadius: "50%", objectFit: "cover", border: "3px solid var(--border)" }}
+            />
+          ) : (
+            <div className="avatar" style={{ width: "90px", height: "90px", borderRadius: "50%", background: "var(--surface-soft)", display: "grid", placeItems: "center", padding: 0 }}>
+              <User size={42} className="text-primary" />
+            </div>
+          )}
+
+          <div style={{ flex: 1, minWidth: "200px" }}>
+            <h2 style={{ fontSize: "1.75rem", margin: 0, fontWeight: 800 }}>{student.name}</h2>
+            <p style={{ color: "var(--muted)", margin: "0.25rem 0", fontWeight: 600 }}>Student ID: #{student.id}</p>
+            <span style={{ color: "var(--primary)", fontWeight: 800, fontSize: "0.95rem" }}>{student.course}</span>
           </div>
 
           <div>
-            <h2>{student.name}</h2>
-            <p>Student ID: #{student.id}</p>
-            <span style={{ color: "var(--secondary)", fontWeight: 900 }}>{student.course}</span>
+            <label className="button button-primary flex items-center gap-1.5 cursor-pointer text-xs" style={{ margin: 0, padding: "0.5rem 1rem", minHeight: "38px" }}>
+              Upload New Photo
+              <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) {
+                    if (file.size > 1.5 * 1024 * 1024) {
+                      alert("Image size must be less than 1.5MB.");
+                      return;
+                    }
+                    const reader = new FileReader();
+                    reader.onloadend = () => {
+                      const base64 = reader.result as string;
+                      fetch("/api/applicants", {
+                        method: "PATCH",
+                        headers: { "Content-Type": "application/json" },
+                        body: JSON.stringify({
+                          id: student.id,
+                          profile_photo: base64
+                        })
+                      })
+                      .then((res) => {
+                        if (res.ok) {
+                          alert("Profile photo updated successfully!");
+                          setStudent({ ...student, profile_photo: base64 });
+                        } else {
+                          alert("Failed to update profile photo.");
+                        }
+                      })
+                      .catch(() => alert("Failed to update profile photo."));
+                    };
+                    reader.readAsDataURL(file);
+                  }
+                }}
+                style={{ display: "none" }}
+              />
+            </label>
           </div>
-
-          <Link className="button button-primary" href="#">
-            Edit Profile
-          </Link>
         </section>
 
         <section className="dashboard-grid two">

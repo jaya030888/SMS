@@ -187,3 +187,44 @@ export async function DELETE(req: Request) {
     );
   }
 }
+
+// PATCH to update payment status (admin only)
+export async function PATCH(req: Request) {
+  try {
+    const session = await getSession();
+    if (!session || session.role !== "admin") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
+    const { id, payment_status } = await req.json();
+
+    if (!id || !payment_status) {
+      return NextResponse.json(
+        { error: "id and payment_status are required" },
+        { status: 400 }
+      );
+    }
+
+    // Update the status of the payment
+    const [result]: any = await db.execute(
+      "UPDATE payments SET payment_status = ? WHERE id = ?",
+      [payment_status, id]
+    );
+
+    if (result.affectedRows === 0) {
+      return NextResponse.json({ error: "Payment record not found" }, { status: 404 });
+    }
+
+    return NextResponse.json({
+      success: true,
+      message: `Payment status updated to ${payment_status} successfully.`
+    });
+  } catch (error: any) {
+    console.error("PATCH payments Error:", error);
+    return NextResponse.json(
+      { error: error.message },
+      { status: 500 }
+    );
+  }
+}
+

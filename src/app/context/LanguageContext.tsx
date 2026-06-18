@@ -16,6 +16,8 @@ const translations = {
     nav_fee_structure: "Fee Structure",
     nav_contact: "Contact",
     nav_login: "Login",
+    nav_dashboard: "Dashboard",
+    nav_logout: "Logout",
     nav_apply_now: "Apply Now",
     brand_name: "Maa Gauri Private ITI",
 
@@ -173,6 +175,8 @@ const translations = {
     nav_fee_structure: "शुल्क संरचना",
     nav_contact: "संपर्क",
     nav_login: "लॉगिन",
+    nav_dashboard: "डैशबोर्ड",
+    nav_logout: "लॉगआउट",
     nav_apply_now: "अभी आवेदन करें",
     brand_name: "माँ गौरी प्राइवेट आईटीआई",
 

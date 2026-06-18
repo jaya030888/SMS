@@ -44,6 +44,7 @@ export async function GET(req: Request) {
         a.course,
         a.Qualification,
         a.Enrollment_Date,
+        a.profile_photo,
         CAST(COALESCE(SUM(p.amount), 0) AS SIGNED) AS amount_paid,
         CAST(COALESCE(cf.total_fee, 0) - COALESCE(SUM(p.amount), 0) AS SIGNED) AS remaining_balance,
         CASE
@@ -61,7 +62,7 @@ export async function GET(req: Request) {
       params.push(id);
     }
 
-    query += ` GROUP BY a.id, cf.total_fee ORDER BY a.id DESC`;
+    query += ` GROUP BY a.id, a.profile_photo, cf.total_fee ORDER BY a.id DESC`;
 
     const [rows]: any = await db.query(query, params);
 
@@ -96,6 +97,7 @@ export async function POST(req: Request) {
       course,
       Qualification,
       amount_paid,
+      profile_photo,
     } = await req.json();
 
     if (!name || !fatherName || !email || !DOB || !phone || !Address || !course || !Qualification) {
@@ -112,10 +114,10 @@ export async function POST(req: Request) {
     const [insertResult]: any = await connection.execute(
       `
       INSERT INTO applicants
-      (name, fatherName, email, DOB, phone, Address, course, Qualification, Enrollment_Date)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_DATE)
+      (name, fatherName, email, DOB, phone, Address, course, Qualification, Enrollment_Date, profile_photo)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_DATE, ?)
       `,
-      [name, fatherName, email, DOB, phone, Address, course, Qualification]
+      [name, fatherName, email, DOB, phone, Address, course, Qualification, profile_photo || null]
     );
 
     const studentId = insertResult.insertId;
@@ -248,21 +250,29 @@ export async function PATCH(req: Request) {
       }
     } else {
       // Profile edit operation
-      const { name, fatherName, email, DOB, phone, Address, course, Qualification } = body;
+      const { name, fatherName, email, DOB, phone, Address, course, Qualification, profile_photo } = body;
 
       if (!name || !fatherName || !email || !DOB || !phone || !Address || !course || !Qualification) {
-        await connection.rollback();
-        return NextResponse.json({ error: "All profile fields are required for updates" }, { status: 400 });
+        // If it's a student updating only their profile photo
+        if (profile_photo !== undefined) {
+          await connection.execute(
+            "UPDATE applicants SET profile_photo = ? WHERE id = ?",
+            [profile_photo, id]
+          );
+        } else {
+          await connection.rollback();
+          return NextResponse.json({ error: "All profile fields are required for updates" }, { status: 400 });
+        }
+      } else {
+        await connection.execute(
+          `
+          UPDATE applicants
+          SET name = ?, fatherName = ?, email = ?, DOB = ?, phone = ?, Address = ?, course = ?, Qualification = ?, profile_photo = ?
+          WHERE id = ?
+          `,
+          [name, fatherName, email, DOB, phone, Address, course, Qualification, profile_photo || null, id]
+        );
       }
-
-      await connection.execute(
-        `
-        UPDATE applicants
-        SET name = ?, fatherName = ?, email = ?, DOB = ?, phone = ?, Address = ?, course = ?, Qualification = ?
-        WHERE id = ?
-        `,
-        [name, fatherName, email, DOB, phone, Address, course, Qualification, id]
-      );
     }
 
     await connection.commit();
