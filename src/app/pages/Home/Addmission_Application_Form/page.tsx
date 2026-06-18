@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { Navbar } from "../Navbar";
 import Footer from "../../../components/Footer";
+import StuNav from "../../../components/StuNav";
 import { useLanguage } from "../../../context/LanguageContext";
 
 interface Applicants {
@@ -21,6 +22,7 @@ export default function Page() {
   const { t } = useLanguage();
   const [courses, setCourses] = useState<any[]>([]);
   const [submitting, setSubmitting] = useState(false);
+  const [role, setRole] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     fatherName: "",
@@ -46,10 +48,23 @@ export default function Page() {
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
 
-  // Fetch courses on mount
+  // Fetch courses and check session on mount
   useEffect(() => {
     fetchCourses();
+    checkSession();
   }, []);
+
+  async function checkSession() {
+    try {
+      const res = await fetch("/api/auth/session");
+      if (res.ok) {
+        const data = await res.json();
+        setRole(data.role);
+      }
+    } catch (e) {
+      console.error("Failed to check session:", e);
+    }
+  }
 
   async function fetchCourses() {
     try {
@@ -163,7 +178,13 @@ export default function Page() {
 
   return (
     <>
-      <Navbar />
+      {role === "admin" ? (
+        <StuNav name="Admissions" role="admin" />
+      ) : role === "student" ? (
+        <StuNav name="Admissions" role="student" />
+      ) : (
+        <Navbar />
+      )}
 
       <main className="form-page">
         <div className="section-inner" style={{ padding: "1rem 0" }}>
@@ -512,7 +533,7 @@ export default function Page() {
         </div>
       )}
 
-      <Footer />
+      {role !== "admin" && role !== "student" && <Footer />}
     </>
   );
 }

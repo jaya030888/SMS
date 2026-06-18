@@ -1,6 +1,21 @@
 // setup-db.js
 const mysql = require('mysql2/promise');
 const crypto = require('crypto');
+const fs = require('fs');
+const path = require('path');
+
+// Load environment variables from .env if it exists
+if (fs.existsSync('.env')) {
+  const envConfig = fs.readFileSync('.env', 'utf-8');
+  envConfig.split('\n').forEach(line => {
+    const parts = line.split('=');
+    if (parts.length > 1) {
+      const key = parts[0].trim();
+      const val = parts.slice(1).join('=').trim().replace(/^['"]|['"]$/g, '');
+      process.env[key] = val;
+    }
+  });
+}
 
 function hashPassword(password) {
   const salt = crypto.randomBytes(16).toString('hex');
@@ -11,14 +26,16 @@ function hashPassword(password) {
 async function main() {
   let connection;
   try {
+    const dbName = process.env.MYSQL_DATABASE || "Applications";
     connection = await mysql.createConnection({
-      host: "localhost",
-      user: "root",
-      password: "root",
-      database: "Applications"
+      host: process.env.MYSQL_HOST || "localhost",
+      port: Number(process.env.MYSQL_PORT) || 3306,
+      user: process.env.MYSQL_USER || "root",
+      password: process.env.MYSQL_PASSWORD || "root",
+      database: dbName
     });
 
-    console.log("Connected to MySQL database 'Applications'.");
+    console.log(`Connected to MySQL database '${dbName}'.`);
 
     // 1. Create course_fees table if it does not exist
     await connection.query(`
@@ -69,7 +86,7 @@ async function main() {
         Address TEXT NOT NULL,
         course VARCHAR(50) NULL,
         Qualification VARCHAR(50) NOT NULL,
-        Enrollment_Date DATE DEFAULT (CURRENT_DATE)
+        Enrollment_Date DATE DEFAULT NULL
       )
     `);
 
@@ -151,12 +168,12 @@ async function main() {
     // 5. Migrate any legacy columns if setup-db.js is run on old data
     const [statusCols] = await connection.query(`
       SELECT COLUMN_NAME FROM information_schema.COLUMNS 
-      WHERE TABLE_SCHEMA='Applications' AND TABLE_NAME='applicants' AND COLUMN_NAME='payment_status'
-    `);
+      WHERE TABLE_SCHEMA=? AND TABLE_NAME='applicants' AND COLUMN_NAME='payment_status'
+    `, [dbName]);
     const [paidCols] = await connection.query(`
       SELECT COLUMN_NAME FROM information_schema.COLUMNS 
-      WHERE TABLE_SCHEMA='Applications' AND TABLE_NAME='applicants' AND COLUMN_NAME='amount_paid'
-    `);
+      WHERE TABLE_SCHEMA=? AND TABLE_NAME='applicants' AND COLUMN_NAME='amount_paid'
+    `, [dbName]);
 
     if (paidCols.length > 0) {
       console.log("Found legacy 'amount_paid' column. Migrating payment records...");
