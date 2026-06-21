@@ -1,6 +1,7 @@
 type MonthCardProps = {
   month: string;
   year: string;
+  days?: [string, string, string][];
 };
 
 type DayProps = {
@@ -10,7 +11,7 @@ type DayProps = {
 };
 
 const Month_Card = (props: MonthCardProps) => {
-  const days = [
+  const days = props.days ?? [
     ["1", "Wed", "P"],
     ["2", "Thu", "P"],
     ["3", "Fri", "P"],

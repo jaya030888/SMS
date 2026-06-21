@@ -37,15 +37,15 @@ interface StudentData {
 }
 
 const defaultStudent: StudentData = {
-  id: 1,
-  name: "Rajesh Kumar",
-  fatherName: "Suresh Kumar",
-  email: "rajesh@institute.edu",
-  DOB: "2005-03-15",
-  phone: "9876543210",
-  Address: "123 Main Street, City, State - 123456",
-  course: "Electrician",
-  Qualification: "10th Pass",
+  id: 0,
+  name: "Student",
+  fatherName: "",
+  email: "",
+  DOB: "",
+  phone: "",
+  Address: "",
+  course: "",
+  Qualification: "",
 };
 
 export default function Page() {

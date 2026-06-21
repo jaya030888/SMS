@@ -29,7 +29,7 @@ const StuNav = (props: StuNavProps) => {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
   const role = props.role ?? "student";
-  const [userName, setUserName] = useState(props.userName ?? (role === "admin" ? "Admin" : "Rajesh"));
+  const [userName, setUserName] = useState(props.userName ?? (role === "admin" ? "Admin" : "Student"));
   const [studentId, setStudentId] = useState("1");
 
   useEffect(() => {
@@ -42,23 +42,29 @@ const StuNav = (props: StuNavProps) => {
       } else {
         const storedId = localStorage.getItem("currentStudentId") || "1";
         setStudentId(storedId);
-        
-        fetch("/api/applicants")
+
+        const storedName = localStorage.getItem("currentStudentName");
+        if (storedName) {
+          setUserName(storedName);
+        }
+
+        fetch(`/api/applicants?id=${storedId}`)
           .then((res) => {
             if (res.ok) return res.json();
             throw new Error();
           })
-          .then((applicants) => {
-            const currentStudent = applicants.find((a: any) => String(a.id) === String(storedId));
-            if (currentStudent) {
+          .then((currentStudent) => {
+            if (currentStudent && currentStudent.name) {
               setUserName(currentStudent.name);
               localStorage.setItem("currentStudentName", currentStudent.name);
             } else {
-              setUserName("Rajesh Kumar");
+              setUserName("Student");
             }
           })
           .catch(() => {
-            setUserName("Rajesh Kumar");
+            if (!storedName) {
+              setUserName("Student");
+            }
           });
       }
     }
