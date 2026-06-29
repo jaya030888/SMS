@@ -116,7 +116,7 @@ export default function FeeStructurePage() {
                   <Landmark size={24} />
                 </span>
                 <div>
-                  <h3 style={{ margin: "0 0 0.5rem", fontSize: "1.15rem" }}>{t("login_choose_role")} Options</h3>
+                  <h3 style={{ margin: "0 0 0.5rem", fontSize: "1.15rem" }}>{t("fee_payment_options")}</h3>
                   <p style={{ margin: 0, color: "var(--muted)", fontSize: "0.95rem" }}>
                     {t("language") === "hi"
                       ? "ट्यूशन फीस का भुगतान किश्तों में, क्रेडिट/डेबिट कार्ड, यूपीआई, नेट बैंकिंग के माध्यम से ऑनलाइन या प्रशासन डेस्क पर नकद में किया जा सकता है।"

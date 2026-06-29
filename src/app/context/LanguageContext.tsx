@@ -145,6 +145,7 @@ const translations = {
     fee_th_tuition_fee: "Tuition Fee (Per Year)",
     fee_th_total_fee: "Total Fee",
     fee_btn_apply: "Proceed to Admission",
+    fee_payment_options: "Payment Options",
 
     // Login Pages
     login_role_student: "Student",
@@ -304,6 +305,7 @@ const translations = {
     fee_th_tuition_fee: "ट्यूशन शुल्क (प्रति वर्ष)",
     fee_th_total_fee: "कुल शुल्क",
     fee_btn_apply: "प्रवेश के लिए आगे बढ़ें",
+    fee_payment_options: "भुगतान विकल्प",
 
     // Login Pages
     login_role_student: "छात्र",
