@@ -77,7 +77,7 @@ const StuNav = (props: StuNavProps) => {
         { name: "Students", href: "/pages/Admin/Student", icon: Users },
         { name: "Courses", href: "/pages/Admin/Courses", icon: BookOpen },
         { name: "Attendance", href: "/pages/Admin/Attendance", icon: CalendarCheck },
-        { name: "Fee Management", href: "/pages/Admin/FeeDetails", icon: CreditCard },
+        { name: "Fee Management", href: "/pages/Admin/fee-details", icon: CreditCard },
         { name: "Reports", href: "/pages/Admin/Reports", icon: ClipboardList },
         { name: "Admissions", href: "/pages/Home/Addmission_Application_Form", icon: FileText },
       ]

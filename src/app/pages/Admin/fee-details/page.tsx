@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import StuNav from "@/src/app/components/StuNav";
+import StuNav from "../../../components/StuNav";
 import { Search, Filter, Download, PlusCircle, CheckCircle, Clock, Trash2, Landmark, RefreshCw, X, Receipt, DollarSign, Printer } from "lucide-react";
 
 interface PaymentLog {
