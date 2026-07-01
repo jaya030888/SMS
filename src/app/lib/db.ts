@@ -10,7 +10,7 @@ export const db = mysql.createPool({
   database: process.env.MYSQL_DATABASE || "Applications",
   port: Number(process.env.MYSQL_PORT) || 3306,
   waitForConnections: true,
-  connectionLimit: 10,
+  connectionLimit: isLocal ? 10 : 2,
   queueLimit: 0,
   ssl: isLocal ? undefined : { rejectUnauthorized: false }
 });
