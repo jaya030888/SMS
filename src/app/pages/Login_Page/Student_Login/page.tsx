@@ -1,6 +1,6 @@
 import Login_Card from '@/src/app/components/Login_Card'
 
-const page = () => {
+export default function Page() {
   return (
     <Login_Card
       image="/file.svg"
@@ -14,5 +14,3 @@ const page = () => {
     />
   )
 }
-
-export default page

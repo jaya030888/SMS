@@ -28,7 +28,7 @@ interface StudentFeeSummary {
   phone: string;
 }
 
-const Page = () => {
+export default function Page() {
   const [stats, setStats] = useState({
     totalCollected: 0,
     totalPending: 0,
@@ -821,6 +821,4 @@ const Page = () => {
       )}
     </>
   );
-};
-
-export default Page;
+}

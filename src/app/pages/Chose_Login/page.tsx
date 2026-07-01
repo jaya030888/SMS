@@ -5,7 +5,7 @@ import Login_Card from "../../components/Chose_Login_Card";
 import { GraduationCap } from "lucide-react";
 import { useLanguage } from "../../context/LanguageContext";
 
-const Page = () => {
+export default function Page() {
   const { t } = useLanguage();
 
   return (
@@ -55,7 +55,5 @@ const Page = () => {
       </div>
     </main>
   );
-};
-
-export default Page;
+}
 

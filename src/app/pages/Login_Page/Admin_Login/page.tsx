@@ -1,7 +1,6 @@
 import Login_Card from '@/src/app/components/Login_Card'
 
-const page = () => {
-
+export default function Page() {
   const path = "/pages/Admin/DashBoard"
 
   return (
@@ -17,5 +16,3 @@ const page = () => {
     />
   )
 }
-
-export default page

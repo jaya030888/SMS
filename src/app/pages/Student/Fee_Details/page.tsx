@@ -37,7 +37,7 @@ interface PaymentRecord {
   remarks: string;
 }
 
-const Page = () => {
+export default function Page() {
   const [student, setStudent] = useState<StudentData | null>(null);
   const [feeStructure, setFeeStructure] = useState<CourseFee | null>(null);
   const [payments, setPayments] = useState<PaymentRecord[]>([]);
@@ -1120,6 +1120,4 @@ const Page = () => {
       )}
     </>
   );
-};
-
-export default Page;
+}

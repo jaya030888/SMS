@@ -1,6 +1,6 @@
 import StuNav from "@/src/app/components/StuNav";
 
-const Page = () => {
+export default function Page() {
   return (
     <>
       <StuNav name="Attendance Management" role="admin" />
@@ -13,6 +13,4 @@ const Page = () => {
       </main>
     </>
   );
-};
-
-export default Page;
+}
