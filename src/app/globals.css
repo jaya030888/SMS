@@ -1792,10 +1792,11 @@ select:focus {
 
   .same-line,
   .total-row,
-  .payment-row {
+  .payment-row,
+  .section-title-row {
     align-items: flex-start;
     flex-direction: column;
-    gap: 0.45rem;
+    gap: 1rem;
   }
 
   .contact-card {

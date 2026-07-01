@@ -334,7 +334,7 @@ export default function CourseManagementPage() {
                   />
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1">
                     <label className="text-xs font-bold uppercase tracking-wider text-slate-500">Tuition Fee (₹)</label>
                     <input
@@ -359,7 +359,7 @@ export default function CourseManagementPage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1">
                     <label className="text-xs font-bold uppercase tracking-wider text-slate-500">Library Fee (₹)</label>
                     <input
@@ -434,7 +434,7 @@ export default function CourseManagementPage() {
               <p className="text-xs text-slate-500 mb-6 font-semibold">Update individual fee items for course: {courseName}.</p>
 
               <div className="space-y-4">
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1">
                     <label className="text-xs font-bold uppercase tracking-wider text-slate-500">Tuition Fee (₹)</label>
                     <input
@@ -459,7 +459,7 @@ export default function CourseManagementPage() {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="flex flex-col gap-1">
                     <label className="text-xs font-bold uppercase tracking-wider text-slate-500">Library Fee (₹)</label>
                     <input
