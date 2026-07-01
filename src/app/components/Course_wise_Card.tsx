@@ -36,7 +36,7 @@ const Course_wise_Card = ({
       <Info_sameliner label="Fees Paid" entry={feesPaid} entryColor="var(--success)" />
       <Info_sameliner label="Fees Pending" entry={feesPending} entryColor="var(--warning)" />
 
-      <button className="button button-secondary">View Details</button>
+      {/* View Details button removed */}
     </div>
   );
 };
