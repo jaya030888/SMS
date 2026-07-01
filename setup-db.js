@@ -27,12 +27,15 @@ async function main() {
   let connection;
   try {
     const dbName = process.env.MYSQL_DATABASE || "Applications";
+    const host = process.env.MYSQL_HOST || "localhost";
+    const isLocal = host === "localhost" || host === "127.0.0.1";
     connection = await mysql.createConnection({
-      host: process.env.MYSQL_HOST || "localhost",
+      host,
       port: Number(process.env.MYSQL_PORT) || 3306,
       user: process.env.MYSQL_USER || "root",
       password: process.env.MYSQL_PASSWORD || "root",
-      database: dbName
+      database: dbName,
+      ssl: isLocal ? undefined : { rejectUnauthorized: false }
     });
 
     console.log(`Connected to MySQL database '${dbName}'.`);
