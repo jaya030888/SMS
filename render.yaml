@@ -2,7 +2,7 @@ services:
   # Next.js Web Service
   - type: web
     name: nextjs-app
-    env: node
+    runtime: node
     buildCommand: npm install && npm run build
     startCommand: npm run start
     envVars:
@@ -26,7 +26,7 @@ services:
   # MySQL Private Database Service
   - type: pserv
     name: mysql-db
-    env: image
+    runtime: image
     image:
       url: mysql:8.0
     disk:
