@@ -45,8 +45,8 @@ export async function GET(req: Request) {
         a.Qualification,
         a.Enrollment_Date,
         a.profile_photo,
-        CAST(COALESCE(SUM(p.amount), 0) AS SIGNED) AS amount_paid,
-        CAST(COALESCE(cf.total_fee, 0) - COALESCE(SUM(p.amount), 0) AS SIGNED) AS remaining_balance,
+        CAST(COALESCE(SUM(p.amount), 0) AS INTEGER) AS amount_paid,
+        CAST(COALESCE(cf.total_fee, 0) - COALESCE(SUM(p.amount), 0) AS INTEGER) AS remaining_balance,
         CASE
           WHEN (COALESCE(cf.total_fee, 0) - COALESCE(SUM(p.amount), 0)) <= 0 THEN 'Paid'
           ELSE 'Pending'
@@ -115,7 +115,7 @@ export async function POST(req: Request) {
       `
       INSERT INTO applicants
       (name, fatherName, email, DOB, phone, Address, course, Qualification, Enrollment_Date, profile_photo)
-      VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_DATE, ?)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, CURRENT_DATE, ?) RETURNING id
       `,
       [name, fatherName, email, DOB, phone, Address, course, Qualification, profile_photo || null]
     );

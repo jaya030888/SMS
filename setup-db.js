@@ -1,5 +1,5 @@
 // setup-db.js
-const mysql = require('mysql2/promise');
+const { Client } = require('pg');
 const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
@@ -26,19 +26,17 @@ function hashPassword(password) {
 async function main() {
   let connection;
   try {
-    const dbName = process.env.MYSQL_DATABASE || "Applications";
-    const host = process.env.MYSQL_HOST || "localhost";
-    const isLocal = host === "localhost" || host === "127.0.0.1";
-    connection = await mysql.createConnection({
-      host,
-      port: Number(process.env.MYSQL_PORT) || 3306,
-      user: process.env.MYSQL_USER || "root",
-      password: process.env.MYSQL_PASSWORD || "root",
-      database: dbName,
-      ssl: isLocal ? undefined : { rejectUnauthorized: false }
-    });
+    const isLocal = process.env.NODE_ENV !== "production" && !process.env.DATABASE_URL?.includes("render.com");
+    const connectionString = process.env.DATABASE_URL || "postgresql://postgres:postgres@localhost:5432/Applications";
 
-    console.log(`Connected to MySQL database '${dbName}'.`);
+    connection = new Client({
+      connectionString,
+      ssl: isLocal ? false : { rejectUnauthorized: false }
+    });
+    
+    await connection.connect();
+
+    console.log(`Connected to PostgreSQL database.`);
 
     // 1. Create course_fees table if it does not exist
     await connection.query(`
@@ -64,14 +62,14 @@ async function main() {
     for (let f of feeStructures) {
       await connection.query(`
         INSERT INTO course_fees (course, tuition_fee, lab_fee, library_fee, exam_fee, development_fee, total_fee)
-        VALUES (?, ?, ?, ?, ?, ?, ?)
-        ON DUPLICATE KEY UPDATE
-          tuition_fee = VALUES(tuition_fee),
-          lab_fee = VALUES(lab_fee),
-          library_fee = VALUES(library_fee),
-          exam_fee = VALUES(exam_fee),
-          development_fee = VALUES(development_fee),
-          total_fee = VALUES(total_fee)
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
+        ON CONFLICT (course) DO UPDATE SET
+          tuition_fee = EXCLUDED.tuition_fee,
+          lab_fee = EXCLUDED.lab_fee,
+          library_fee = EXCLUDED.library_fee,
+          exam_fee = EXCLUDED.exam_fee,
+          development_fee = EXCLUDED.development_fee,
+          total_fee = EXCLUDED.total_fee
       `, [f.course, f.tuition_fee, f.lab_fee, f.library_fee, f.exam_fee, f.development_fee, f.total_fee]);
     }
     console.log("Course fees seeded successfully.");
@@ -80,7 +78,7 @@ async function main() {
     console.log("Checking/creating 'applicants' table...");
     await connection.query(`
       CREATE TABLE IF NOT EXISTS applicants (
-        id INT AUTO_INCREMENT PRIMARY KEY,
+        id SERIAL PRIMARY KEY,
         name VARCHAR(100) NOT NULL,
         fatherName VARCHAR(100) NOT NULL,
         email VARCHAR(100) NOT NULL,
@@ -102,7 +100,7 @@ async function main() {
 
     // Add profile_photo column if it does not exist
     try {
-      await connection.query("ALTER TABLE applicants ADD COLUMN profile_photo LONGTEXT NULL");
+      await connection.query("ALTER TABLE applicants ADD COLUMN profile_photo TEXT NULL");
       console.log("Column 'profile_photo' verified/added.");
     } catch (e) {
       // Column already exists
@@ -140,7 +138,7 @@ async function main() {
     // 4. Create payments table if it does not exist
     await connection.query(`
       CREATE TABLE IF NOT EXISTS payments (
-        id INT AUTO_INCREMENT PRIMARY KEY,
+        id SERIAL PRIMARY KEY,
         student_id INT NOT NULL,
         amount INT NOT NULL,
         payment_method VARCHAR(50) NOT NULL DEFAULT 'UPI',
@@ -169,26 +167,26 @@ async function main() {
     } catch (e) {}
 
     // 5. Migrate any legacy columns if setup-db.js is run on old data
-    const [statusCols] = await connection.query(`
-      SELECT COLUMN_NAME FROM information_schema.COLUMNS 
-      WHERE TABLE_SCHEMA=? AND TABLE_NAME='applicants' AND COLUMN_NAME='payment_status'
+    const resStatus = await connection.query(`
+      SELECT column_name FROM information_schema.columns 
+      WHERE table_catalog=$1 AND table_name='applicants' AND column_name='payment_status'
     `, [dbName]);
-    const [paidCols] = await connection.query(`
-      SELECT COLUMN_NAME FROM information_schema.COLUMNS 
-      WHERE TABLE_SCHEMA=? AND TABLE_NAME='applicants' AND COLUMN_NAME='amount_paid'
+    const resPaid = await connection.query(`
+      SELECT column_name FROM information_schema.columns 
+      WHERE table_catalog=$1 AND table_name='applicants' AND column_name='amount_paid'
     `, [dbName]);
 
-    if (paidCols.length > 0) {
+    if (resPaid.rows.length > 0) {
       console.log("Found legacy 'amount_paid' column. Migrating payment records...");
-      const [students] = await connection.query("SELECT id, amount_paid FROM applicants");
-      for (let s of students) {
+      const resStudents = await connection.query("SELECT id, amount_paid FROM applicants");
+      for (let s of resStudents.rows) {
         const amount = Number(s.amount_paid);
         if (amount > 0) {
-          const [existing] = await connection.query("SELECT id FROM payments WHERE student_id = ?", [s.id]);
-          if (existing.length === 0) {
+          const resExisting = await connection.query("SELECT id FROM payments WHERE student_id = $1", [s.id]);
+          if (resExisting.rows.length === 0) {
             const txnId = `TXN-REG-MIGRATED-${s.id}-${Date.now()}`;
             await connection.query(
-              "INSERT INTO payments (student_id, amount, transaction_id, remarks) VALUES (?, ?, ?, 'Migrated Registration Fee')", 
+              "INSERT INTO payments (student_id, amount, transaction_id, remarks) VALUES ($1, $2, $3, 'Migrated Registration Fee')", 
               [s.id, amount, txnId]
             );
           }
@@ -198,7 +196,7 @@ async function main() {
       console.log("Dropped legacy 'amount_paid'.");
     }
 
-    if (statusCols.length > 0) {
+    if (resStatus.rows.length > 0) {
       await connection.query("ALTER TABLE applicants DROP COLUMN payment_status");
       console.log("Dropped legacy 'payment_status'.");
     }
@@ -206,7 +204,7 @@ async function main() {
     // 6. Create users credentials table
     await connection.query(`
       CREATE TABLE IF NOT EXISTS users (
-        id INT AUTO_INCREMENT PRIMARY KEY,
+        id SERIAL PRIMARY KEY,
         username VARCHAR(100) UNIQUE NOT NULL,
         password_hash VARCHAR(255) NOT NULL,
         role VARCHAR(20) NOT NULL,
@@ -224,11 +222,11 @@ async function main() {
 
     // 7. Seed Admin User
     const adminEmail = "jayamyname19@gmail.com";
-    const [adminRows] = await connection.query("SELECT id FROM users WHERE username = ?", [adminEmail]);
-    if (adminRows.length === 0) {
+    const resAdmin = await connection.query("SELECT id FROM users WHERE username = $1", [adminEmail]);
+    if (resAdmin.rows.length === 0) {
       const hashedAdminPassword = hashPassword("12345");
       await connection.query(
-        "INSERT INTO users (username, password_hash, role) VALUES (?, ?, 'admin')",
+        "INSERT INTO users (username, password_hash, role) VALUES ($1, $2, 'admin')",
         [adminEmail, hashedAdminPassword]
       );
       console.log("Seeded admin user credentials successfully.");
@@ -237,16 +235,16 @@ async function main() {
     }
 
     // 8. Seed Student Users for all existing applicants
-    const [applicants] = await connection.query("SELECT id FROM applicants");
+    const resApplicants = await connection.query("SELECT id FROM applicants");
     let seededStudentsCount = 0;
-    for (let student of applicants) {
+    for (let student of resApplicants.rows) {
       const username = String(student.id);
-      const [userRows] = await connection.query("SELECT id FROM users WHERE username = ?", [username]);
-      if (userRows.length === 0) {
+      const resUsers = await connection.query("SELECT id FROM users WHERE username = $1", [username]);
+      if (resUsers.rows.length === 0) {
         const passwordText = "10" + username;
         const hashedStudentPassword = hashPassword(passwordText);
         await connection.query(
-          "INSERT INTO users (username, password_hash, role, student_id) VALUES (?, ?, 'student', ?)",
+          "INSERT INTO users (username, password_hash, role, student_id) VALUES ($1, $2, 'student', $3)",
           [username, hashedStudentPassword, student.id]
         );
         seededStudentsCount++;
