@@ -28,7 +28,7 @@ services:
     name: mysql-db
     runtime: image
     image:
-      url: mysql:8.0
+      url: docker.io/library/mysql:8.0
     disk:
       name: mysql-data
       mountPath: /var/lib/mysql
