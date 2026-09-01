@@ -10,7 +10,7 @@ services:
         fromService:
           type: pserv
           name: mysql-db
-          envVarKey: RENDER_DISCOVERY_NAME
+          property: host
       - key: MYSQL_PORT
         value: "3306"
       - key: MYSQL_USER
@@ -26,7 +26,7 @@ services:
   # MySQL Private Database Service
   - type: pserv
     name: mysql-db
-    env: docker
+    env: image
     image:
       url: mysql:8.0
     disk:
