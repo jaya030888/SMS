@@ -3,6 +3,7 @@ services:
   - type: web
     name: nextjs-app
     runtime: node
+    plan: free
     buildCommand: npm install && npm run build
     startCommand: npm run start
     envVars:
@@ -27,12 +28,9 @@ services:
   - type: pserv
     name: mysql-db
     runtime: image
+    plan: free
     image:
       url: docker.io/library/mysql:8.0
-    disk:
-      name: mysql-data
-      mountPath: /var/lib/mysql
-      sizeGB: 10
     envVars:
       - key: MYSQL_ROOT_PASSWORD
         generateValue: true
