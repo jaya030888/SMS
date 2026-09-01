@@ -1,0 +1,40 @@
+services:
+  # Next.js Web Service
+  - type: web
+    name: nextjs-app
+    env: node
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: MYSQL_HOST
+        fromService:
+          type: pserv
+          name: mysql-db
+          envVarKey: RENDER_DISCOVERY_NAME
+      - key: MYSQL_PORT
+        value: "3306"
+      - key: MYSQL_USER
+        value: "root"
+      - key: MYSQL_PASSWORD
+        fromService:
+          type: pserv
+          name: mysql-db
+          envVarKey: MYSQL_ROOT_PASSWORD
+      - key: MYSQL_DATABASE
+        value: "Applications"
+
+  # MySQL Private Database Service
+  - type: pserv
+    name: mysql-db
+    env: docker
+    image:
+      url: mysql:8.0
+    disk:
+      name: mysql-data
+      mountPath: /var/lib/mysql
+      sizeGB: 10
+    envVars:
+      - key: MYSQL_ROOT_PASSWORD
+        generateValue: true
+      - key: MYSQL_DATABASE
+        value: "Applications"

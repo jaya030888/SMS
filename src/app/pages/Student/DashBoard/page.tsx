@@ -14,9 +14,7 @@ import {
   BookOpen, 
   Book, 
   LineChart, 
-  Activity, 
   FileText, 
-  ClipboardList, 
   Bell,
   Wrench
 } from "lucide-react";
@@ -50,7 +48,7 @@ const defaultStudent: StudentData = {
 
 export default function Page() {
   const [student, setStudent] = useState<StudentData>(defaultStudent);
-  const [courseFees, setCourseFees] = useState<any[]>([]);
+  const [courseFees, setCourseFees] = useState<{ course: string; total_fee: number; [key: string]: unknown }[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -104,11 +102,11 @@ export default function Page() {
               courseName.toLowerCase().includes(cf.course.toLowerCase())
     );
 
-    const totalFee = matchedFee ? matchedFee.total_fee : 15000;
-    const paidAmount = (student as any).amount_paid !== undefined ? (student as any).amount_paid : 2000;
+    const totalFee = matchedFee ? (matchedFee.total_fee as number) : 15000;
+    const paidAmount = student.amount_paid !== undefined ? student.amount_paid : 2000;
     const balanceAmount = Math.max(0, totalFee - paidAmount);
     
-    const dbStatus = (student as any).payment_status || "Pending";
+    const dbStatus = student.payment_status || "Pending";
     const status = balanceAmount <= 0 || dbStatus === "Paid" ? "Paid" : "Pending";
     const color = status === "Paid" ? "var(--success)" : "var(--warning)";
 

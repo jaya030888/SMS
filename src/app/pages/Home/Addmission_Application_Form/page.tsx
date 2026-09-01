@@ -47,12 +47,8 @@ export default function Page() {
   const [cardCvv, setCardCvv] = useState("");
   const [paymentLoading, setPaymentLoading] = useState(false);
   const [paymentSuccess, setPaymentSuccess] = useState(false);
+  const [txnId, setTxnId] = useState("");
 
-  // Fetch courses and check session on mount
-  useEffect(() => {
-    fetchCourses();
-    checkSession();
-  }, []);
 
   async function checkSession() {
     try {
@@ -77,6 +73,12 @@ export default function Page() {
       console.error("Failed to fetch courses:", e);
     }
   }
+
+  // Fetch courses and check session on mount
+  useEffect(() => {
+    fetchCourses();
+    checkSession();
+  }, []);
 
       const handleChange = (
         e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -112,6 +114,7 @@ export default function Page() {
       // Keep success state visible for 1 second
       await new Promise((resolve) => setTimeout(resolve, 1000));
       
+      setTxnId(`TXN-${Math.floor(10000000 + Math.random() * 90000000)}`);
       setShowPaymentModal(false);
       setPaymentSuccess(false);
       setSubmitting(true);
@@ -417,7 +420,7 @@ export default function Page() {
                   ✓
                 </div>
                 <h3>Payment Successful!</h3>
-                <p style={{ color: "var(--muted)" }}>Transaction ID: TXN-{Math.floor(10000000 + Math.random() * 90000000)}</p>
+                <p style={{ color: "var(--muted)" }}>Transaction ID: {txnId}</p>
               </div>
             ) : (
               <div>

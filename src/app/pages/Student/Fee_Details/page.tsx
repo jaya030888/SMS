@@ -1,10 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Info_Card from "@/src/app/components/Info_Card";
 import Info_sameliner from "@/src/app/components/Info_sameliner";
 import StuNav from "@/src/app/components/StuNav";
-import { Download, CreditCard, CheckCircle, Clock, Printer, X, ShieldCheck, Wallet, ArrowRight, Receipt } from "lucide-react";
+import { CreditCard, CheckCircle, Clock, Printer, X, ShieldCheck, Wallet, ArrowRight, Receipt } from "lucide-react";
 
 interface StudentData {
   id: number;
@@ -67,7 +66,7 @@ export default function Page() {
       fetch(`/api/applicants?id=${storedId}`).then(res => {
         if (res.ok) return res.json();
         return fetch("/api/applicants").then(r => r.json()).then(data => {
-          return data.find((a: any) => String(a.id) === String(storedId)) || data[0];
+          return data.find((a: StudentData) => String(a.id) === String(storedId)) || data[0];
         });
       }),
       fetch("/api/course_fees").then(res => res.json()),
@@ -79,7 +78,7 @@ export default function Page() {
         setPayments(paymentsData || []);
         
         const matchedFee = feesData.find(
-          (cf: any) => cf.course.toLowerCase() === matchedStudent.course.toLowerCase() || 
+          (cf: CourseFee) => cf.course.toLowerCase() === matchedStudent.course.toLowerCase() || 
                        matchedStudent.course.toLowerCase().includes(cf.course.toLowerCase())
         );
         if (matchedFee) {
@@ -874,10 +873,10 @@ export default function Page() {
                         value={cardNumber} 
                         maxLength={19}
                         onChange={(e) => {
-                          let val = e.target.value.replace(/\s+/g, "").replace(/[^0-9]/gi, "");
-                          let matches = val.match(/\d{4,16}/g);
-                          let match = (matches && matches[0]) || "";
-                          let parts = [];
+                          const val = e.target.value.replace(/\s+/g, "").replace(/[^0-9]/gi, "");
+                          const matches = val.match(/\d{4,16}/g);
+                          const match = (matches && matches[0]) || "";
+                          const parts = [];
                           for (let i=0, len=match.length; i<len; i+=4) {
                             parts.push(match.substring(i, i+4));
                           }
@@ -895,7 +894,7 @@ export default function Page() {
                           value={cardExpiry} 
                           maxLength={5}
                           onChange={(e) => {
-                            let val = e.target.value.replace(/\//g, "").replace(/[^0-9]/gi, "");
+                            const val = e.target.value.replace(/\//g, "").replace(/[^0-9]/gi, "");
                             if (val.length >= 2) {
                               setCardExpiry(val.substring(0, 2) + "/" + val.substring(2, 4));
                             } else {
@@ -939,7 +938,7 @@ export default function Page() {
                   <div style={{ background: "var(--surface-soft)", border: "1.5px dashed var(--border)", borderRadius: "12px", padding: "1.5rem", textAlign: "center" }}>
                     <p style={{ fontWeight: 700, color: "var(--primary)", margin: "0 0 0.5rem" }}>Deposit Cash at Counters</p>
                     <p style={{ fontSize: "0.85rem", color: "var(--muted)", margin: 0, lineHeight: 1.5 }}>
-                      Please visit the accounts window at the institute main campus to submit cash. Click "Submit Reference" below to register this cash transaction under pending approval.
+                      Please visit the accounts window at the institute main campus to submit cash. Click &quot;Submit Reference&quot; below to register this cash transaction under pending approval.
                     </p>
                   </div>
                 )}
@@ -967,7 +966,7 @@ export default function Page() {
                       />
                     </div>
                     <p style={{ fontSize: "0.8rem", color: "var(--muted)", margin: 0, lineHeight: 1.4 }}>
-                      Drawn cheque should be in favor of <strong>"Maa Gauri ITI"</strong>. Please hand over the physical cheque/DD to the Accounts counter.
+                      Drawn cheque should be in favor of <strong>&quot;Maa Gauri ITI&quot;</strong>. Please hand over the physical cheque/DD to the Accounts counter.
                     </p>
                   </div>
                 )}
