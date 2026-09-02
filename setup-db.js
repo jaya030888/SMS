@@ -26,8 +26,8 @@ function hashPassword(password) {
 async function main() {
   let connection;
   try {
-    const isLocal = process.env.NODE_ENV !== "production" && !process.env.DATABASE_URL?.includes("render.com");
-    const connectionString = process.env.DATABASE_URL || "postgresql://postgres:postgres@localhost:5432/Applications";
+    const isLocal = process.env.NODE_ENV !== "production" && !(process.env.DATABASE_URL || process.env.POSTGRES_URL)?.includes("render.com");
+    const connectionString = process.env.DATABASE_URL || process.env.POSTGRES_URL || "postgresql://postgres:postgres@localhost:5432/Applications";
 
     connection = new Client({
       connectionString,
