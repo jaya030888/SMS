@@ -169,12 +169,12 @@ async function main() {
     // 5. Migrate any legacy columns if setup-db.js is run on old data
     const resStatus = await connection.query(`
       SELECT column_name FROM information_schema.columns 
-      WHERE table_catalog=$1 AND table_name='applicants' AND column_name='payment_status'
-    `, [dbName]);
+      WHERE table_catalog=current_database() AND table_name='applicants' AND column_name='payment_status'
+    `);
     const resPaid = await connection.query(`
       SELECT column_name FROM information_schema.columns 
-      WHERE table_catalog=$1 AND table_name='applicants' AND column_name='amount_paid'
-    `, [dbName]);
+      WHERE table_catalog=current_database() AND table_name='applicants' AND column_name='amount_paid'
+    `);
 
     if (resPaid.rows.length > 0) {
       console.log("Found legacy 'amount_paid' column. Migrating payment records...");
