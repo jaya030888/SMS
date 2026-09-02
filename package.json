@@ -11,7 +11,7 @@
     "test:watch": "jest --watch",
     "cypress:open": "cypress open",
     "cypress:run": "cypress run",
-    "postbuild": "node setup-db.js"
+    "migrate": "node setup-db.js"
   },
   "dependencies": {
     "lucide-react": "^1.17.0",

@@ -1,16 +1,25 @@
 import { Pool } from 'pg';
 
-const isLocal = process.env.NODE_ENV !== "production" && !(process.env.DATABASE_URL || process.env.POSTGRES_URL)?.includes("render.com");
-const connectionString = process.env.DATABASE_URL || process.env.POSTGRES_URL || "postgresql://postgres:postgres@localhost:5432/Applications";
+const connectionString = process.env.DATABASE_URL || process.env.POSTGRES_URL;
+const configurationError = connectionString
+  ? null
+  : "Database is not configured. Set DATABASE_URL on the server.";
 
 const pool = new Pool({
   connectionString,
-  ssl: isLocal ? false : { rejectUnauthorized: false },
+  ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false,
 });
+
+function ensureDatabaseConfiguration() {
+  if (configurationError) {
+    throw new Error(configurationError);
+  }
+}
 
 // Wrapper to replace `?` with `$1`, `$2`, etc. so we don't have to rewrite every query
 export const db = {
   query: async (text: string, params: any[] = []) => {
+    ensureDatabaseConfiguration();
     let index = 1;
     const pgQuery = text.replace(/\?/g, () => `$${index++}`);
     const result = await pool.query(pgQuery, params);
@@ -18,6 +27,7 @@ export const db = {
     return [result.rows, result.fields];
   },
   execute: async (text: string, params: any[] = []) => {
+    ensureDatabaseConfiguration();
     let index = 1;
     const pgQuery = text.replace(/\?/g, () => `$${index++}`);
     const result = await pool.query(pgQuery, params);
@@ -26,6 +36,7 @@ export const db = {
     return [{ insertId, affectedRows: result.rowCount }, result.fields];
   },
   getConnection: async () => {
+    ensureDatabaseConfiguration();
     const client = await pool.connect();
     return {
       query: async (text: string, params: any[] = []) => {

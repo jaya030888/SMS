@@ -26,12 +26,14 @@ function hashPassword(password) {
 async function main() {
   let connection;
   try {
-    const isLocal = process.env.NODE_ENV !== "production" && !(process.env.DATABASE_URL || process.env.POSTGRES_URL)?.includes("render.com");
-    const connectionString = process.env.DATABASE_URL || process.env.POSTGRES_URL || "postgresql://postgres:postgres@localhost:5432/Applications";
+    const connectionString = process.env.DATABASE_URL || process.env.POSTGRES_URL;
+    if (!connectionString) {
+      throw new Error("DATABASE_URL is required. Add it locally in .env or attach the Render PostgreSQL database to this service.");
+    }
 
     connection = new Client({
       connectionString,
-      ssl: isLocal ? false : { rejectUnauthorized: false }
+      ssl: process.env.NODE_ENV === "production" ? { rejectUnauthorized: false } : false
     });
     
     await connection.connect();
@@ -90,13 +92,6 @@ async function main() {
         Enrollment_Date DATE DEFAULT NULL
       )
     `);
-
-    console.log("Adjusting 'applicants' table columns...");
-    await connection.query("ALTER TABLE applicants MODIFY COLUMN name VARCHAR(100) NOT NULL");
-    await connection.query("ALTER TABLE applicants MODIFY COLUMN fatherName VARCHAR(100) NOT NULL");
-    await connection.query("ALTER TABLE applicants MODIFY COLUMN email VARCHAR(100) NOT NULL");
-    await connection.query("ALTER TABLE applicants MODIFY COLUMN phone VARCHAR(15) NOT NULL");
-    await connection.query("ALTER TABLE applicants MODIFY COLUMN course VARCHAR(50) NULL");
 
     // Add profile_photo column if it does not exist
     try {
@@ -259,6 +254,7 @@ async function main() {
     console.log("Database schema migration successfully completed!");
   } catch (err) {
     console.error("Database schema migration failed:", err);
+    process.exitCode = 1;
   } finally {
     if (connection) await connection.end();
   }
