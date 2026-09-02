@@ -6,6 +6,7 @@ services:
     plan: free
     buildCommand: npm ci && npm run migrate && npm run build
     startCommand: npm run start
+    healthCheckPath: /api/health
     envVars:
       - key: DATABASE_URL
         fromDatabase:

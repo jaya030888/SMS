@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "npm run migrate && next start",
     "lint": "eslint",
     "test": "jest",
     "test:watch": "jest --watch",
