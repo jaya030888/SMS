@@ -1,43 +1,62 @@
-import Image from "next/image";
+// src/app/components/Chose_Login_Card.tsx
 import Link from "next/link";
-import { GraduationCap, ShieldCheck, User } from "lucide-react";
+import { ShieldCheck, User, UserCheck, ArrowRight, Key } from "lucide-react";
 import { useLanguage } from "../context/LanguageContext";
 
 type ChoseLoginCardProps = {
-  image: string;
-  alter: string;
   role: string;
+  roleType: "student" | "teacher" | "admin";
   para: string;
   to: string;
+  demoCreds: { id: string; pass: string };
 };
 
-const Chose_Login_Card = (props: ChoseLoginCardProps) => {
+const Chose_Login_Card = ({ role, roleType, para, to, demoCreds }: ChoseLoginCardProps) => {
   const { t } = useLanguage();
-  const isStudent = props.to.toLowerCase().includes("student");
+  const isStudent = roleType === "student";
+  const isTeacher = roleType === "teacher";
 
   return (
-    <article className="flex flex-col items-center text-center p-6 bg-white border border-slate-100 shadow-md rounded-2xl transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-      {/* Dynamic Brand/Role Icon Badge */}
-      <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary mb-4 border border-primary/5">
-        {isStudent ? <User size={28} /> : <ShieldCheck size={28} />}
+    <article className="flex flex-col justify-between p-5 bg-white border border-slate-200/80 shadow-xs hover:shadow-md rounded-2xl transition-all duration-200 hover:-translate-y-1">
+      <div>
+        {/* Role Icon Header */}
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[#EEF5FC] text-[#4285CD] border border-[#85B6E9]/30">
+            {isStudent ? <User size={22} /> : isTeacher ? <UserCheck size={22} /> : <ShieldCheck size={22} />}
+          </div>
+          <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 bg-slate-100 px-2.5 py-0.5 rounded-md">
+            {roleType}
+          </span>
+        </div>
+
+        <h3 className="text-base font-bold text-[#06090C] mb-1">
+          {role} {t("nav_login")}
+        </h3>
+        <p className="text-xs text-slate-500 line-clamp-2 leading-relaxed mb-4">
+          {para}
+        </p>
       </div>
 
-      <h3 className="text-xl font-bold text-slate-800 mb-2">
-        {props.role} {t("nav_login")}
-      </h3>
-      <p className="text-sm font-medium text-slate-500 mb-6 leading-relaxed flex-1">
-        {props.para}
-      </p>
+      <div>
+        {/* Quick Demo Credential Pill */}
+        <div className="mb-3.5 px-3 py-2 bg-[#F4F8FB] border border-slate-200/70 rounded-xl text-[11px] flex items-center justify-between text-slate-600">
+          <div className="flex items-center gap-1.5 truncate">
+            <Key size={13} className="text-[#4285CD] shrink-0" />
+            <span className="truncate"><b>{demoCreds.id}</b> / {demoCreds.pass}</span>
+          </div>
+          <span className="text-[10px] text-slate-400 font-semibold shrink-0">Demo</span>
+        </div>
 
-      <Link 
-        className="w-full flex items-center justify-center py-3 px-4 rounded-xl text-sm font-bold text-white bg-primary hover:bg-primary-dark shadow-sm shadow-primary/25 hover:-translate-y-0.5 active:translate-y-0 transition-all duration-150 cursor-pointer" 
-        href={props.to}
-      >
-        {t("language") === "hi" ? `${props.role} के रूप में साइन इन करें` : `Sign In as ${props.role}`}
-      </Link>
+        <Link 
+          className="w-full flex items-center justify-center gap-1.5 py-2.5 px-4 rounded-xl text-xs font-bold text-white bg-[#4285CD] hover:bg-[#2F8AD4] shadow-xs active:translate-y-0 transition-all cursor-pointer" 
+          href={to}
+        >
+          <span>{t("language") === "hi" ? `${role} साइन इन` : `Sign In as ${role}`}</span>
+          <ArrowRight size={14} />
+        </Link>
+      </div>
     </article>
   );
 };
 
 export default Chose_Login_Card;
-

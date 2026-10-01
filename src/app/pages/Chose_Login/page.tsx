@@ -1,59 +1,70 @@
+// src/app/pages/Chose_Login/page.tsx
 "use client";
 
 import Link from "next/link";
-import Login_Card from "../../components/Chose_Login_Card";
-import { GraduationCap } from "lucide-react";
+import Chose_Login_Card from "../../components/Chose_Login_Card";
+import { GraduationCap, ArrowLeft } from "lucide-react";
 import { useLanguage } from "../../context/LanguageContext";
 
 export default function Page() {
   const { t } = useLanguage();
 
   return (
-    <main className="flex min-h-screen flex-col justify-center items-center bg-slate-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="w-full max-w-2xl">
-        {/* Page Header branding */}
-        <div className="text-center mb-8">
-          <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-white shadow-md shadow-primary/20 mb-4">
-            <GraduationCap size={28} />
-          </span>
-          <h2 className="text-3xl font-extrabold tracking-tight text-slate-800 sm:text-4xl">
+    <main className="min-h-screen md:h-screen flex flex-col justify-center items-center bg-[#F8FAFC] p-4 sm:p-6 overflow-y-auto md:overflow-hidden">
+      <div className="w-full max-w-4xl flex flex-col justify-center my-auto">
+        
+        {/* Compact Header */}
+        <div className="text-center mb-6">
+          <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[#4285CD] text-white shadow-xs mb-2.5">
+            <GraduationCap size={26} />
+          </div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#06090C]">
             {t("login_choose_role")}
-          </h2>
-          <p className="mt-2 text-sm font-semibold text-slate-500 max-w-sm mx-auto">
-            {t("login_choose_subtitle")}
+          </h1>
+          <p className="mt-1 text-xs text-slate-500 max-w-md mx-auto">
+            Select your portal to access student document registry, fee payment ledgers, and institute governance.
           </p>
         </div>
 
-        {/* Roles Selection Grid */}
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 mt-8">
-          <Login_Card
-            image="/file.svg"
-            alter="Student"
+        {/* 3 Role Selection Cards */}
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-5 mb-5">
+          <Chose_Login_Card
             role={t("login_role_student")}
-            para={t("login_student_desc")}
+            roleType="student"
+            para="Access KYC documents verification, fee status, payment history, and instant receipts."
             to="/pages/Login_Page/Student_Login"
+            demoCreds={{ id: "1", pass: "101" }}
           />
 
-          <Login_Card
-            image="/file.svg"
-            alter="Admin"
+          <Chose_Login_Card
+            role="Teacher"
+            roleType="teacher"
+            para="Access assigned trade instructor profile, batch curriculum, and departmental details."
+            to="/pages/Login_Page/Teacher_Login"
+            demoCreds={{ id: "amit.sharma@mgiti.edu", pass: "12345" }}
+          />
+
+          <Chose_Login_Card
             role={t("login_role_admin")}
-            para={t("login_admin_desc")}
+            roleType="admin"
+            para="Complete institute governance: student document verification, fee ledger, and admissions."
             to="/pages/Login_Page/Admin_Login"
+            demoCreds={{ id: "jayamyname19@gmail.com", pass: "12345" }}
           />
         </div>
 
-        {/* Back to Homepage Link */}
-        <div className="text-center mt-8">
+        {/* Footer Navigation Link */}
+        <div className="text-center">
           <Link 
             href="/" 
-            className="inline-flex items-center gap-2 text-sm font-bold text-primary hover:text-primary-dark hover:underline transition-colors"
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-[#4285CD] hover:text-[#2F8AD4] hover:underline transition-colors"
           >
-            &larr; {t("login_btn_home")}
+            <ArrowLeft size={14} />
+            <span>{t("login_btn_home")}</span>
           </Link>
         </div>
+
       </div>
     </main>
   );
 }
-

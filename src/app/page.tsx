@@ -7,10 +7,11 @@ import Updates from "./pages/Home/Updates";
 import Gallery from "./pages/Home/Gallery";
 import Contact from "./pages/Home/Contact";
 import Footer from "./components/Footer";
+import { CMSProvider } from "./context/CMSContext";
 
 export default function Home() {
   return (
-    <>
+    <CMSProvider>
       <Navbar />
       <main>
         <Hero />
@@ -22,6 +23,6 @@ export default function Home() {
         <Contact />
       </main>
       <Footer />
-    </>
+    </CMSProvider>
   );
 }

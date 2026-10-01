@@ -403,7 +403,7 @@ export default function Page() {
 
       <main className="dashboard-page">
         {/* Top ERP Summary Panel */}
-        <section className="dashboard-hero" style={{ background: "linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%)", borderRadius: "16px" }}>
+        <section className="dashboard-hero" style={{ background: "var(--black)", borderRadius: "16px" }}>
           <div className="course-badge" style={{ padding: "0.8rem", borderRadius: "12px", background: "rgba(255, 255, 255, 0.12)", color: "#fff" }}>
             <Wallet size={36} />
           </div>
@@ -823,7 +823,7 @@ export default function Page() {
                   <div style={{ display: "grid", gap: "1rem" }}>
                     {/* Interactive credit card preview */}
                     <div style={{
-                      background: "linear-gradient(135deg, #1e293b 0%, #0f172a 100%)",
+                      background: "#06090C",
                       borderRadius: "16px",
                       padding: "1.25rem 1.5rem",
                       color: "white",
@@ -974,7 +974,7 @@ export default function Page() {
                 {payMode === "Offline" && payMethod === "Bank Transfer" && (
                   <div style={{ display: "grid", gap: "1rem" }}>
                     <div style={{
-                      background: "linear-gradient(135deg, #191970 0%, #11114f 100%)",
+                      background: "#06090C",
                       borderRadius: "12px",
                       padding: "1.25rem",
                       color: "white",

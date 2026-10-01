@@ -1,16 +1,16 @@
+// src/app/components/Login_Card.tsx
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { FormEvent, useState } from "react";
-import { GraduationCap, AlertCircle } from "lucide-react";
+import { GraduationCap, AlertCircle, ShieldCheck, User, UserCheck, KeyRound } from "lucide-react";
 import { useLanguage } from "../context/LanguageContext";
 
 type LoginCardProps = {
   image: string;
   alter: string;
-  role: "Student" | "Admin";
+  role: "Student" | "Admin" | "Teacher";
   para: string;
   label: string;
   type: "number" | "email";
@@ -25,40 +25,41 @@ const Login_Card = (props: LoginCardProps) => {
   const [loginId, setLoginId] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const fillDemo = () => {
+    if (props.role === "Admin") {
+      setLoginId("jayamyname19@gmail.com");
+      setPassword("12345");
+    } else if (props.role === "Teacher") {
+      setLoginId("amit.sharma@mgiti.edu");
+      setPassword("12345");
+    } else {
+      setLoginId("1");
+      setPassword("101");
+    }
+    setError("");
+  };
 
   const validate = () => {
     if (!loginId.trim()) {
-      const fieldName = props.role === "Student" ? t("login_student_id") : t("login_admin_email");
-      return `${fieldName} ${t("language") === "hi" ? "आवश्यक है।" : "is required."}`;
+      const fieldName = props.role === "Student" ? t("login_student_id") : `${props.role} Email`;
+      return `${fieldName} is required.`;
     }
 
     if (props.type === "number") {
       const value = Number(loginId);
-
       if (!Number.isInteger(value) || value <= 0) {
-        return t("language") === "hi" 
-          ? "छात्र आईडी एक सकारात्मक पूर्णांक होना चाहिए।" 
-          : "Student ID must be a positive integer.";
+        return "Student ID must be a positive number.";
       }
     }
 
-    if (
-      props.type === "email" &&
-      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(loginId)
-    ) {
-      return t("language") === "hi"
-        ? "एक मान्य ईमेल पता दर्ज करें।"
-        : "Enter a valid email address.";
+    if (props.type === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(loginId)) {
+      return "Enter a valid email address.";
     }
 
     if (!password.trim()) {
-      return t("language") === "hi" ? "पासवर्ड आवश्यक है।" : "Password is required.";
-    }
-
-    if (password.length < 3) {
-      return t("language") === "hi"
-        ? "पासवर्ड कम से कम 3 वर्णों का होना चाहिए।"
-        : "Password must be at least 3 characters.";
+      return "Password is required.";
     }
 
     return "";
@@ -66,99 +67,118 @@ const Login_Card = (props: LoginCardProps) => {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    const validationError = validate();
 
-    const message = validate();
-
-    if (message) {
-      setError(message);
+    if (validationError) {
+      setError(validationError);
       return;
     }
 
     setError("");
+    setLoading(true);
 
     try {
-      const loginRole = props.role === "Student" ? "student" : "admin";
-      const res = await fetch("/api/auth/login", {
+      const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          username: loginId,
-          password: password,
-          role: loginRole,
+          username: loginId.trim(),
+          password: password.trim(),
+          role: props.role.toLowerCase(),
         }),
       });
 
-      if (!res.ok) {
-        const errData = await res.json();
-        setError(errData.error || (t("language") === "hi" ? "लॉगिन विफल रहा" : "Login failed"));
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.error || "Authentication failed. Please check credentials.");
+        setLoading(false);
         return;
       }
 
-      const data = await res.json();
-      localStorage.setItem("currentRole", data.role);
-      if (data.role === "student") {
-        localStorage.setItem("currentStudentId", String(data.studentId));
+      // Store in localStorage for client-side state
+      if (typeof window !== "undefined") {
+        localStorage.setItem("currentRole", props.role.toLowerCase());
+        if (data.studentId) localStorage.setItem("currentStudentId", String(data.studentId));
+        if (data.teacherId) localStorage.setItem("currentTeacherId", String(data.teacherId));
+        if (data.name) localStorage.setItem("currentStudentName", data.name);
       }
 
       router.push(props.dashboardPath);
+      router.refresh();
     } catch (err) {
-      console.error(err);
-      setError(t("language") === "hi" ? "एक त्रुटि हुई। कृपया पुन: प्रयास करें।" : "An error occurred. Please try again.");
+      setError("An unexpected network error occurred. Please try again.");
+    } finally {
+      setLoading(false);
     }
   };
 
-  const roleTitle = props.role === "Student" ? t("login_role_student") : t("login_role_admin");
-  const roleSubtitle = props.role === "Student" ? t("login_student_para") : t("login_admin_para");
-  const inputLabel = props.role === "Student" ? t("login_student_id") : t("login_admin_email");
-  const inputPlaceholder = props.role === "Student" ? (t("language") === "hi" ? "अपनी छात्र आईडी दर्ज करें" : "Enter your Student ID") : (t("language") === "hi" ? "अपना एडमिन ईमेल दर्ज करें" : "Enter your Admin Email");
+  const isStudent = props.role === "Student";
+  const isTeacher = props.role === "Teacher";
 
   return (
-    <main className="flex min-h-screen flex-col justify-center bg-slate-50 py-12 px-4 sm:px-6 lg:px-8">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
-        <span className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-primary text-white shadow-md shadow-primary/20 mb-4">
-          <GraduationCap size={28} />
-        </span>
-        <h2 className="text-3xl font-extrabold tracking-tight text-slate-800">
-          {roleTitle} {t("nav_login")}
-        </h2>
-        <p className="mt-1.5 text-sm font-semibold text-slate-500 max-w-xs mx-auto">
-          {roleSubtitle}
-        </p>
-      </div>
+    <main className="flex min-h-screen flex-col justify-center items-center bg-slate-50 py-12 px-4 sm:px-6 lg:px-8">
+      <div className="w-full max-w-md">
+        {/* Modern Card Container */}
+        <div className="bg-white border border-slate-100 shadow-xl rounded-3xl p-8 sm:p-10">
+          {/* Header branding */}
+          <div className="text-center mb-6">
+            <div className="inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-[#EEF5FC] text-[#4285CD] mb-3 border border-[#85B6E9]/40">
+              {isStudent ? <User size={28} /> : isTeacher ? <UserCheck size={28} /> : <ShieldCheck size={28} />}
+            </div>
+            <h2 className="text-2xl font-extrabold tracking-tight text-[#06090C]">
+              {props.role} Sign In
+            </h2>
+            <p className="mt-1 text-xs font-semibold text-slate-500">
+              {props.para}
+            </p>
+          </div>
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white py-8 px-6 border border-slate-100 shadow-xl rounded-2xl sm:px-10">
-          <form className="space-y-5" onSubmit={handleSubmit} noValidate>
-            
-            {/* Login ID Input Field */}
-            <div className="space-y-1.5">
+          {/* Quick Demo Credentials Autofill Banner */}
+          <div className="mb-6 p-3 bg-[#EEF5FC] border border-[#85B6E9]/40 rounded-xl flex items-center justify-between">
+            <div className="text-[11px] text-[#06090C] font-medium">
+              <span>Demo Login: </span>
+              <b className="text-[#4285CD]">
+                {props.role === "Admin" ? "jayamyname19@gmail.com / 12345" : props.role === "Teacher" ? "amit.sharma@mgiti.edu / 12345" : "ID: 1 / Pwd: 101"}
+              </b>
+            </div>
+            <button
+              type="button"
+              onClick={fillDemo}
+              className="text-[11px] font-bold text-[#4285CD] bg-white border border-[#85B6E9]/50 px-2 py-1 rounded-lg hover:bg-[#EEF5FC] shadow-xs cursor-pointer"
+            >
+              Fill Demo
+            </button>
+          </div>
+
+          {/* Login Form */}
+          <form className="space-y-4" onSubmit={handleSubmit} noValidate>
+            {/* ID / Email Input Field */}
+            <div className="space-y-1">
               <label 
                 htmlFor="login-id" 
                 className="block text-xs font-bold uppercase tracking-wider text-slate-500"
               >
-                {inputLabel}
+                {props.label}
               </label>
               <input
                 id="login-id"
                 type={props.type}
-                inputMode={props.type === "number" ? "numeric" : "email"}
-                min={props.type === "number" ? 1 : undefined}
-                placeholder={inputPlaceholder}
+                placeholder={props.placeholder}
                 value={loginId}
                 onChange={(event) => setLoginId(event.target.value)}
-                className="block w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm text-slate-800 placeholder-slate-400 focus:border-primary focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-150"
+                className="block w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-2.5 text-sm text-[#06090C] placeholder-slate-400 focus:border-[#4285CD] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#4285CD]/20 transition-all duration-150"
                 aria-invalid={Boolean(error)}
-                aria-describedby={error ? "login-error" : undefined}
               />
             </div>
 
             {/* Password Input Field */}
-            <div className="space-y-1.5">
+            <div className="space-y-1">
               <label 
                 htmlFor="login-password" 
                 className="block text-xs font-bold uppercase tracking-wider text-slate-500"
               >
-                {t("login_password")}
+                Password
               </label>
               <input
                 id="login-password"
@@ -166,15 +186,14 @@ const Login_Card = (props: LoginCardProps) => {
                 placeholder="••••••••"
                 value={password}
                 onChange={(event) => setPassword(event.target.value)}
-                className="block w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-3 text-sm text-slate-800 placeholder-slate-400 focus:border-primary focus:bg-white focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all duration-150"
+                className="block w-full rounded-xl border border-slate-200 bg-slate-50/50 px-4 py-2.5 text-sm text-[#06090C] placeholder-slate-400 focus:border-[#4285CD] focus:bg-white focus:outline-none focus:ring-2 focus:ring-[#4285CD]/20 transition-all duration-150"
               />
             </div>
 
             {/* Error Message Alert */}
             {error && (
               <div 
-                className="flex items-center gap-2 text-xs font-bold text-red-600 bg-red-50 border border-red-100 px-4 py-3 rounded-xl"
-                id="login-error"
+                className="flex items-center gap-2 text-xs font-bold text-red-600 bg-red-50 border border-red-100 px-3.5 py-2.5 rounded-xl"
                 role="alert"
               >
                 <AlertCircle size={16} className="shrink-0" />
@@ -185,24 +204,25 @@ const Login_Card = (props: LoginCardProps) => {
             {/* Submit Button */}
             <button
               type="submit"
-              className="flex w-full justify-center items-center rounded-xl bg-primary px-4 py-3 text-sm font-bold text-white shadow-md shadow-primary/25 hover:bg-primary-dark hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-primary/20 active:translate-y-0 transition-all duration-150 cursor-pointer"
+              disabled={loading}
+              className="flex w-full justify-center items-center rounded-xl bg-[#4285CD] hover:bg-[#2F8AD4] px-4 py-3 text-sm font-bold text-white shadow-sm hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-[#4285CD]/20 active:translate-y-0 transition-all duration-150 cursor-pointer disabled:opacity-50"
             >
-              {t("login_btn_signin")}
+              {loading ? "Signing In..." : "Sign In"}
             </button>
 
             {/* Footer Form Links */}
-            <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-xs font-bold">
+            <div className="flex items-center justify-between pt-3 border-t border-slate-100 text-xs font-bold">
               <Link 
                 href="/pages/Chose_Login" 
-                className="text-primary hover:text-primary-dark hover:underline transition-colors"
+                className="text-[#4285CD] hover:text-[#2F8AD4] hover:underline transition-colors"
               >
-                {t("login_btn_back")}
+                &larr; Switch Role
               </Link>
               <Link 
                 href="/" 
-                className="text-slate-500 hover:text-slate-800 hover:underline transition-colors"
+                className="text-slate-500 hover:text-[#06090C] hover:underline transition-colors"
               >
-                {t("login_btn_home")}
+                Go to Homepage
               </Link>
             </div>
           </form>

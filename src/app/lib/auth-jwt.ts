@@ -1,4 +1,6 @@
-const JWT_SECRET = process.env.JWT_SECRET || 'maa-gauri-pvt-iti-erp-secure-secret-key-2026';
+// src/app/lib/auth-jwt.ts
+
+const JWT_SECRET = process.env.JWT_SECRET || 'maa-gauri-pvt-iti-erp-secure-secret-key-2026-min-entropy';
 const encoder = new TextEncoder();
 const decoder = new TextDecoder();
 
@@ -38,15 +40,15 @@ function base64urlDecodeToBytes(str: string): Uint8Array {
 }
 
 /**
- * Sign a JWT using standard Web Crypto API (Edge & Node compatible)
+ * Sign a JWT using HMAC-SHA256 with Web Crypto API
  */
-export async function signJWT(payload: any): Promise<string> {
+export async function signJWT(payload: any, expiresInSeconds: number = 86400): Promise<string> {
   const header = { alg: 'HS256', typ: 'JWT' };
   const headerStr = base64urlEncode(JSON.stringify(header));
   
-  // Set expiration to 24 hours
-  const exp = Math.floor(Date.now() / 1000) + 60 * 60 * 24;
-  const payloadStr = base64urlEncode(JSON.stringify({ ...payload, exp }));
+  const exp = Math.floor(Date.now() / 1000) + expiresInSeconds;
+  const iat = Math.floor(Date.now() / 1000);
+  const payloadStr = base64urlEncode(JSON.stringify({ ...payload, exp, iat }));
 
   const key = await crypto.subtle.importKey(
     'raw',
@@ -73,13 +75,21 @@ export async function signJWT(payload: any): Promise<string> {
 }
 
 /**
- * Verify a JWT using standard Web Crypto API
+ * Verify a JWT using strict HMAC-SHA256 signature verification & expiration check
  */
 export async function verifyJWT(token: string): Promise<any | null> {
   try {
+    if (!token || typeof token !== 'string') return null;
+
     const parts = token.split('.');
     if (parts.length !== 3) return null;
     const [headerStr, payloadStr, signatureStr] = parts;
+
+    // Verify header algorithm to prevent algorithm confusion attacks
+    const header = JSON.parse(base64urlDecode(headerStr));
+    if (header.alg !== 'HS256' || header.typ !== 'JWT') {
+      return null;
+    }
 
     const key = await crypto.subtle.importKey(
       'raw',
@@ -102,8 +112,15 @@ export async function verifyJWT(token: string): Promise<any | null> {
 
     const decodedPayload = JSON.parse(base64urlDecode(payloadStr));
     
-    if (decodedPayload.exp && decodedPayload.exp < Date.now() / 1000) {
+    // Check expiry
+    const nowInSeconds = Math.floor(Date.now() / 1000);
+    if (decodedPayload.exp && decodedPayload.exp < nowInSeconds) {
       return null; // Expired
+    }
+
+    // Check issued-at (prevent future tokens)
+    if (decodedPayload.iat && decodedPayload.iat > nowInSeconds + 300) {
+      return null;
     }
 
     return decodedPayload;

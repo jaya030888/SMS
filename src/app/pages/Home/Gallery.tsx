@@ -1,11 +1,41 @@
 "use client";
 
 import { useLanguage } from "../../context/LanguageContext";
-import Gallery_card from "../../components/Gallery_Card"
-import { Wrench, Monitor, BookOpen, Settings, Building, Lightbulb } from 'lucide-react'
+import { useCMS } from "../../context/CMSContext";
+import Gallery_card from "../../components/Gallery_Card";
+import { Wrench, Monitor, BookOpen, Settings, Building, Lightbulb } from 'lucide-react';
+
+const iconMap: Record<string, any> = {
+  Wrench,
+  Monitor,
+  BookOpen,
+  Settings,
+  Building,
+  Lightbulb,
+};
 
 const Gallery = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const { cms } = useCMS();
+
+  const isHindi = language === "hi";
+
+  const defaultItems = [
+    { id: 1, icon: Wrench, text: t("gallery_img_workshop") },
+    { id: 2, icon: Monitor, text: t("gallery_img_computer") },
+    { id: 3, icon: BookOpen, text: t("gallery_img_practical") },
+    { id: 4, icon: Settings, text: t("gallery_img_equipment") },
+    { id: 5, icon: Building, text: t("gallery_img_infrastructure") },
+    { id: 6, icon: Lightbulb, text: t("gallery_img_hands_on") },
+  ];
+
+  const galleryToRender = (!isHindi && cms?.gallery && cms.gallery.length > 0)
+    ? cms.gallery.map(g => ({
+        id: g.id,
+        icon: iconMap[g.iconName || ""] || Building,
+        text: g.title,
+      }))
+    : defaultItems;
 
   return (
     <section className="section gallery-section">
@@ -16,16 +46,18 @@ const Gallery = () => {
           <p>{t("gallery_desc")}</p>
         </div>
         <div className="card-grid gallery-grid">
-          <Gallery_card icon={Wrench} alter={t("gallery_img_workshop")} text={t("gallery_img_workshop")} />
-          <Gallery_card icon={Monitor} alter={t("gallery_img_computer")} text={t("gallery_img_computer")} />
-          <Gallery_card icon={BookOpen} alter={t("gallery_img_practical")} text={t("gallery_img_practical")} />
-          <Gallery_card icon={Settings} alter={t("gallery_img_equipment")} text={t("gallery_img_equipment")} />
-          <Gallery_card icon={Building} alter={t("gallery_img_infrastructure")} text={t("gallery_img_infrastructure")} />
-          <Gallery_card icon={Lightbulb} alter={t("gallery_img_hands_on")} text={t("gallery_img_hands_on")} />
+          {galleryToRender.map(item => (
+            <Gallery_card 
+              key={item.id} 
+              icon={item.icon} 
+              alter={item.text} 
+              text={item.text} 
+            />
+          ))}
         </div>
       </div>
     </section>
-  )
-}
+  );
+};
 
-export default Gallery
+export default Gallery;

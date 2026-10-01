@@ -23,6 +23,8 @@ export async function GET() {
       username: payload.username,
       role: payload.role,
       studentId: payload.studentId,
+      teacherId: payload.teacherId,
+      name: payload.name,
     });
   } catch (error: any) {
     console.error("Session API Error:", error);

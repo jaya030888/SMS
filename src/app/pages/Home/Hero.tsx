@@ -1,20 +1,31 @@
 "use client";
 
-import React from 'react'
-import Link from 'next/link'
+import React from 'react';
+import Link from 'next/link';
 import { useLanguage } from "../../context/LanguageContext";
+import { useCMS } from "../../context/CMSContext";
+import StackedCards from "../../components/StackedCards";
 
 const Hero = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const { cms } = useCMS();
+
+  const isHindi = language === "hi";
+
+  // Use CMS values or localized fallback
+  const eyebrow = isHindi ? t("hero_eyebrow") : (cms?.hero?.eyebrow || t("hero_eyebrow"));
+  const title1 = isHindi ? t("hero_title_1") : (cms?.hero?.title_1 || t("hero_title_1"));
+  const title2 = isHindi ? t("hero_title_2") : (cms?.hero?.title_2 || t("hero_title_2"));
+  const desc = isHindi ? t("hero_desc") : (cms?.hero?.desc || t("hero_desc"));
 
   return (
     <section className="hero section" id="home">
       <div className="section-inner hero-inner">
         <div className="hero-content">
-          <p className="eyebrow">{t("hero_eyebrow")}</p>
-          <h1>{t("hero_title_1")} <span>{t("hero_title_2")}</span></h1>
+          <p className="eyebrow">{eyebrow}</p>
+          <h1>{title1} <span>{title2}</span></h1>
 
-          <p>{t("hero_desc")}</p>
+          <p className="hero-description">{desc}</p>
 
           <div className="hero-actions">
             <Link href="/pages/Home/Addmission_Application_Form" className="button button-primary">
@@ -27,34 +38,13 @@ const Hero = () => {
           </div>
         </div>
 
-        <div className="hero-visual" aria-label="Institute highlights">
-          <div className="hero-card">
-            <div className="hero-card-top">
-              <span>{t("hero_card_tag")}</span>
-              <strong>{t("hero_card_year")}</strong>
-            </div>
-            <h2>{t("hero_card_title")}</h2>
-            <p>{t("hero_card_desc")}</p>
-
-            <div className="hero-badges">
-              <div>
-                <strong>{t("hero_badge_govt")}</strong>
-                <span>{t("hero_badge_govt_desc")}</span>
-              </div>
-              <div>
-                <strong>{t("hero_badge_alumni")}</strong>
-                <span>{t("hero_badge_alumni_desc")}</span>
-              </div>
-              <div>
-                <strong>{t("hero_badge_placement")}</strong>
-                <span>{t("hero_badge_placement_desc")}</span>
-              </div>
-            </div>
-          </div>
+        {/* Right Side: Interactive 3D Stacked Cards Deck */}
+        <div className="hero-visual" aria-label="Institute highlights deck">
+          <StackedCards />
         </div>
       </div>
     </section>
-  )
-}
+  );
+};
 
-export default Hero
+export default Hero;

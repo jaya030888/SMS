@@ -1,3 +1,4 @@
+import { describe, it, expect } from '@jest/globals';
 import { render, screen } from '@testing-library/react';
 import Page from '@/src/app/pages/Home/page'; // Adjust the import according to your actual Home component
 

@@ -1,29 +1,36 @@
 "use client";
 
-import React from 'react'
+import React from 'react';
 import { useLanguage } from "../../context/LanguageContext";
-import Updates_Card from '../../components/Updates_Card'
-import { BellRing } from 'lucide-react'
+import Updates_Card from '../../components/Updates_Card';
+import { BellRing } from 'lucide-react';
 
 const Updates = () => {
   const { t } = useLanguage();
 
   return (
-    <section className="section updates-section" id="updates">
-      <div className="section-inner">
-        <div className="section-title-row">
-          <BellRing className="text-primary" size={24} />
-          <h1>{t("updates_title")}</h1>
+    <section className="section bg-[#F8FAFC]" id="updates">
+      <div className="section-inner max-w-4xl mx-auto">
+        <div className="text-center mb-10">
+          <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[#EEF5FC] text-[#4285CD] mb-3">
+            <BellRing size={20} />
+          </div>
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-[#06090C] tracking-tight">
+            {t("updates_title")}
+          </h2>
+          <p className="text-xs sm:text-sm text-slate-500 mt-1">
+            Latest circulars, examination alerts, and academic notifications
+          </p>
         </div>
 
-        <div className="updates-list">
+        <div className="space-y-3.5">
           <Updates_Card date={t("update_1_date")} update={t("update_1_title")} para={t("update_1_desc")} />
           <Updates_Card date={t("update_2_date")} update={t("update_2_title")} para={t("update_2_desc")} />
           <Updates_Card date={t("update_3_date")} update={t("update_3_title")} para={t("update_3_desc")} />
         </div>
       </div>
     </section>
-  )
-}
+  );
+};
 
-export default Updates
+export default Updates;
