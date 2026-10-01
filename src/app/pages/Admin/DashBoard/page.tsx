@@ -188,61 +188,6 @@ export default function AdminDashboardPage() {
             {/* Left 2 Cols: Monthly Admissions & Document Status */}
             <div className="lg:col-span-2 space-y-6">
               
-              {/* Monthly Enrollment Bar Chart */}
-              <ChartCard 
-                title="Student Admission & Registration Velocity"
-                subtitle="Monthly student enrollment count for current academic session"
-                action={<Badge variant="primary">Target Exceeded</Badge>}
-              >
-                <div className="pt-2">
-                  <div className="h-56 flex items-end justify-between gap-2 sm:gap-4 px-2">
-                    {[
-                      { month: "Apr", val: 18, max: 50 },
-                      { month: "May", val: 26, max: 50 },
-                      { month: "Jun", val: 45, max: 50 },
-                      { month: "Jul", val: 48, max: 50 },
-                      { month: "Aug", val: 32, max: 50 },
-                      { month: "Sep", val: 38, max: 50 },
-                      { month: "Oct", val: 22, max: 50 },
-                      { month: "Nov", val: 15, max: 50 },
-                      { month: "Dec", val: 12, max: 50 },
-                      { month: "Jan", val: 28, max: 50 },
-                      { month: "Feb", val: 35, max: 50 },
-                      { month: "Mar", val: 40, max: 50 },
-                    ].map((bar) => {
-                      const heightPct = Math.round((bar.val / bar.max) * 100);
-                      const isHigh = bar.val >= 35;
-                      return (
-                        <div key={bar.month} className="flex-1 flex flex-col items-center gap-2 group">
-                          <div className="text-[10px] font-bold text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                            {bar.val}
-                          </div>
-                          <div className="w-full bg-slate-100 rounded-xl overflow-hidden flex flex-col justify-end h-40 p-0.5">
-                            <div
-                              style={{ height: `${heightPct}%` }}
-                              className={`w-full rounded-lg transition-all duration-500 group-hover:scale-105 ${
-                                isHigh ? 'bg-indigo-600' : 'bg-indigo-400/80'
-                              }`}
-                            />
-                          </div>
-                          <span className="text-[11px] font-bold text-slate-500">
-                            {bar.month}
-                          </span>
-                        </div>
-                      );
-                    })}
-                  </div>
-
-                  <div className="flex items-center justify-between pt-4 mt-2 border-t border-slate-100 text-xs text-slate-500">
-                    <span className="flex items-center gap-1.5">
-                      <span className="h-2.5 w-2.5 rounded-full bg-indigo-600 inline-block" />
-                      Peak Admission Months (June - July)
-                    </span>
-                    <span className="font-bold text-slate-700">Total Enrolled: {totalStudents} Students</span>
-                  </div>
-                </div>
-              </ChartCard>
-
               {/* Document Status Breakdown Matrix */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 

@@ -1978,3 +1978,56 @@ select:focus {
   opacity: 0.3;
 }
 
+/* ==========================================================================
+   Universal Mobile Responsive Helpers & Touch Optimization
+   ========================================================================== */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+@media (max-width: 640px) {
+  body {
+    font-size: 14px;
+  }
+
+  .section-inner {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+
+  .dashboard-grid.two,
+  .dashboard-grid.three {
+    grid-template-columns: 1fr !important;
+    gap: 1rem !important;
+  }
+
+  .stats-grid {
+    grid-template-columns: 1fr !important;
+    gap: 0.75rem !important;
+  }
+
+  .hero-badges {
+    grid-template-columns: 1fr !important;
+  }
+
+  .about-layout {
+    grid-template-columns: 1fr !important;
+    gap: 1.5rem !important;
+  }
+
+  .about-stats {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Modals on Mobile */
+  .modal-container {
+    padding: 0.75rem !important;
+    margin: 0 !important;
+  }
+}
+
+

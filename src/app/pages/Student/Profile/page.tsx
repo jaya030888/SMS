@@ -1,3 +1,4 @@
+// src/app/pages/Student/Profile/page.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -19,8 +20,12 @@ import {
   BadgeCheck, 
   Building,
   CreditCard,
-  AlertCircle
+  AlertCircle,
+  Award,
+  Printer
 } from "lucide-react";
+import type { PublishedMarksheet } from "@/src/app/lib/mockData";
+import MarksheetModal from "@/src/app/components/ui/MarksheetModal";
 
 interface StudentData {
   id: number;
@@ -41,7 +46,6 @@ interface StudentData {
   profile_photo?: string;
   gender?: string;
   blood_group?: string;
-  // Document details
   aadhaar_no?: string;
   aadhaar_status?: "Verified" | "Submitted" | "Pending" | "Rejected";
   marksheet_10th_roll?: string;
@@ -68,6 +72,10 @@ const defaultStudent: StudentData = {
 
 export default function StudentProfilePage() {
   const [student, setStudent] = useState<StudentData>(defaultStudent);
+  const [marksheets, setMarksheets] = useState<PublishedMarksheet[]>([]);
+  const [selectedMarksheet, setSelectedMarksheet] = useState<PublishedMarksheet | null>(null);
+  const [acceptingId, setAcceptingId] = useState<number | null>(null);
+  const [successToast, setSuccessToast] = useState("");
   const [loading, setLoading] = useState(true);
   const [uploading, setUploading] = useState(false);
 
@@ -78,15 +86,15 @@ export default function StudentProfilePage() {
         throw new Error("No session");
       })
       .then((session) => {
-        const studentId = session.studentId;
-        return fetch(`/api/applicants?id=${studentId}`);
+        const studentId = session.studentId || 1;
+        return Promise.all([
+          fetch(`/api/applicants?id=${studentId}`).then(r => r.ok ? r.json() : defaultStudent),
+          fetch(`/api/marksheets?student_id=${studentId}`).then(r => r.ok ? r.json() : [])
+        ]);
       })
-      .then((res) => {
-        if (res.ok) return res.json();
-        throw new Error("Failed to fetch student profile");
-      })
-      .then((data: StudentData) => {
+      .then(([data, mData]) => {
         setStudent(data);
+        setMarksheets(mData);
       })
       .catch((err) => {
         console.error("Error fetching student profile:", err);
@@ -95,6 +103,30 @@ export default function StudentProfilePage() {
         setLoading(false);
       });
   }, []);
+
+  const handleAcceptMarksheet = async (marksheetId: number) => {
+    setAcceptingId(marksheetId);
+    try {
+      const res = await fetch("/api/marksheets", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "accept", marksheet_id: marksheetId })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setMarksheets(prev => prev.map(m => m.id === marksheetId ? data.marksheet : m));
+        if (selectedMarksheet?.id === marksheetId) {
+          setSelectedMarksheet(data.marksheet);
+        }
+        setSuccessToast("Marksheet signed and accepted successfully!");
+        setTimeout(() => setSuccessToast(""), 4000);
+      }
+    } catch (e) {
+      console.error("Failed to accept marksheet:", e);
+    } finally {
+      setAcceptingId(null);
+    }
+  };
 
   const formatDate = (dateStr?: string) => {
     if (!dateStr) return "N/A";
@@ -128,16 +160,14 @@ export default function StudentProfilePage() {
           profile_photo: base64
         })
       })
-      .then((res) => {
-        if (res.ok) {
-          alert("Profile photo updated successfully!");
-          setStudent(prev => ({ ...prev, profile_photo: base64 }));
-        } else {
-          alert("Failed to update profile photo.");
-        }
-      })
-      .catch(() => alert("Failed to update profile photo."))
-      .finally(() => setUploading(false));
+        .then((res) => {
+          if (res.ok) {
+            setStudent((prev) => ({ ...prev, profile_photo: base64 }));
+          }
+        })
+        .finally(() => {
+          setUploading(false);
+        });
     };
     reader.readAsDataURL(file);
   };
@@ -146,7 +176,7 @@ export default function StudentProfilePage() {
     return (
       <>
         <StuNav name="My Documents & Profile" role="student" />
-        <main className="min-h-screen bg-slate-50 flex items-center justify-center p-8">
+        <main className="min-h-screen bg-slate-50 flex items-center justify-center">
           <div className="text-center space-y-3">
             <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary mx-auto"></div>
             <p className="text-slate-600 font-bold text-sm">Loading Student Document Details...</p>
@@ -160,10 +190,21 @@ export default function StudentProfilePage() {
 
   return (
     <>
-      <StuNav name="My Documents & Profile" role="student" />
+      <StuNav name="My Documents & Profile" role="student" userName={student.name} />
 
       <main className="min-h-screen bg-slate-50 py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-5xl mx-auto space-y-6">
+
+          {/* Toast Notification */}
+          {successToast && (
+            <div className="p-4 rounded-2xl bg-emerald-600 text-white font-bold text-xs flex items-center justify-between shadow-lg">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 size={18} />
+                <span>{successToast}</span>
+              </div>
+              <button onClick={() => setSuccessToast("")} className="text-white/80 hover:text-white cursor-pointer font-bold">✕</button>
+            </div>
+          )}
 
           {/* Profile Header Banner */}
           <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xs flex flex-col sm:flex-row items-center sm:items-start gap-6">
@@ -180,7 +221,7 @@ export default function StudentProfilePage() {
                 </div>
               )}
 
-              <label className="absolute bottom-0 right-0 p-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 shadow-md cursor-pointer transition-all hover:scale-105">
+              <label className="absolute bottom-0 right-0 p-2 rounded-xl bg-[#4285CD] text-white hover:bg-[#2F8AD4] shadow-md cursor-pointer transition-all hover:scale-105">
                 <Camera size={14} />
                 <input
                   type="file"
@@ -209,7 +250,7 @@ export default function StudentProfilePage() {
 
               <h1 className="text-2xl sm:text-3xl font-black text-slate-900">{student.name}</h1>
               <p className="text-xs sm:text-sm text-slate-500 font-medium">
-                Student ID: #{student.id} • Session 2024-2026 • Maa Gauri ITI
+                Student ID: #{student.id} • Session {student.batch || "2024-2026"} • Maa Gauri ITI
               </p>
             </div>
 
@@ -222,6 +263,73 @@ export default function StudentProfilePage() {
                 <span>Fee Ledger</span>
               </Link>
             </div>
+          </div>
+
+          {/* OFFICIAL PUBLISHED MARKSHEETS & RESULTS SECTION */}
+          <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-xs space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 gap-2">
+              <div className="flex items-center gap-2.5">
+                <div className="h-9 w-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">
+                  <Award size={20} />
+                </div>
+                <div>
+                  <h2 className="text-base font-extrabold text-slate-900">Official Published Marksheets</h2>
+                  <p className="text-xs text-slate-500">View, download, and accept semester marksheet issued by Admin</p>
+                </div>
+              </div>
+            </div>
+
+            {marksheets.length === 0 ? (
+              <div className="p-6 text-center bg-slate-50 rounded-2xl border border-slate-150">
+                <p className="text-xs font-bold text-slate-500">No published marksheets available yet.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {marksheets.map((m) => {
+                  const isAccepted = m.status === "Accepted by Student";
+                  return (
+                    <div key={m.id} className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-3 flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-center justify-between gap-2 mb-1.5">
+                          <span className="text-[10px] font-mono font-bold text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200">
+                            {m.certificate_no}
+                          </span>
+                          <span className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-full flex items-center gap-1 ${
+                            isAccepted ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800"
+                          }`}>
+                            {isAccepted ? <CheckCircle2 size={12} /> : <Clock size={12} />}
+                            <span>{m.status}</span>
+                          </span>
+                        </div>
+                        <h4 className="text-xs font-extrabold text-slate-900">{m.semester}</h4>
+                        <p className="text-[11px] text-slate-500">{m.exam_session}</p>
+                        <p className="text-xs font-bold text-indigo-700 mt-1">Score: {m.total_marks}/{m.max_marks} ({m.percentage}%) • Grade: {m.grade}</p>
+                      </div>
+
+                      <div className="flex items-center gap-2 pt-2 border-t border-slate-200">
+                        <button
+                          onClick={() => setSelectedMarksheet(m)}
+                          className="flex-1 py-2 px-3 rounded-xl bg-white hover:bg-slate-100 text-slate-800 border border-slate-200 font-bold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                        >
+                          <Printer size={13} />
+                          <span>View & Download</span>
+                        </button>
+                        {!isAccepted && (
+                          <button
+                            onClick={() => handleAcceptMarksheet(m.id)}
+                            disabled={acceptingId === m.id}
+                            className="flex-1 py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-xs cursor-pointer disabled:opacity-50"
+                          >
+                            <CheckCircle2 size={13} />
+                            <span>{acceptingId === m.id ? "Signing..." : "Accept"}</span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           {/* Official Document Details Section */}
@@ -247,13 +355,12 @@ export default function StudentProfilePage() {
 
             {/* Grid of Documents */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-
               {/* 1. Aadhaar Card */}
               <div className="p-4 rounded-2xl bg-slate-50 border border-slate-150 space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <ShieldCheck size={18} className="text-indigo-600" />
-                    <h3 className="text-xs font-extrabold text-slate-800">Aadhaar Card (UIDAI)</h3>
+                    <h3 className="text-xs font-extrabold text-slate-800">Government Aadhaar Card</h3>
                   </div>
                   <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
                     (student.aadhaar_status || "Verified") === "Verified"
@@ -264,17 +371,17 @@ export default function StudentProfilePage() {
                   </span>
                 </div>
                 <div className="text-xs space-y-0.5">
-                  <span className="text-[10px] uppercase font-bold text-slate-400">Aadhaar Number</span>
-                  <p className="font-mono font-bold text-slate-800">{student.aadhaar_no || `5821-9043-${String(student.id + 1000).padStart(4, "0")}`}</p>
+                  <span className="text-[10px] uppercase font-bold text-slate-400">UIDAI Aadhaar Number</span>
+                  <p className="font-mono font-bold text-slate-800">{student.aadhaar_no || "5821-9043-1290"}</p>
                 </div>
               </div>
 
-              {/* 2. 10th Class Marksheet */}
+              {/* 2. 10th Marksheet */}
               <div className="p-4 rounded-2xl bg-slate-50 border border-slate-150 space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
                     <FileCheck2 size={18} className="text-indigo-600" />
-                    <h3 className="text-xs font-extrabold text-slate-800">10th Class Marksheet / Certificate</h3>
+                    <h3 className="text-xs font-extrabold text-slate-800">10th / Matriculation Marksheet</h3>
                   </div>
                   <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
                     (student.marksheet_10th_status || "Verified") === "Verified"
@@ -285,17 +392,17 @@ export default function StudentProfilePage() {
                   </span>
                 </div>
                 <div className="text-xs space-y-0.5">
-                  <span className="text-[10px] uppercase font-bold text-slate-400">Roll / Certificate No</span>
-                  <p className="font-mono font-bold text-slate-800">{student.marksheet_10th_roll || `BSEB-2022-${String(student.id + 5000)}`}</p>
+                  <span className="text-[10px] uppercase font-bold text-slate-400">Board Roll / Certificate</span>
+                  <p className="font-mono font-bold text-slate-800">{student.marksheet_10th_roll || "BSEB-2022-0941"}</p>
                 </div>
               </div>
 
-              {/* 3. 12th / Intermediate Certificate */}
+              {/* 3. 12th Marksheet */}
               <div className="p-4 rounded-2xl bg-slate-50 border border-slate-150 space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <GraduationCap size={18} className="text-indigo-600" />
-                    <h3 className="text-xs font-extrabold text-slate-800">12th / Higher Qualification</h3>
+                    <FileCheck2 size={18} className="text-indigo-600" />
+                    <h3 className="text-xs font-extrabold text-slate-800">12th / Intermediate Certificate</h3>
                   </div>
                   <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
                     (student.marksheet_12th_status || "Verified") === "Verified"
@@ -333,7 +440,6 @@ export default function StudentProfilePage() {
                   </p>
                 </div>
               </div>
-
             </div>
 
             {/* Document Remarks */}
@@ -351,7 +457,7 @@ export default function StudentProfilePage() {
           {/* Personal Information */}
           <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-xs">
             <h2 className="text-base font-extrabold text-slate-900 pb-4 border-b border-slate-100 mb-5">
-              Personal Profile
+              Personal Profile & Contact Details
             </h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 text-xs">
@@ -429,6 +535,16 @@ export default function StudentProfilePage() {
 
         </div>
       </main>
+
+      {/* Official Marksheet Modal */}
+      {selectedMarksheet && (
+        <MarksheetModal
+          marksheet={selectedMarksheet}
+          onClose={() => setSelectedMarksheet(null)}
+          onAccept={handleAcceptMarksheet}
+          accepting={acceptingId === selectedMarksheet.id}
+        />
+      )}
     </>
   );
 }

@@ -1,3 +1,4 @@
+// src/app/pages/Student/DashBoard/page.tsx
 "use client";
 
 import { useState, useEffect } from "react";
@@ -15,13 +16,17 @@ import {
   Clock, 
   AlertCircle, 
   ShieldCheck, 
-  ArrowRight,
-  Printer,
-  BadgeCheck,
-  FileCheck2,
-  Receipt,
-  Sparkles
+  ArrowRight, 
+  Printer, 
+  BadgeCheck, 
+  FileCheck2, 
+  Receipt, 
+  Sparkles,
+  Award,
+  Download
 } from "lucide-react";
+import type { PublishedMarksheet } from "@/src/app/lib/mockData";
+import MarksheetModal from "@/src/app/components/ui/MarksheetModal";
 
 interface StudentData {
   id: number;
@@ -42,7 +47,6 @@ interface StudentData {
   payment_status?: string;
   remaining_balance?: number;
   profile_photo?: string;
-  // Document details
   aadhaar_no?: string;
   aadhaar_status?: "Verified" | "Submitted" | "Pending" | "Rejected";
   marksheet_10th_roll?: string;
@@ -69,38 +73,63 @@ const defaultStudent: StudentData = {
 export default function StudentDashboardPage() {
   const [student, setStudent] = useState<StudentData>(defaultStudent);
   const [courseFees, setCourseFees] = useState<{ course: string; total_fee: number; [key: string]: unknown }[]>([]);
+  const [marksheets, setMarksheets] = useState<PublishedMarksheet[]>([]);
+  const [selectedMarksheet, setSelectedMarksheet] = useState<PublishedMarksheet | null>(null);
+  const [acceptingId, setAcceptingId] = useState<number | null>(null);
+  const [successToast, setSuccessToast] = useState("");
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/auth/session")
-      .then((res) => {
-        if (res.ok) return res.json();
-        throw new Error("No session");
-      })
-      .then((session) => {
-        const studentId = session.studentId;
-        return Promise.all([
-          fetch(`/api/applicants?id=${studentId}`).then((res) => {
-            if (res.ok) return res.json();
-            throw new Error("Failed to fetch student details");
-          }),
-          fetch("/api/course_fees").then((res) => {
-            if (res.ok) return res.json();
-            throw new Error("Failed to fetch course fees");
-          })
+    async function loadData() {
+      try {
+        const resSession = await fetch("/api/auth/session");
+        let studentId = 1;
+        if (resSession.ok) {
+          const session = await resSession.json();
+          if (session.studentId) studentId = session.studentId;
+        }
+
+        const [resApplicant, resFees, resMarksheets] = await Promise.all([
+          fetch(`/api/applicants?id=${studentId}`),
+          fetch("/api/course_fees"),
+          fetch(`/api/marksheets?student_id=${studentId}`)
         ]);
-      })
-      .then(([applicant, feesData]) => {
-        setCourseFees(feesData);
-        setStudent(applicant);
-      })
-      .catch((err) => {
+
+        if (resApplicant.ok) setStudent(await resApplicant.json());
+        if (resFees.ok) setCourseFees(await resFees.json());
+        if (resMarksheets.ok) setMarksheets(await resMarksheets.json());
+      } catch (err) {
         console.error("Error fetching student details:", err);
-      })
-      .finally(() => {
+      } finally {
         setLoading(false);
-      });
+      }
+    }
+    loadData();
   }, []);
+
+  const handleAcceptMarksheet = async (marksheetId: number) => {
+    setAcceptingId(marksheetId);
+    try {
+      const res = await fetch("/api/marksheets", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: "accept", marksheet_id: marksheetId })
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setMarksheets(prev => prev.map(m => m.id === marksheetId ? data.marksheet : m));
+        if (selectedMarksheet?.id === marksheetId) {
+          setSelectedMarksheet(data.marksheet);
+        }
+        setSuccessToast("Marksheet accepted and digitally acknowledged successfully!");
+        setTimeout(() => setSuccessToast(""), 4000);
+      }
+    } catch (e) {
+      console.error("Failed to accept marksheet:", e);
+    } finally {
+      setAcceptingId(null);
+    }
+  };
 
   const getFeeDetails = () => {
     const courseName = student.course || "";
@@ -141,84 +170,64 @@ export default function StudentDashboardPage() {
     return new Intl.NumberFormat("en-IN", {
       style: "currency",
       currency: "INR",
-      maximumFractionDigits: 0
+      maximumFractionDigits: 0,
     }).format(val);
   };
-
-  const fee = getFeeDetails();
-
-  // Document status helper
-  const docStatus = student.documents_status || (student.id % 2 === 0 ? "Verified" : "Pending Verification");
-
-  const documentChecklist = [
-    {
-      name: "Aadhaar Card",
-      detail: student.aadhaar_no || `XXXX-XXXX-${String(student.id).padStart(4, "0")}`,
-      status: student.aadhaar_status || "Verified",
-      icon: ShieldCheck
-    },
-    {
-      name: "10th Class Marksheet",
-      detail: student.marksheet_10th_roll || `Roll: BSEB-${student.id + 1000}`,
-      status: student.marksheet_10th_status || "Verified",
-      icon: FileCheck2
-    },
-    {
-      name: "12th / Qualification Certificate",
-      detail: student.Qualification || "Senior Secondary",
-      status: student.marksheet_12th_status || (student.Qualification.includes("12th") ? "Verified" : "N/A"),
-      icon: GraduationCap
-    },
-    {
-      name: "Transfer / Leaving Certificate (TC)",
-      detail: `TC Ref: TC-MG-${student.id + 500}`,
-      status: student.tc_status || (student.id % 2 === 0 ? "Verified" : "Pending"),
-      icon: FileText
-    }
-  ];
 
   if (loading) {
     return (
       <>
-        <StuNav name="Dashboard" role="student" />
-        <main className="min-h-screen bg-slate-50 flex items-center justify-center p-8">
+        <StuNav name="Student Dashboard" role="student" />
+        <main className="min-h-screen bg-slate-50 flex items-center justify-center">
           <div className="text-center space-y-3">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-primary mx-auto"></div>
-            <p className="text-slate-600 font-bold text-sm">Loading Student Records & Fee Details...</p>
+            <div className="h-10 w-10 border-4 border-[#4285CD] border-t-transparent rounded-full animate-spin mx-auto" />
+            <p className="text-xs font-bold text-slate-500">Loading Student Dashboard...</p>
           </div>
         </main>
       </>
     );
   }
 
+  const fee = getFeeDetails();
+  const docStatus = student.documents_status || "Verified";
+
+  const documentChecklist = [
+    { name: "Government Aadhaar Card", status: student.aadhaar_status || "Verified", detail: student.aadhaar_no || "5821-XXXX-1290", icon: ShieldCheck },
+    { name: "10th High School Marksheet", status: student.marksheet_10th_status || "Verified", detail: `Roll: ${student.marksheet_10th_roll || "BSEB-0941"}`, icon: FileCheck2 },
+    { name: "12th / Intermediate Marksheet", status: student.marksheet_12th_status || "Verified", detail: "Science Stream", icon: FileCheck2 },
+    { name: "Transfer Certificate (TC)", status: student.tc_status || "Verified", detail: "Original Submitted", icon: BadgeCheck },
+    { name: "Category / Caste Certificate", status: student.category_cert_status || "General", detail: "General Quota", icon: FileText }
+  ];
+
   return (
     <>
-      <StuNav name="Dashboard" role="student" />
+      <StuNav name="Student Portal" role="student" userName={student.name} />
 
       <main className="min-h-screen bg-slate-50 py-8 px-4 sm:px-6 lg:px-8">
         <div className="max-w-7xl mx-auto space-y-6">
 
-          {/* Hero Student Banner */}
-          <div className="bg-gradient-to-r from-slate-900 via-indigo-950 to-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-md relative overflow-hidden border border-slate-800">
-            <div className="absolute right-0 top-0 translate-x-10 -translate-y-10 w-64 h-64 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+          {/* Success Toast Notification */}
+          {successToast && (
+            <div className="p-4 rounded-2xl bg-emerald-600 text-white font-bold text-xs flex items-center justify-between shadow-lg animate-in fade-in">
+              <div className="flex items-center gap-2">
+                <CheckCircle2 size={18} />
+                <span>{successToast}</span>
+              </div>
+              <button onClick={() => setSuccessToast("")} className="text-white/80 hover:text-white cursor-pointer font-extrabold">✕</button>
+            </div>
+          )}
 
+          {/* Hero Student Banner */}
+          <div className="bg-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-md relative overflow-hidden border border-slate-800">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 relative z-10">
               <div className="flex items-center gap-5">
-                {student.profile_photo ? (
-                  <img
-                    src={student.profile_photo}
-                    alt={student.name}
-                    className="w-20 h-20 rounded-2xl object-cover border-2 border-white/20 shadow-md"
-                  />
-                ) : (
-                  <div className="w-20 h-20 rounded-2xl bg-white/10 border border-white/20 flex items-center justify-center text-white text-2xl font-black">
-                    {student.name[0]}
-                  </div>
-                )}
+                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-[#4285CD] text-white flex items-center justify-center text-2xl font-black shrink-0">
+                  {student.name.split(" ").map(n => n[0]).slice(0, 2).join("")}
+                </div>
 
                 <div>
                   <div className="flex items-center gap-2 mb-1">
-                    <span className="text-[10px] uppercase tracking-wider font-extrabold px-2.5 py-0.5 rounded-md bg-indigo-500/30 text-indigo-300 border border-indigo-400/30">
+                    <span className="text-[10px] uppercase tracking-wider font-extrabold px-2.5 py-0.5 rounded-md bg-[#4285CD]/30 text-indigo-300 border border-indigo-400/30">
                       Roll: {student.roll_no || `MG-2024-${String(student.id).padStart(3, "0")}`}
                     </span>
                     <span className="text-[10px] uppercase tracking-wider font-extrabold px-2.5 py-0.5 rounded-md bg-white/10 text-slate-300">
@@ -230,7 +239,7 @@ export default function StudentDashboardPage() {
                   <p className="text-xs sm:text-sm text-slate-300 mt-1 flex items-center gap-2">
                     <span>Father: <b>{student.fatherName}</b></span>
                     <span>•</span>
-                    <span>ID: #{student.id}</span>
+                    <span>Batch: {student.batch || "2024-2026"}</span>
                   </p>
                 </div>
               </div>
@@ -242,17 +251,106 @@ export default function StudentDashboardPage() {
                   className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs border border-white/15 transition-all flex items-center gap-1.5"
                 >
                   <FileText size={14} />
-                  <span>My Documents</span>
+                  <span>My KYC & Profile</span>
                 </Link>
                 <Link
                   href="/pages/Student/Fee_Details"
-                  className="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-md transition-all flex items-center gap-1.5"
+                  className="px-4 py-2.5 rounded-xl bg-[#4285CD] hover:bg-[#2F8AD4] text-white font-bold text-xs shadow-md transition-all flex items-center gap-1.5"
                 >
                   <CreditCard size={14} />
                   <span>Fee Ledger & Receipts</span>
                 </Link>
               </div>
             </div>
+          </div>
+
+          {/* OFFICIAL PUBLISHED MARKSHEETS SECTION (Admin Published -> Student Download/Accept) */}
+          <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-xs space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-slate-100">
+              <div className="flex items-center gap-2.5">
+                <div className="h-9 w-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">
+                  <Award size={20} />
+                </div>
+                <div>
+                  <h2 className="text-base font-extrabold text-slate-900">Official Marksheets & Certificates</h2>
+                  <p className="text-xs text-slate-500">NCVT / Institute examination marksheets published by Admin</p>
+                </div>
+              </div>
+              <span className="text-xs font-extrabold text-indigo-700 bg-indigo-50 px-3 py-1 rounded-xl border border-indigo-100 self-start sm:self-auto">
+                {marksheets.length} Marksheet(s) Available
+              </span>
+            </div>
+
+            {marksheets.length === 0 ? (
+              <div className="p-8 text-center bg-slate-50 rounded-2xl border border-slate-150">
+                <p className="text-xs font-bold text-slate-500">No published marksheets found for your enrollment yet.</p>
+                <p className="text-[11px] text-slate-400 mt-1">Admin publishes marksheets after semester evaluations.</p>
+              </div>
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {marksheets.map((m) => {
+                  const isAccepted = m.status === "Accepted by Student";
+                  return (
+                    <div key={m.id} className="p-5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-4 flex flex-col justify-between">
+                      <div>
+                        <div className="flex items-center justify-between gap-2 mb-2">
+                          <span className="text-[10px] font-mono font-bold text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200">
+                            {m.certificate_no}
+                          </span>
+                          <span className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-full flex items-center gap-1 ${
+                            isAccepted 
+                              ? "bg-emerald-100 text-emerald-800" 
+                              : "bg-amber-100 text-amber-800"
+                          }`}>
+                            {isAccepted ? <CheckCircle2 size={12} /> : <Clock size={12} />}
+                            <span>{m.status}</span>
+                          </span>
+                        </div>
+
+                        <h3 className="text-sm font-extrabold text-slate-900">{m.semester}</h3>
+                        <p className="text-xs text-slate-500">{m.exam_session}</p>
+
+                        <div className="grid grid-cols-3 gap-2 my-3 p-3 bg-white rounded-xl border border-slate-150 text-center text-xs">
+                          <div>
+                            <span className="text-[10px] text-slate-400 font-bold block">Score</span>
+                            <strong className="text-slate-800 font-bold font-mono">{m.total_marks}/{m.max_marks}</strong>
+                          </div>
+                          <div>
+                            <span className="text-[10px] text-slate-400 font-bold block">Percentage</span>
+                            <strong className="text-[#4285CD] font-bold font-mono">{m.percentage}%</strong>
+                          </div>
+                          <div>
+                            <span className="text-[10px] text-slate-400 font-bold block">Grade</span>
+                            <strong className="text-emerald-700 font-black">{m.grade}</strong>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2 pt-2 border-t border-slate-200/70">
+                        <button
+                          onClick={() => setSelectedMarksheet(m)}
+                          className="flex-1 py-2 px-3 rounded-xl bg-white hover:bg-slate-100 text-slate-800 border border-slate-200 font-bold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                        >
+                          <Printer size={13} />
+                          <span>View & Download</span>
+                        </button>
+
+                        {!isAccepted && (
+                          <button
+                            onClick={() => handleAcceptMarksheet(m.id)}
+                            disabled={acceptingId === m.id}
+                            className="flex-1 py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-xs cursor-pointer disabled:opacity-50"
+                          >
+                            <CheckCircle2 size={13} />
+                            <span>{acceptingId === m.id ? "Signing..." : "Accept"}</span>
+                          </button>
+                        )}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
 
           {/* Top Two Main Cards: Document Verification & Fee Summary */}
@@ -387,7 +485,7 @@ export default function StudentDashboardPage() {
               <div className="pt-5 mt-4 border-t border-slate-100">
                 <Link
                   href="/pages/Student/Fee_Details"
-                  className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl bg-primary hover:bg-primary-dark text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
+                  className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl bg-[#4285CD] hover:bg-[#2F8AD4] text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
                 >
                   <Receipt size={15} />
                   <span>View Fee History & Pay Online</span>
@@ -443,6 +541,16 @@ export default function StudentDashboardPage() {
 
         </div>
       </main>
+
+      {/* Official Marksheet Print / Download Modal */}
+      {selectedMarksheet && (
+        <MarksheetModal
+          marksheet={selectedMarksheet}
+          onClose={() => setSelectedMarksheet(null)}
+          onAccept={handleAcceptMarksheet}
+          accepting={acceptingId === selectedMarksheet.id}
+        />
+      )}
     </>
   );
 }

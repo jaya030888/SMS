@@ -100,6 +100,35 @@ export interface Payment {
   remarks?: string;
 }
 
+export interface PublishedMarksheet {
+  id: number;
+  student_id: number;
+  student_name: string;
+  roll_no: string;
+  course: string;
+  batch: string;
+  semester: string;
+  exam_session: string;
+  issue_date: string;
+  certificate_no: string;
+  total_marks: number;
+  max_marks: number;
+  percentage: number;
+  grade: string;
+  result: 'PASS' | 'DISTINCTION';
+  subjects: Array<{
+    code: string;
+    name: string;
+    max_marks: number;
+    min_pass_marks: number;
+    secured_marks: number;
+    grade: string;
+  }>;
+  status: 'Published' | 'Accepted by Student';
+  accepted_at?: string;
+  admin_signature: string;
+}
+
 export interface LandingCMSData {
   hero: {
     eyebrow: string;
@@ -411,6 +440,60 @@ export const initialPayments: Payment[] = [
   }
 ];
 
+export const initialPublishedMarksheets: PublishedMarksheet[] = [
+  {
+    id: 1,
+    student_id: 1,
+    student_name: "Aarav Sharma",
+    roll_no: "MG-2024-001",
+    course: "COPA",
+    batch: "2024-2026",
+    semester: "Semester 1 (Annual AITT Exam)",
+    exam_session: "NCVT All India Trade Test - July 2025",
+    issue_date: "2025-08-10",
+    certificate_no: "NCVT-AITT-2025-COPA-0091",
+    total_marks: 556,
+    max_marks: 600,
+    percentage: 92.6,
+    grade: "A+",
+    result: "DISTINCTION",
+    subjects: [
+      { code: "TT-101", name: "Trade Theory & Computer Fundamentals", max_marks: 100, min_pass_marks: 33, secured_marks: 88, grade: "A+" },
+      { code: "TP-102", name: "Trade Practical (HTML/JS/Database Lab)", max_marks: 250, min_pass_marks: 150, secured_marks: 232, grade: "O" },
+      { code: "ES-103", name: "Employability & Workplace Skills", max_marks: 50, min_pass_marks: 17, secured_marks: 46, grade: "A+" },
+      { code: "FA-104", name: "Formative Assessment & Sessional Work", max_marks: 200, min_pass_marks: 120, secured_marks: 190, grade: "O" }
+    ],
+    status: "Published",
+    admin_signature: "Controller of Examinations & Principal, Maa Gauri ITI"
+  },
+  {
+    id: 2,
+    student_id: 2,
+    student_name: "Sneha Patel",
+    roll_no: "MG-2024-002",
+    course: "Electrician",
+    batch: "2024-2026",
+    semester: "Semester 1 (AITT Mid-Term Exam)",
+    exam_session: "NCVT All India Trade Test - July 2025",
+    issue_date: "2025-08-10",
+    certificate_no: "NCVT-AITT-2025-ELEC-0118",
+    total_marks: 391,
+    max_marks: 450,
+    percentage: 86.8,
+    grade: "A+",
+    result: "PASS",
+    subjects: [
+      { code: "TT-201", name: "Trade Theory (AC/DC Machines & Wiring)", max_marks: 100, min_pass_marks: 33, secured_marks: 82, grade: "A" },
+      { code: "TP-202", name: "Trade Practical (Electrical Machines Lab)", max_marks: 250, min_pass_marks: 150, secured_marks: 220, grade: "A+" },
+      { code: "WS-203", name: "Workshop Calculation & Science", max_marks: 50, min_pass_marks: 17, secured_marks: 44, grade: "A+" },
+      { code: "ED-204", name: "Engineering Drawing (Circuits)", max_marks: 50, min_pass_marks: 17, secured_marks: 45, grade: "A+" }
+    ],
+    status: "Accepted by Student",
+    accepted_at: "2025-08-14T15:20:00Z",
+    admin_signature: "Controller of Examinations & Principal, Maa Gauri ITI"
+  }
+];
+
 export const initialLandingCMS: LandingCMSData = {
   hero: {
     eyebrow: "Govt. Recognized Vocational Training",
@@ -491,6 +574,7 @@ class ERPStore {
   courses: CourseBatch[] = [...initialCourses];
   fees: CourseFee[] = [...initialFees];
   payments: Payment[] = [...initialPayments];
+  marksheets: PublishedMarksheet[] = [...initialPublishedMarksheets];
   landingCMS: LandingCMSData = JSON.parse(JSON.stringify(initialLandingCMS));
 
   constructor() {}
@@ -572,6 +656,34 @@ class ERPStore {
     const newPayment: Payment = { ...p, id: newId, transaction_id, payment_date };
     this.payments.unshift(newPayment);
     return newPayment;
+  }
+
+  // Marksheets methods
+  getMarksheets(student_id?: number): PublishedMarksheet[] {
+    if (student_id) {
+      return this.marksheets.filter(m => m.student_id === student_id);
+    }
+    return this.marksheets;
+  }
+
+  acceptMarksheet(id: number, student_id: number): PublishedMarksheet | null {
+    const idx = this.marksheets.findIndex(m => m.id === id && m.student_id === student_id);
+    if (idx !== -1) {
+      this.marksheets[idx] = {
+        ...this.marksheets[idx],
+        status: 'Accepted by Student',
+        accepted_at: new Date().toISOString()
+      };
+      return this.marksheets[idx];
+    }
+    return null;
+  }
+
+  publishMarksheet(m: Omit<PublishedMarksheet, 'id'>): PublishedMarksheet {
+    const newId = this.marksheets.length > 0 ? Math.max(...this.marksheets.map(x => x.id)) + 1 : 1;
+    const newMarksheet: PublishedMarksheet = { ...m, id: newId };
+    this.marksheets.unshift(newMarksheet);
+    return newMarksheet;
   }
 
   // Landing CMS methods
