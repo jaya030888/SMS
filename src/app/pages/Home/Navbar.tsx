@@ -163,6 +163,21 @@ export function Navbar() {
             </nav>
 
             <div className="mt-auto space-y-3 pt-4 border-t border-slate-100">
+              {/* Mobile Language Switcher */}
+              <div className="flex items-center justify-between p-2 rounded-xl bg-slate-50 border border-slate-200">
+                <span className="text-xs font-bold text-slate-600">Language / भाषा:</span>
+                <button 
+                  onClick={toggleLanguage} 
+                  className="lang-btn" 
+                  type="button"
+                  aria-label="Switch Language"
+                >
+                  <span className={`lang-label ${language === 'en' ? 'active' : ''}`}>EN</span>
+                  <span className="lang-divider">|</span>
+                  <span className={`lang-label ${language === 'hi' ? 'active' : ''}`}>हिं</span>
+                </button>
+              </div>
+
               {session?.authenticated ? (
                 <Link
                   onClick={() => setMobileOpen(false)}

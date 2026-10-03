@@ -4,6 +4,7 @@
 import React from 'react';
 import { Modal } from './Modal';
 import { Printer, Download, CheckCircle2, GraduationCap, Building2 } from 'lucide-react';
+import { downloadReceiptHtml } from '@/src/app/lib/downloadHelpers';
 
 interface ReceiptData {
   receiptNo: string;
@@ -166,7 +167,7 @@ export const ReceiptModal: React.FC<ReceiptModalProps> = ({ isOpen, onClose, rec
         </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center justify-end gap-3 print:hidden">
+        <div className="flex flex-wrap items-center justify-end gap-3 print:hidden">
           <button
             type="button"
             onClick={onClose}
@@ -174,13 +175,25 @@ export const ReceiptModal: React.FC<ReceiptModalProps> = ({ isOpen, onClose, rec
           >
             Close
           </button>
+
+          <button
+            type="button"
+            onClick={() => downloadReceiptHtml(receipt)}
+            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 hover:bg-slate-800 text-xs font-bold text-white shadow-xs cursor-pointer transition-all"
+            style={{ color: "#ffffff" }}
+          >
+            <Download size={15} className="text-white" />
+            <span style={{ color: "#ffffff" }}>Download Receipt (.html)</span>
+          </button>
+
           <button
             type="button"
             onClick={handlePrint}
-            className="flex items-center gap-2 px-5 py-2 rounded-xl bg-primary hover:bg-primary-dark text-xs font-bold text-white shadow-xs cursor-pointer"
+            className="flex items-center gap-2 px-5 py-2 rounded-xl bg-[#4285CD] hover:bg-[#2F8AD4] text-xs font-bold text-white shadow-xs cursor-pointer transition-all"
+            style={{ color: "#ffffff" }}
           >
-            <Printer size={15} />
-            <span>Print / Save as PDF</span>
+            <Printer size={15} className="text-white" />
+            <span style={{ color: "#ffffff" }}>Print / PDF</span>
           </button>
         </div>
       </div>

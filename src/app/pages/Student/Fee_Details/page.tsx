@@ -3,7 +3,8 @@
 import { useEffect, useState } from "react";
 import Info_sameliner from "@/src/app/components/Info_sameliner";
 import StuNav from "@/src/app/components/StuNav";
-import { CreditCard, CheckCircle, Clock, Printer, X, ShieldCheck, Wallet, ArrowRight, Receipt } from "lucide-react";
+import { CreditCard, CheckCircle, Clock, Printer, X, ShieldCheck, Wallet, ArrowRight, Receipt, Download } from "lucide-react";
+import { printReceiptWindow, downloadReceiptHtml } from "@/src/app/lib/downloadHelpers";
 
 interface StudentData {
   id: number;
@@ -121,125 +122,18 @@ export default function Page() {
   // Launch Invoice Printable Window
   const handlePrintReceipt = (payment: PaymentRecord) => {
     if (!student) return;
-    
-    const printWindow = window.open("", "_blank", "width=850,height=750");
-    if (!printWindow) return;
-
-    const formattedDate = new Date(payment.payment_date).toLocaleDateString("en-IN", {
-      day: "numeric",
-      month: "long",
-      year: "numeric",
-      hour: "2-digit",
-      minute: "2-digit"
+    printReceiptWindow({
+      receiptNo: `RCP-FEE-${payment.id}-${payment.student_id}`,
+      transactionId: payment.transaction_id || `TXN-${payment.id}`,
+      date: payment.payment_date,
+      studentName: student.name,
+      studentId: student.id,
+      course: student.course,
+      amount: payment.amount,
+      paymentMethod: payment.payment_method,
+      paymentMode: payment.payment_mode,
+      remarks: payment.remarks
     });
-
-    printWindow.document.write(`
-      <html>
-        <head>
-          <title>Maa Gauri ITI - Receipt #${payment.id}</title>
-          <style>
-            body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #1e293b; padding: 2.5rem; margin: 0; background-color: #f8fafc; }
-            .receipt-card { max-width: 760px; margin: auto; border: 1px solid #e2e8f0; padding: 3rem; border-radius: 16px; background-color: #ffffff; box-shadow: 0 10px 15px -3px rgba(0,0,0,0.05); }
-            .header-row { display: flex; justify-content: space-between; align-items: start; border-bottom: 2.5px solid #191970; padding-bottom: 1.5rem; margin-bottom: 2rem; }
-            .header-left h1 { color: #191970; margin: 0; font-size: 2.1rem; font-weight: 800; letter-spacing: -0.025em; }
-            .header-left p { margin: 0.35rem 0 0; color: #64748b; font-size: 0.95rem; }
-            .badge-success { display: inline-block; padding: 0.5rem 1.15rem; background: #dcfce7; color: #166534; font-weight: 700; border-radius: 9999px; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.05em; }
-            .info-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1.75rem; margin-bottom: 2.5rem; }
-            .info-item h4 { margin: 0 0 0.35rem 0; color: #94a3b8; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; }
-            .info-item p { margin: 0; font-size: 1.1rem; font-weight: 600; color: #0f172a; }
-            .receipt-table { width: 100%; border-collapse: collapse; margin-bottom: 2.5rem; }
-            .receipt-table th { padding: 1rem 1.25rem; text-align: left; border-bottom: 2px solid #e2e8f0; background-color: #f8fafc; font-weight: 700; color: #475569; text-transform: uppercase; font-size: 0.8rem; }
-            .receipt-table td { padding: 1.25rem; text-align: left; border-bottom: 1px solid #e2e8f0; font-size: 1.05rem; line-height: 1.5; }
-            .total-section { display: flex; justify-content: flex-end; align-items: center; gap: 2rem; padding-top: 1.5rem; border-top: 2px solid #e2e8f0; }
-            .total-label { font-size: 1.15rem; color: #64748b; font-weight: 600; }
-            .total-val { margin: 0; color: #191970; font-size: 1.85rem; font-weight: 800; }
-            .receipt-footer { text-align: center; margin-top: 3.5rem; font-size: 0.88rem; color: #94a3b8; border-top: 1px solid #e2e8f0; padding-top: 1.5rem; }
-            .print-action { background: #191970; color: #ffffff; padding: 0.65rem 1.25rem; border: none; border-radius: 8px; font-weight: 700; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; margin-bottom: 2rem; transition: background 0.2s; }
-            .print-action:hover { background: #11114f; }
-            @media print {
-              .print-action { display: none; }
-              body { padding: 0; background-color: #ffffff; }
-              .receipt-card { border: none; box-shadow: none; padding: 0; max-width: 100%; }
-            }
-          </style>
-        </head>
-        <body>
-          <div class="receipt-card">
-            <button class="print-action" onclick="window.print()">Print / Export PDF</button>
-            
-            <div class="header-row">
-              <div class="header-left">
-                <h1>MAA GAURI PRIVATE ITI</h1>
-                <p>Affiliated to NCVT (Govt. of India) • Code: GR090011</p>
-                <p>Campus: City Center Main Road, District Office, State</p>
-              </div>
-              <div>
-                <span class="badge-success">Success</span>
-              </div>
-            </div>
-
-            <div class="info-grid">
-              <div class="info-item">
-                <h4>Student Name</h4>
-                <p>${student.name}</p>
-              </div>
-              <div class="info-item">
-                <h4>Receipt ID</h4>
-                <p>RCP-FEE-${payment.id}-${payment.student_id}</p>
-              </div>
-              <div class="info-item">
-                <h4>Course / Trade</h4>
-                <p>${student.course}</p>
-              </div>
-              <div class="info-item">
-                <h4>Transaction Date</h4>
-                <p>${formattedDate}</p>
-              </div>
-              <div class="info-item">
-                <h4>Transaction ID</h4>
-                <p>${payment.transaction_id}</p>
-              </div>
-              <div class="info-item">
-                <h4>Payment Method</h4>
-                <p>${payment.payment_mode} (${payment.payment_method})</p>
-              </div>
-            </div>
-
-            <table class="receipt-table">
-              <thead>
-                <tr>
-                  <th>Description</th>
-                  <th style="text-align: right;">Amount</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr>
-                  <td>
-                    Academic Tuition & Fee installment payment
-                    <div style="font-size: 0.88rem; color: #64748b; margin-top: 0.25rem;">
-                      Remarks: ${payment.remarks || 'Standard Semester Installment'}
-                    </div>
-                  </td>
-                  <td style="text-align: right; font-weight: 700; color: #0f172a;">₹${payment.amount.toLocaleString("en-IN")}</td>
-                </tr>
-              </tbody>
-            </table>
-
-            <div class="total-section">
-              <span class="total-label">Total Amount Paid:</span>
-              <h3 class="total-val">₹${payment.amount.toLocaleString("en-IN")}</h3>
-            </div>
-
-            <div class="receipt-footer">
-              <p>This is an officially verified computer-generated record of payment. No physical signature is required.</p>
-              <p>For any queries, contact accounts@maagauriiti.edu.in</p>
-              <p style="margin-top: 0.5rem; font-weight: 600;">&copy; ${new Date().getFullYear()} Maa Gauri Private ITI. All rights reserved.</p>
-            </div>
-          </div>
-        </body>
-      </html>
-    `);
-    printWindow.document.close();
   };
 
   // Start payment flow
@@ -560,13 +454,38 @@ export default function Page() {
                           </span>
                         </td>
                         <td style={{ padding: "1.1rem 1rem", textAlign: "center" }}>
-                          <button 
-                            onClick={() => handlePrintReceipt(p)}
-                            className="button button-secondary"
-                            style={{ minHeight: "34px", padding: "0.4rem 0.8rem", borderRadius: "6px", fontSize: "0.85rem", gap: "0.35rem" }}
-                          >
-                            <Printer size={14} /> Receipt
-                          </button>
+                          <div style={{ display: "inline-flex", gap: "0.4rem", alignItems: "center" }}>
+                            <button 
+                              onClick={() => {
+                                if (!student) return;
+                                downloadReceiptHtml({
+                                  receiptNo: `RCP-FEE-${p.id}`,
+                                  transactionId: p.transaction_id || `TXN-${p.id}`,
+                                  date: p.payment_date,
+                                  studentName: student.name,
+                                  studentId: student.id,
+                                  course: student.course,
+                                  amount: p.amount,
+                                  paymentMethod: p.payment_method,
+                                  paymentMode: p.payment_mode,
+                                  remarks: p.remarks
+                                });
+                              }}
+                              className="button button-secondary"
+                              style={{ minHeight: "34px", padding: "0.4rem 0.65rem", borderRadius: "6px", fontSize: "0.8rem", gap: "0.3rem" }}
+                              title="Download Receipt HTML file"
+                            >
+                              <Download size={13} /> Download
+                            </button>
+                            <button 
+                              onClick={() => handlePrintReceipt(p)}
+                              className="button button-secondary"
+                              style={{ minHeight: "34px", padding: "0.4rem 0.65rem", borderRadius: "6px", fontSize: "0.8rem", gap: "0.3rem" }}
+                              title="Print / Save as PDF"
+                            >
+                              <Printer size={13} /> Print
+                            </button>
+                          </div>
                         </td>
                       </tr>
                     );
@@ -1105,13 +1024,38 @@ export default function Page() {
                   </div>
                 </div>
 
-                <button 
-                  onClick={() => setShowPayModal(false)} 
-                  className="button button-primary"
-                  style={{ width: "100%", height: "46px" }}
-                >
-                  Return to Dashboard
-                </button>
+                <div style={{ display: "flex", gap: "0.75rem", flexDirection: "column" }}>
+                  <button 
+                    type="button"
+                    onClick={() => {
+                      if (!student) return;
+                      downloadReceiptHtml({
+                        receiptNo: `RCP-FEE-${Date.now().toString().slice(-6)}`,
+                        transactionId: simulatedTxnId || `TXN-${Date.now()}`,
+                        date: new Date().toISOString(),
+                        studentName: student.name,
+                        studentId: student.id,
+                        course: student.course,
+                        amount: Number(payAmount) || 0,
+                        paymentMethod: payMethod,
+                        paymentMode: payMode,
+                        remarks: payRemarks || `${payMode} online payment`
+                      });
+                    }}
+                    className="button button-secondary"
+                    style={{ width: "100%", height: "44px", gap: "0.5rem" }}
+                  >
+                    <Download size={16} /> Download Official Receipt
+                  </button>
+
+                  <button 
+                    onClick={() => setShowPayModal(false)} 
+                    className="button button-primary"
+                    style={{ width: "100%", height: "46px" }}
+                  >
+                    Return to Dashboard
+                  </button>
+                </div>
               </div>
             )}
           </div>

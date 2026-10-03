@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import StuNav from "@/src/app/components/StuNav";
 import { Search, Filter, Download, FileText, Calendar, RefreshCw, Printer, AlertCircle, ChevronDown, CheckCircle, Clock } from "lucide-react";
+import { downloadReportHtml } from "@/src/app/lib/downloadHelpers";
 
 interface StudentRecord {
   id: number;
@@ -249,6 +250,74 @@ export default function ReportsPage() {
   };
 
   // ---------------------------------
+  // HTML Document Export Trigger
+  // ---------------------------------
+  const handleExportHTML = () => {
+    let headers: string[] = [];
+    let rows: string[][] = [];
+    let title = "";
+    let note = "";
+
+    if (reportType === "students") {
+      title = "Student Directory & Enrollment Report";
+      headers = ["Student ID", "Student Name", "Father's Name", "Email Address", "Phone", "DOB", "Enrolled Course", "Qualification", "Enrollment Date", "Fees Status"];
+      rows = getFilteredStudents().map(s => [
+        String(s.id),
+        s.name,
+        s.fatherName,
+        s.email,
+        s.phone,
+        s.DOB ? s.DOB.split("T")[0] : "",
+        s.course,
+        s.Qualification,
+        s.Enrollment_Date ? s.Enrollment_Date.split("T")[0] : "",
+        s.payment_status
+      ]);
+      note = `Course Filter: ${filterCourse} | Total Enrolled: ${rows.length}`;
+    } else if (reportType === "fees") {
+      title = "Fee Collection & Outstanding Ledger Report";
+      headers = ["Student ID", "Student Name", "Trade/Course", "Billed Fee Amount (₹)", "Total Paid Amount (₹)", "Outstanding Dues (₹)", "Billing Status"];
+      rows = getFilteredStudents().map(s => {
+        const matchedCourse = courses.find(c => c.course.toLowerCase() === s.course.toLowerCase());
+        const totalFee = matchedCourse ? matchedCourse.total_fee : 15000;
+        return [
+          String(s.id),
+          s.name,
+          s.course,
+          String(totalFee),
+          String(s.amount_paid),
+          String(s.remaining_balance),
+          s.payment_status
+        ];
+      });
+      note = `Status Filter: ${filterStatus} | Course: ${filterCourse}`;
+    } else {
+      title = "Fee Transactions & Payment Audit Journal";
+      headers = ["Transaction Date", "Student ID", "Student Name", "Trade/Course", "Transaction ID", "Payment Mode", "Payment Method", "Amount Paid (₹)", "Remarks", "Status"];
+      rows = getFilteredPayments().map(p => [
+        p.payment_date ? p.payment_date.split("T")[0] : "",
+        String(p.student_id),
+        p.student_name,
+        p.student_course,
+        p.transaction_id,
+        p.payment_mode,
+        p.payment_method,
+        String(p.amount),
+        p.remarks || "Standard Installment",
+        p.payment_status
+      ]);
+      note = `Mode: ${filterStatus} | Date Range: ${startDate || 'All'} to ${endDate || 'All'}`;
+    }
+
+    if (rows.length === 0) {
+      alert("No data available to export with current filters.");
+      return;
+    }
+
+    downloadReportHtml(title, headers, rows, note);
+  };
+
+  // ---------------------------------
   // Print / PDF Trigger
   // ---------------------------------
   const handlePrint = () => {
@@ -271,7 +340,7 @@ export default function ReportsPage() {
             <p className="eyebrow m-0 text-primary uppercase text-xs tracking-wider">Reports & Audits Ledger</p>
             <h1 className="m-0 text-slate-800 text-3xl font-extrabold tracking-tight">Institutional Reports Dashboard</h1>
           </div>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <button
               onClick={handleRefresh}
               className="button button-secondary flex items-center gap-1.5"
@@ -285,14 +354,21 @@ export default function ReportsPage() {
               className="button button-secondary flex items-center gap-1.5 border-slate-300 text-slate-700 hover:bg-slate-50"
             >
               <Printer size={16} />
-              Export PDF / Print
+              Print / PDF
+            </button>
+            <button
+              onClick={handleExportHTML}
+              className="button button-secondary flex items-center gap-1.5 border-slate-300 text-slate-700 hover:bg-slate-50"
+            >
+              <Download size={16} />
+              Download Report (.html)
             </button>
             <button
               onClick={handleExportCSV}
               className="button button-primary flex items-center gap-1.5"
             >
               <Download size={16} />
-              Export to Excel (CSV)
+              Download Excel (CSV)
             </button>
           </div>
         </section>

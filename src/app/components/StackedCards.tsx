@@ -189,27 +189,27 @@ export default function StackedCards() {
               </div>
 
               {/* Card Titles */}
-              <h3 className="text-xl sm:text-2xl font-black tracking-tight text-white mb-1 leading-tight">
+              <h3 className="text-xl sm:text-2xl font-black tracking-tight mb-1.5 leading-tight text-white" style={{ color: "#ffffff" }}>
                 {card.title}
               </h3>
-              <p className="text-xs font-bold text-white/80 mb-3">
+              <p className="text-xs sm:text-[13px] font-bold mb-3 tracking-wide text-white" style={{ color: "#ffffff", opacity: 0.95 }}>
                 {card.subtitle}
               </p>
 
               {/* Card Body Narrative */}
-              <p className="text-xs leading-relaxed text-white/95 line-clamp-3">
+              <p className="text-xs sm:text-[13px] leading-relaxed line-clamp-3 text-white font-medium" style={{ color: "#ffffff", opacity: 0.95 }}>
                 {card.description}
               </p>
 
               {/* Card Bottom Indicator Bar */}
-              <div className="mt-5 pt-3 border-t border-white/20 flex items-center justify-between text-[11px] font-bold text-white/90">
-                <span className="flex items-center gap-1">
-                  <Sparkles size={13} />
-                  <span>{isFront ? (isHindi ? "सक्रिय विशेषता" : "Featured Highlight") : (isHindi ? "क्लिक करें" : "Click to View")}</span>
+              <div className="mt-5 pt-3 border-t border-white/20 flex items-center justify-between text-[11px] font-bold text-white" style={{ color: "#ffffff" }}>
+                <span className="flex items-center gap-1.5" style={{ color: "#ffffff" }}>
+                  <Sparkles size={13} className="text-white" />
+                  <span style={{ color: "#ffffff" }}>{isFront ? (isHindi ? "सक्रिय विशेषता" : "Featured Highlight") : (isHindi ? "क्लिक करें" : "Click to View")}</span>
                 </span>
-                <span className="flex items-center gap-1 group-hover:translate-x-1 transition-transform">
-                  <span>{isHindi ? "विस्तार" : "Explore"}</span>
-                  <ArrowRight size={13} />
+                <span className="flex items-center gap-1.5 group-hover:translate-x-1 transition-transform" style={{ color: "#ffffff" }}>
+                  <span style={{ color: "#ffffff" }}>{isHindi ? "विस्तार" : "Explore"}</span>
+                  <ArrowRight size={13} className="text-white" />
                 </span>
               </div>
             </div>

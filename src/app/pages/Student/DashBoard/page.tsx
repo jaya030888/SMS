@@ -221,23 +221,23 @@ export default function StudentDashboardPage() {
           <div className="bg-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-md relative overflow-hidden border border-slate-800">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 relative z-10">
               <div className="flex items-center gap-5">
-                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-[#4285CD] text-white flex items-center justify-center text-2xl font-black shrink-0">
-                  {student.name.split(" ").map(n => n[0]).slice(0, 2).join("")}
+                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-[#4285CD] text-white flex items-center justify-center text-2xl font-black shrink-0 shadow-sm">
+                  {((student.name || "Student").split(" ").filter(Boolean).map(n => n[0]).slice(0, 2).join("") || "S").toUpperCase()}
                 </div>
 
                 <div>
-                  <div className="flex items-center gap-2 mb-1">
+                  <div className="flex flex-wrap items-center gap-2 mb-1">
                     <span className="text-[10px] uppercase tracking-wider font-extrabold px-2.5 py-0.5 rounded-md bg-[#4285CD]/30 text-indigo-300 border border-indigo-400/30">
-                      Roll: {student.roll_no || `MG-2024-${String(student.id).padStart(3, "0")}`}
+                      Roll: {student.roll_no || `MG-2024-${String(student.id || 1).padStart(3, "0")}`}
                     </span>
                     <span className="text-[10px] uppercase tracking-wider font-extrabold px-2.5 py-0.5 rounded-md bg-white/10 text-slate-300">
-                      {student.course} Trade
+                      {student.course || "COPA"} Trade
                     </span>
                   </div>
 
-                  <h1 className="text-2xl sm:text-3xl font-black tracking-tight">{student.name}</h1>
+                  <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">{student.name || "Student Name"}</h1>
                   <p className="text-xs sm:text-sm text-slate-300 mt-1 flex items-center gap-2">
-                    <span>Father: <b>{student.fatherName}</b></span>
+                    <span>Father: <b className="text-white font-bold">{student.fatherName || "Father's Name on record"}</b></span>
                     <span>•</span>
                     <span>Batch: {student.batch || "2024-2026"}</span>
                   </p>
@@ -312,15 +312,15 @@ export default function StudentDashboardPage() {
 
                         <div className="grid grid-cols-3 gap-2 my-3 p-3 bg-white rounded-xl border border-slate-150 text-center text-xs">
                           <div>
-                            <span className="text-[10px] text-slate-400 font-bold block">Score</span>
+                            <span className="text-[10px] text-slate-500 font-bold block">Score</span>
                             <strong className="text-slate-800 font-bold font-mono">{m.total_marks}/{m.max_marks}</strong>
                           </div>
                           <div>
-                            <span className="text-[10px] text-slate-400 font-bold block">Percentage</span>
+                            <span className="text-[10px] text-slate-500 font-bold block">Percentage</span>
                             <strong className="text-[#4285CD] font-bold font-mono">{m.percentage}%</strong>
                           </div>
                           <div>
-                            <span className="text-[10px] text-slate-400 font-bold block">Grade</span>
+                            <span className="text-[10px] text-slate-500 font-bold block">Grade</span>
                             <strong className="text-emerald-700 font-black">{m.grade}</strong>
                           </div>
                         </div>

@@ -14,6 +14,7 @@ import {
   Building
 } from "lucide-react";
 import type { PublishedMarksheet } from "@/src/app/lib/mockData";
+import { downloadMarksheetHtml } from "@/src/app/lib/downloadHelpers";
 
 interface MarksheetModalProps {
   marksheet: PublishedMarksheet | null;
@@ -65,12 +66,21 @@ export default function MarksheetModal({
             )}
 
             <button
+              onClick={() => downloadMarksheetHtml(marksheet)}
+              className="px-3.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer"
+              title="Download Marksheet as HTML file"
+            >
+              <Download size={14} />
+              <span className="hidden sm:inline">Download File</span>
+            </button>
+
+            <button
               onClick={handlePrint}
-              className="px-3.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer"
+              className="px-3.5 py-1.5 rounded-xl bg-[#4285CD] hover:bg-[#2F8AD4] text-white font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
               title="Print or Save as PDF"
             >
               <Printer size={14} />
-              <span className="hidden sm:inline">Print / Download PDF</span>
+              <span className="hidden sm:inline">Print / PDF</span>
             </button>
 
             <button

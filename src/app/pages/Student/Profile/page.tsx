@@ -209,19 +209,19 @@ export default function StudentProfilePage() {
           {/* Profile Header Banner */}
           <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xs flex flex-col sm:flex-row items-center sm:items-start gap-6">
             <div className="relative group">
-              {student.profile_photo ? (
+              {student.profile_photo && student.profile_photo.trim().length > 20 ? (
                 <img
                   src={student.profile_photo}
-                  alt={student.name}
+                  alt={student.name || "Student"}
                   className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl object-cover border-4 border-slate-100 shadow-md"
                 />
               ) : (
-                <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl bg-indigo-50 border-4 border-slate-100 flex items-center justify-center text-indigo-600 text-3xl font-black shadow-md">
-                  {student.name[0]}
+                <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl bg-[#4285CD] border-4 border-slate-100 flex items-center justify-center text-white text-3xl font-black shadow-md">
+                  {student.name && student.name.trim() ? student.name.trim()[0].toUpperCase() : <User size={40} className="text-white" />}
                 </div>
               )}
 
-              <label className="absolute bottom-0 right-0 p-2 rounded-xl bg-[#4285CD] text-white hover:bg-[#2F8AD4] shadow-md cursor-pointer transition-all hover:scale-105">
+              <label className="absolute bottom-0 right-0 p-2 rounded-xl bg-[#06090C] text-white hover:bg-slate-800 shadow-md cursor-pointer transition-all hover:scale-105 border border-white/20">
                 <Camera size={14} />
                 <input
                   type="file"
@@ -257,10 +257,11 @@ export default function StudentProfilePage() {
             <div className="sm:self-center">
               <Link
                 href="/pages/Student/Fee_Details"
-                className="px-4 py-2.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs shadow-xs transition-all flex items-center gap-1.5"
+                className="px-4 py-2.5 rounded-xl bg-[#4285CD] hover:bg-[#2F8AD4] text-white font-bold text-xs shadow-xs transition-all flex items-center gap-1.5"
+                style={{ color: "#ffffff" }}
               >
-                <CreditCard size={14} />
-                <span>Fee Ledger</span>
+                <CreditCard size={14} className="text-white shrink-0" />
+                <span className="text-white" style={{ color: "#ffffff" }}>Fee Ledger</span>
               </Link>
             </div>
           </div>
@@ -371,7 +372,7 @@ export default function StudentProfilePage() {
                   </span>
                 </div>
                 <div className="text-xs space-y-0.5">
-                  <span className="text-[10px] uppercase font-bold text-slate-400">UIDAI Aadhaar Number</span>
+                  <span className="text-[10px] uppercase font-bold text-slate-500">UIDAI Aadhaar Number</span>
                   <p className="font-mono font-bold text-slate-800">{student.aadhaar_no || "5821-9043-1290"}</p>
                 </div>
               </div>
@@ -392,7 +393,7 @@ export default function StudentProfilePage() {
                   </span>
                 </div>
                 <div className="text-xs space-y-0.5">
-                  <span className="text-[10px] uppercase font-bold text-slate-400">Board Roll / Certificate</span>
+                  <span className="text-[10px] uppercase font-bold text-slate-500">Board Roll / Certificate</span>
                   <p className="font-mono font-bold text-slate-800">{student.marksheet_10th_roll || "BSEB-2022-0941"}</p>
                 </div>
               </div>
@@ -413,7 +414,7 @@ export default function StudentProfilePage() {
                   </span>
                 </div>
                 <div className="text-xs space-y-0.5">
-                  <span className="text-[10px] uppercase font-bold text-slate-400">Qualification Level</span>
+                  <span className="text-[10px] uppercase font-bold text-slate-500">Qualification Level</span>
                   <p className="font-bold text-slate-800">{student.Qualification}</p>
                 </div>
               </div>
@@ -434,7 +435,7 @@ export default function StudentProfilePage() {
                   </span>
                 </div>
                 <div className="text-xs space-y-0.5">
-                  <span className="text-[10px] uppercase font-bold text-slate-400">Institute Record Status</span>
+                  <span className="text-[10px] uppercase font-bold text-slate-500">Institute Record Status</span>
                   <p className="font-bold text-slate-800">
                     {student.tc_status === "Pending" ? "Pending submission at counter" : "Archived in Student File"}
                   </p>
@@ -462,44 +463,44 @@ export default function StudentProfilePage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 text-xs">
               <div className="space-y-1">
-                <span className="text-[10px] font-extrabold uppercase text-slate-400">Full Name</span>
-                <p className="text-sm font-bold text-slate-800">{student.name}</p>
+                <span className="text-[10px] font-extrabold uppercase text-slate-500">Full Name</span>
+                <p className="text-sm font-bold text-slate-900">{student.name || "Student Name"}</p>
               </div>
 
               <div className="space-y-1">
-                <span className="text-[10px] font-extrabold uppercase text-slate-400">Father's Name</span>
-                <p className="text-sm font-bold text-slate-800">{student.fatherName}</p>
+                <span className="text-[10px] font-extrabold uppercase text-slate-500">Father's Name</span>
+                <p className="text-sm font-bold text-slate-900">{student.fatherName || "Father's Name on Record"}</p>
               </div>
 
               <div className="space-y-1">
-                <span className="text-[10px] font-extrabold uppercase text-slate-400">Mother's Name</span>
-                <p className="text-sm font-bold text-slate-800">{student.motherName || "Mrs. Sharma"}</p>
+                <span className="text-[10px] font-extrabold uppercase text-slate-500">Mother's Name</span>
+                <p className="text-sm font-bold text-slate-900">{student.motherName || "Mrs. Sharma"}</p>
               </div>
 
               <div className="space-y-1">
-                <span className="text-[10px] font-extrabold uppercase text-slate-400">Date of Birth</span>
-                <p className="text-sm font-bold text-slate-800">{formatDate(student.DOB)}</p>
+                <span className="text-[10px] font-extrabold uppercase text-slate-500">Date of Birth</span>
+                <p className="text-sm font-bold text-slate-900">{formatDate(student.DOB || "2002-05-14")}</p>
               </div>
 
               <div className="space-y-1">
-                <span className="text-[10px] font-extrabold uppercase text-slate-400">Primary Contact Phone</span>
-                <p className="text-sm font-bold text-slate-800">{student.phone}</p>
+                <span className="text-[10px] font-extrabold uppercase text-slate-500">Primary Contact Phone</span>
+                <p className="text-sm font-bold text-slate-900">{student.phone || "9876543210"}</p>
                 {student.alt_phone && (
-                  <span className="text-[11px] text-slate-500 block">Alt: {student.alt_phone}</span>
+                  <span className="text-[11px] text-slate-500 block font-medium">Alt: {student.alt_phone}</span>
                 )}
               </div>
 
               <div className="space-y-1">
-                <span className="text-[10px] font-extrabold uppercase text-slate-400">Primary Email Address</span>
-                <p className="text-sm font-bold text-slate-800">{student.email}</p>
+                <span className="text-[10px] font-extrabold uppercase text-slate-500">Primary Email Address</span>
+                <p className="text-sm font-bold text-slate-900 truncate">{student.email || "student@maagauriiti.edu.in"}</p>
                 {student.alt_email && (
-                  <span className="text-[11px] text-slate-500 block truncate">Alt: {student.alt_email}</span>
+                  <span className="text-[11px] text-slate-500 block truncate font-medium">Alt: {student.alt_email}</span>
                 )}
               </div>
 
               <div className="space-y-1 sm:col-span-2 md:col-span-3">
-                <span className="text-[10px] font-extrabold uppercase text-slate-400">Permanent Address</span>
-                <p className="text-sm font-bold text-slate-800">{student.Address}</p>
+                <span className="text-[10px] font-extrabold uppercase text-slate-500">Permanent Address</span>
+                <p className="text-sm font-bold text-slate-900">{student.Address || "Main Campus Residential, State Road, District Office"}</p>
               </div>
             </div>
           </div>
@@ -512,22 +513,22 @@ export default function StudentProfilePage() {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5 text-xs">
               <div className="space-y-1">
-                <span className="text-[10px] font-extrabold uppercase text-slate-400">Enrolled Trade</span>
+                <span className="text-[10px] font-extrabold uppercase text-slate-500">Enrolled Trade</span>
                 <p className="text-sm font-bold text-indigo-600">{student.course}</p>
               </div>
 
               <div className="space-y-1">
-                <span className="text-[10px] font-extrabold uppercase text-slate-400">Batch Session</span>
+                <span className="text-[10px] font-extrabold uppercase text-slate-500">Batch Session</span>
                 <p className="text-sm font-bold text-slate-800">{student.batch || "2024-2026"}</p>
               </div>
 
               <div className="space-y-1">
-                <span className="text-[10px] font-extrabold uppercase text-slate-400">Enrollment Date</span>
+                <span className="text-[10px] font-extrabold uppercase text-slate-500">Enrollment Date</span>
                 <p className="text-sm font-bold text-slate-800">{formatDate(student.Enrollment_Date || "2024-07-10")}</p>
               </div>
 
               <div className="space-y-1">
-                <span className="text-[10px] font-extrabold uppercase text-slate-400">Affiliation</span>
+                <span className="text-[10px] font-extrabold uppercase text-slate-500">Affiliation</span>
                 <p className="text-sm font-bold text-slate-800">NCVT (DGT) Govt. of India</p>
               </div>
             </div>
