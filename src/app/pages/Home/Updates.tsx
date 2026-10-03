@@ -12,10 +12,10 @@ const Updates = () => {
     <section className="section bg-[#F8FAFC]" id="updates">
       <div className="section-inner max-w-4xl mx-auto">
         <div className="text-center mb-10">
-          <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-[#EEF5FC] text-[#4285CD] mb-3">
+          <div className="inline-flex h-10 w-10 items-center justify-center rounded-xl bg-teal-50 text-teal-600 border border-teal-100 mb-3 shadow-2xs">
             <BellRing size={20} />
           </div>
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-[#06090C] tracking-tight">
+          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
             {t("updates_title")}
           </h2>
           <p className="text-xs sm:text-sm text-slate-500 mt-1">

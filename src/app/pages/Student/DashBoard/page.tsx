@@ -217,27 +217,27 @@ export default function StudentDashboardPage() {
             </div>
           )}
 
-          {/* Hero Student Banner */}
-          <div className="bg-slate-900 rounded-3xl p-6 sm:p-8 text-white shadow-md relative overflow-hidden border border-slate-800">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-6 relative z-10">
-              <div className="flex items-center gap-5">
-                <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl bg-[#4285CD] text-white flex items-center justify-center text-2xl font-black shrink-0 shadow-sm">
+          {/* Hero Student Banner - CLEAN LIGHT DESIGN */}
+          <div className="bg-white rounded-xl p-5 sm:p-6 text-slate-900 shadow-xs border border-slate-200">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-5">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-teal-600 text-white flex items-center justify-center text-xl font-bold shrink-0 shadow-xs">
                   {((student.name || "Student").split(" ").filter(Boolean).map(n => n[0]).slice(0, 2).join("") || "S").toUpperCase()}
                 </div>
 
                 <div>
                   <div className="flex flex-wrap items-center gap-2 mb-1">
-                    <span className="text-[10px] uppercase tracking-wider font-extrabold px-2.5 py-0.5 rounded-md bg-[#4285CD]/30 text-indigo-300 border border-indigo-400/30">
+                    <span className="text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded bg-teal-50 text-teal-700 border border-teal-200">
                       Roll: {student.roll_no || `MG-2024-${String(student.id || 1).padStart(3, "0")}`}
                     </span>
-                    <span className="text-[10px] uppercase tracking-wider font-extrabold px-2.5 py-0.5 rounded-md bg-white/10 text-slate-300">
+                    <span className="text-[10px] uppercase tracking-wider font-bold px-2 py-0.5 rounded bg-slate-100 text-slate-700">
                       {student.course || "COPA"} Trade
                     </span>
                   </div>
 
-                  <h1 className="text-2xl sm:text-3xl font-black tracking-tight text-white">{student.name || "Student Name"}</h1>
-                  <p className="text-xs sm:text-sm text-slate-300 mt-1 flex items-center gap-2">
-                    <span>Father: <b className="text-white font-bold">{student.fatherName || "Father's Name on record"}</b></span>
+                  <h1 className="text-xl sm:text-2xl font-bold tracking-tight text-slate-900">{student.name || "Student Name"}</h1>
+                  <p className="text-xs sm:text-sm text-slate-500 mt-0.5 flex items-center gap-2">
+                    <span>Father: <b className="text-slate-700 font-semibold">{student.fatherName || "Father's Name on record"}</b></span>
                     <span>•</span>
                     <span>Batch: {student.batch || "2024-2026"}</span>
                   </p>
@@ -245,17 +245,17 @@ export default function StudentDashboardPage() {
               </div>
 
               {/* Quick Links */}
-              <div className="flex flex-wrap items-center gap-2.5">
+              <div className="flex flex-wrap items-center gap-2">
                 <Link
                   href="/pages/Student/Profile"
-                  className="px-4 py-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs border border-white/15 transition-all flex items-center gap-1.5"
+                  className="px-3.5 py-2 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-700 font-semibold text-xs border border-slate-200 transition-all flex items-center gap-1.5"
                 >
                   <FileText size={14} />
                   <span>My KYC & Profile</span>
                 </Link>
                 <Link
                   href="/pages/Student/Fee_Details"
-                  className="px-4 py-2.5 rounded-xl bg-[#4285CD] hover:bg-[#2F8AD4] text-white font-bold text-xs shadow-md transition-all flex items-center gap-1.5"
+                  className="px-3.5 py-2 rounded-lg bg-teal-600 hover:bg-teal-700 text-white font-semibold text-xs transition-all flex items-center gap-1.5"
                 >
                   <CreditCard size={14} />
                   <span>Fee Ledger & Receipts</span>
@@ -264,72 +264,72 @@ export default function StudentDashboardPage() {
             </div>
           </div>
 
-          {/* OFFICIAL PUBLISHED MARKSHEETS SECTION (Admin Published -> Student Download/Accept) */}
-          <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-xs space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-4 border-b border-slate-100">
+          {/* OFFICIAL PUBLISHED MARKSHEETS SECTION */}
+          <div className="bg-white rounded-xl p-5 sm:p-6 border border-slate-200 shadow-xs space-y-4">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-slate-100">
               <div className="flex items-center gap-2.5">
-                <div className="h-9 w-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">
-                  <Award size={20} />
+                <div className="h-8 w-8 rounded-lg bg-teal-50 text-teal-700 flex items-center justify-center font-bold">
+                  <Award size={18} />
                 </div>
                 <div>
-                  <h2 className="text-base font-extrabold text-slate-900">Official Marksheets & Certificates</h2>
-                  <p className="text-xs text-slate-500">NCVT / Institute examination marksheets published by Admin</p>
+                  <h2 className="text-sm font-bold text-slate-900">Official Marksheets & Certificates</h2>
+                  <p className="text-[11px] text-slate-500">NCVT / Institute examination marksheets published by Admin</p>
                 </div>
               </div>
-              <span className="text-xs font-extrabold text-indigo-700 bg-indigo-50 px-3 py-1 rounded-xl border border-indigo-100 self-start sm:self-auto">
+              <span className="text-xs font-semibold text-teal-800 bg-teal-50 px-2.5 py-0.5 rounded border border-teal-100 self-start sm:self-auto">
                 {marksheets.length} Marksheet(s) Available
               </span>
             </div>
 
             {marksheets.length === 0 ? (
-              <div className="p-8 text-center bg-slate-50 rounded-2xl border border-slate-150">
-                <p className="text-xs font-bold text-slate-500">No published marksheets found for your enrollment yet.</p>
-                <p className="text-[11px] text-slate-400 mt-1">Admin publishes marksheets after semester evaluations.</p>
+              <div className="p-6 text-center bg-slate-50 rounded-lg border border-slate-200">
+                <p className="text-xs font-semibold text-slate-500">No published marksheets found for your enrollment yet.</p>
+                <p className="text-[11px] text-slate-400 mt-0.5">Admin publishes marksheets after semester evaluations.</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {marksheets.map((m) => {
                   const isAccepted = m.status === "Accepted by Student";
                   return (
-                    <div key={m.id} className="p-5 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-4 flex flex-col justify-between">
+                    <div key={m.id} className="p-4 rounded-lg bg-slate-50 border border-slate-200 space-y-3 flex flex-col justify-between">
                       <div>
                         <div className="flex items-center justify-between gap-2 mb-2">
-                          <span className="text-[10px] font-mono font-bold text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200">
+                          <span className="text-[10px] font-mono font-semibold text-slate-600 bg-white px-2 py-0.5 rounded border border-slate-200">
                             {m.certificate_no}
                           </span>
-                          <span className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-full flex items-center gap-1 ${
+                          <span className={`text-[10px] font-semibold px-2 py-0.5 rounded flex items-center gap-1 ${
                             isAccepted 
-                              ? "bg-emerald-100 text-emerald-800" 
-                              : "bg-amber-100 text-amber-800"
+                              ? "bg-emerald-50 text-emerald-700 border border-emerald-200" 
+                              : "bg-amber-50 text-amber-700 border border-amber-200"
                           }`}>
                             {isAccepted ? <CheckCircle2 size={12} /> : <Clock size={12} />}
                             <span>{m.status}</span>
                           </span>
                         </div>
 
-                        <h3 className="text-sm font-extrabold text-slate-900">{m.semester}</h3>
-                        <p className="text-xs text-slate-500">{m.exam_session}</p>
+                        <h3 className="text-xs font-bold text-slate-900">{m.semester}</h3>
+                        <p className="text-[11px] text-slate-500">{m.exam_session}</p>
 
-                        <div className="grid grid-cols-3 gap-2 my-3 p-3 bg-white rounded-xl border border-slate-150 text-center text-xs">
+                        <div className="grid grid-cols-3 gap-2 my-2.5 p-2.5 bg-white rounded-lg border border-slate-200 text-center text-xs">
                           <div>
-                            <span className="text-[10px] text-slate-500 font-bold block">Score</span>
+                            <span className="text-[10px] text-slate-400 font-semibold block">Score</span>
                             <strong className="text-slate-800 font-bold font-mono">{m.total_marks}/{m.max_marks}</strong>
                           </div>
                           <div>
-                            <span className="text-[10px] text-slate-500 font-bold block">Percentage</span>
-                            <strong className="text-[#4285CD] font-bold font-mono">{m.percentage}%</strong>
+                            <span className="text-[10px] text-slate-400 font-semibold block">Percentage</span>
+                            <strong className="text-teal-700 font-bold font-mono">{m.percentage}%</strong>
                           </div>
                           <div>
-                            <span className="text-[10px] text-slate-500 font-bold block">Grade</span>
-                            <strong className="text-emerald-700 font-black">{m.grade}</strong>
+                            <span className="text-[10px] text-slate-400 font-semibold block">Grade</span>
+                            <strong className="text-emerald-700 font-bold">{m.grade}</strong>
                           </div>
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-2 pt-2 border-t border-slate-200/70">
+                      <div className="flex items-center gap-2 pt-2 border-t border-slate-200">
                         <button
                           onClick={() => setSelectedMarksheet(m)}
-                          className="flex-1 py-2 px-3 rounded-xl bg-white hover:bg-slate-100 text-slate-800 border border-slate-200 font-bold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                          className="flex-1 py-1.5 px-3 rounded-lg bg-white hover:bg-slate-100 text-slate-700 border border-slate-200 font-medium text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                         >
                           <Printer size={13} />
                           <span>View & Download</span>
@@ -339,7 +339,7 @@ export default function StudentDashboardPage() {
                           <button
                             onClick={() => handleAcceptMarksheet(m.id)}
                             disabled={acceptingId === m.id}
-                            className="flex-1 py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-xs cursor-pointer disabled:opacity-50"
+                            className="flex-1 py-1.5 px-3 rounded-lg bg-emerald-600 hover:bg-emerald-700 text-white font-semibold text-xs flex items-center justify-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
                           >
                             <CheckCircle2 size={13} />
                             <span>{acceptingId === m.id ? "Signing..." : "Accept"}</span>
@@ -357,20 +357,20 @@ export default function StudentDashboardPage() {
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
             {/* 1. Document Details & Status Card */}
-            <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-xs flex flex-col justify-between">
+            <div className="bg-white rounded-xl p-5 sm:p-6 border border-slate-200 shadow-xs flex flex-col justify-between">
               <div>
-                <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-150">
                   <div className="flex items-center gap-2.5">
-                    <div className="h-9 w-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">
-                      <BadgeCheck size={20} />
+                    <div className="h-8 w-8 rounded-lg bg-teal-50 text-teal-600 flex items-center justify-center font-bold">
+                      <BadgeCheck size={18} />
                     </div>
                     <div>
-                      <h2 className="text-base font-extrabold text-slate-900">Student Document Details</h2>
-                      <p className="text-xs text-slate-500">Official verification record with institute registry</p>
+                      <h2 className="text-sm font-bold text-slate-900">Student Document Details</h2>
+                      <p className="text-[11px] text-slate-500">Official verification record with institute registry</p>
                     </div>
                   </div>
 
-                  <span className={`px-3 py-1 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-1 ${
+                  <span className={`px-2.5 py-0.5 rounded text-xs font-semibold uppercase tracking-wider flex items-center gap-1 ${
                     docStatus === "Verified" 
                       ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                       : "bg-amber-50 text-amber-700 border border-amber-200"
@@ -381,30 +381,30 @@ export default function StudentDashboardPage() {
                 </div>
 
                 {/* Checklist of individual documents */}
-                <div className="space-y-3 pt-4">
+                <div className="space-y-2.5 pt-3.5">
                   {documentChecklist.map((doc, idx) => {
                     const Icon = doc.icon;
                     const isOk = doc.status === "Verified";
                     return (
-                      <div key={idx} className="p-3.5 rounded-2xl bg-slate-50 border border-slate-150 flex items-center justify-between gap-3">
-                        <div className="flex items-center gap-3">
-                          <div className={`h-8 w-8 rounded-xl flex items-center justify-center ${
+                      <div key={idx} className="p-2.5 rounded-lg bg-slate-50 border border-slate-200 flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-2.5">
+                          <div className={`h-7 w-7 rounded-md flex items-center justify-center ${
                             isOk ? "bg-emerald-100 text-emerald-700" : "bg-slate-200 text-slate-600"
                           }`}>
-                            <Icon size={16} />
+                            <Icon size={14} />
                           </div>
                           <div>
-                            <h4 className="text-xs font-bold text-slate-800">{doc.name}</h4>
-                            <p className="text-[11px] text-slate-500 font-mono">{doc.detail}</p>
+                            <h4 className="text-xs font-semibold text-slate-800">{doc.name}</h4>
+                            <p className="text-[10px] text-slate-500 font-mono">{doc.detail}</p>
                           </div>
                         </div>
 
-                        <span className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-md ${
+                        <span className={`text-[10px] font-semibold px-2 py-0.5 rounded ${
                           isOk 
-                            ? "bg-emerald-100/70 text-emerald-800" 
+                            ? "bg-emerald-50 text-emerald-700 border border-emerald-200" 
                             : doc.status === "N/A"
                             ? "bg-slate-200 text-slate-600"
-                            : "bg-amber-100 text-amber-800"
+                            : "bg-amber-50 text-amber-700 border border-amber-200"
                         }`}>
                           {doc.status}
                         </span>
@@ -414,13 +414,13 @@ export default function StudentDashboardPage() {
                 </div>
               </div>
 
-              <div className="pt-5 mt-4 border-t border-slate-100 flex items-center justify-between">
-                <p className="text-xs text-slate-500">
+              <div className="pt-4 mt-3 border-t border-slate-100 flex items-center justify-between">
+                <p className="text-[11px] text-slate-500">
                   {docStatus === "Verified" ? "All documents verified by Admission Office" : "Submission pending for physical verification"}
                 </p>
                 <Link
                   href="/pages/Student/Profile"
-                  className="text-xs font-bold text-indigo-600 hover:text-indigo-800 flex items-center gap-1 cursor-pointer"
+                  className="text-xs font-semibold text-teal-600 hover:text-teal-700 flex items-center gap-1 cursor-pointer"
                 >
                   <span>View Details</span>
                   <ArrowRight size={13} />
@@ -429,20 +429,20 @@ export default function StudentDashboardPage() {
             </div>
 
             {/* 2. Fee Details & Billing Card */}
-            <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-xs flex flex-col justify-between">
+            <div className="bg-white rounded-xl p-5 sm:p-6 border border-slate-200 shadow-xs flex flex-col justify-between">
               <div>
-                <div className="flex items-center justify-between pb-4 border-b border-slate-100">
+                <div className="flex items-center justify-between pb-3 border-b border-slate-150">
                   <div className="flex items-center gap-2.5">
-                    <div className="h-9 w-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
-                      <CreditCard size={20} />
+                    <div className="h-8 w-8 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center font-bold">
+                      <CreditCard size={18} />
                     </div>
                     <div>
-                      <h2 className="text-base font-extrabold text-slate-900">Tuition & Fee Status</h2>
-                      <p className="text-xs text-slate-500">{student.course} Trade Fee Breakdown</p>
+                      <h2 className="text-sm font-bold text-slate-900">Tuition & Fee Status</h2>
+                      <p className="text-[11px] text-slate-500">{student.course} Trade Fee Breakdown</p>
                     </div>
                   </div>
 
-                  <span className={`px-3 py-1 rounded-xl text-xs font-black uppercase tracking-wider ${
+                  <span className={`px-2.5 py-0.5 rounded text-xs font-semibold uppercase tracking-wider ${
                     fee.status === "Paid" 
                       ? "bg-emerald-50 text-emerald-700 border border-emerald-200" 
                       : "bg-amber-50 text-amber-700 border border-amber-200"
@@ -452,28 +452,28 @@ export default function StudentDashboardPage() {
                 </div>
 
                 {/* Amount grid */}
-                <div className="grid grid-cols-3 gap-3 pt-4">
-                  <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-150 text-center">
-                    <span className="text-[10px] uppercase font-extrabold text-slate-400 block mb-0.5">Total Fee</span>
-                    <strong className="text-sm sm:text-base font-black text-slate-900">{formatCurrency(fee.total)}</strong>
+                <div className="grid grid-cols-3 gap-2.5 pt-3.5">
+                  <div className="p-3 rounded-lg bg-slate-50 border border-slate-200 text-center">
+                    <span className="text-[9px] uppercase font-bold text-slate-400 block mb-0.5">Total Fee</span>
+                    <strong className="text-xs sm:text-sm font-bold text-slate-900">{formatCurrency(fee.total)}</strong>
                   </div>
-                  <div className="p-3.5 rounded-2xl bg-emerald-50 border border-emerald-100 text-center">
-                    <span className="text-[10px] uppercase font-extrabold text-emerald-600 block mb-0.5">Paid</span>
-                    <strong className="text-sm sm:text-base font-black text-emerald-800">{formatCurrency(fee.paid)}</strong>
+                  <div className="p-3 rounded-lg bg-emerald-50/60 border border-emerald-100 text-center">
+                    <span className="text-[9px] uppercase font-bold text-emerald-600 block mb-0.5">Paid</span>
+                    <strong className="text-xs sm:text-sm font-bold text-emerald-800">{formatCurrency(fee.paid)}</strong>
                   </div>
-                  <div className="p-3.5 rounded-2xl bg-amber-50 border border-amber-100 text-center">
-                    <span className="text-[10px] uppercase font-extrabold text-amber-600 block mb-0.5">Balance</span>
-                    <strong className="text-sm sm:text-base font-black text-amber-800">{formatCurrency(fee.balance)}</strong>
+                  <div className="p-3 rounded-lg bg-amber-50/60 border border-amber-100 text-center">
+                    <span className="text-[9px] uppercase font-bold text-amber-600 block mb-0.5">Balance</span>
+                    <strong className="text-xs sm:text-sm font-bold text-amber-800">{formatCurrency(fee.balance)}</strong>
                   </div>
                 </div>
 
                 {/* Progress bar */}
-                <div className="space-y-1.5 pt-4">
-                  <div className="flex justify-between text-xs font-bold text-slate-600">
+                <div className="space-y-1 pt-3.5">
+                  <div className="flex justify-between text-xs font-semibold text-slate-600">
                     <span>Payment Completion</span>
-                    <span className="text-emerald-700 font-black">{fee.percent}%</span>
+                    <span className="text-emerald-700 font-bold">{fee.percent}%</span>
                   </div>
-                  <div className="h-3 w-full bg-slate-100 rounded-full overflow-hidden">
+                  <div className="h-2 w-full bg-slate-100 rounded-full overflow-hidden">
                     <div 
                       className="h-full bg-emerald-500 rounded-full transition-all duration-500"
                       style={{ width: `${fee.percent}%` }}
@@ -482,12 +482,12 @@ export default function StudentDashboardPage() {
                 </div>
               </div>
 
-              <div className="pt-5 mt-4 border-t border-slate-100">
+              <div className="pt-4 mt-3 border-t border-slate-100">
                 <Link
                   href="/pages/Student/Fee_Details"
-                  className="w-full flex items-center justify-center gap-2 py-3 rounded-2xl bg-[#4285CD] hover:bg-[#2F8AD4] text-white font-bold text-xs shadow-xs transition-all cursor-pointer"
+                  className="w-full flex items-center justify-center gap-2 py-2.5 rounded-lg bg-teal-600 hover:bg-teal-700 text-white font-semibold text-xs transition-all cursor-pointer"
                 >
-                  <Receipt size={15} />
+                  <Receipt size={14} />
                   <span>View Fee History & Pay Online</span>
                 </Link>
               </div>
@@ -496,44 +496,44 @@ export default function StudentDashboardPage() {
           </div>
 
           {/* Personal & Registry Information Details */}
-          <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-xs">
-            <h2 className="text-base font-extrabold text-slate-900 pb-4 border-b border-slate-100 mb-5">
+          <div className="bg-white rounded-xl p-5 sm:p-6 border border-slate-200 shadow-xs">
+            <h2 className="text-base font-bold text-slate-900 pb-4 border-b border-slate-100 mb-5">
               Personal & Admission Details
             </h2>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 text-xs">
-              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-150 space-y-1">
-                <span className="text-[10px] font-extrabold uppercase text-slate-400">Full Name</span>
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 text-xs">
+              <div className="p-3 rounded-lg bg-slate-50 border border-slate-200 space-y-1">
+                <span className="text-[10px] font-extrabold uppercase text-slate-500">Full Name</span>
                 <p className="text-sm font-bold text-slate-800">{student.name}</p>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-150 space-y-1">
-                <span className="text-[10px] font-extrabold uppercase text-slate-400">Father's Name</span>
+              <div className="p-3 rounded-lg bg-slate-50 border border-slate-200 space-y-1">
+                <span className="text-[10px] font-extrabold uppercase text-slate-500">Father's Name</span>
                 <p className="text-sm font-bold text-slate-800">{student.fatherName}</p>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-150 space-y-1">
-                <span className="text-[10px] font-extrabold uppercase text-slate-400">Date of Birth</span>
+              <div className="p-3 rounded-lg bg-slate-50 border border-slate-200 space-y-1">
+                <span className="text-[10px] font-extrabold uppercase text-slate-500">Date of Birth</span>
                 <p className="text-sm font-bold text-slate-800">{formatDate(student.DOB)}</p>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-150 space-y-1">
-                <span className="text-[10px] font-extrabold uppercase text-slate-400">Phone Number</span>
+              <div className="p-3 rounded-lg bg-slate-50 border border-slate-200 space-y-1">
+                <span className="text-[10px] font-extrabold uppercase text-slate-500">Phone Number</span>
                 <p className="text-sm font-bold text-slate-800">{student.phone}</p>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-150 space-y-1">
-                <span className="text-[10px] font-extrabold uppercase text-slate-400">Email Address</span>
+              <div className="p-3 rounded-lg bg-slate-50 border border-slate-200 space-y-1">
+                <span className="text-[10px] font-extrabold uppercase text-slate-500">Email Address</span>
                 <p className="text-sm font-bold text-slate-800 truncate">{student.email}</p>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-150 space-y-1">
-                <span className="text-[10px] font-extrabold uppercase text-slate-400">Previous Qualification</span>
+              <div className="p-3 rounded-lg bg-slate-50 border border-slate-200 space-y-1">
+                <span className="text-[10px] font-extrabold uppercase text-slate-500">Previous Qualification</span>
                 <p className="text-sm font-bold text-slate-800">{student.Qualification}</p>
               </div>
 
-              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-150 space-y-1 sm:col-span-2 md:col-span-3">
-                <span className="text-[10px] font-extrabold uppercase text-slate-400">Residential Address</span>
+              <div className="p-3 rounded-lg bg-slate-50 border border-slate-200 space-y-1 sm:col-span-2 md:col-span-3">
+                <span className="text-[10px] font-extrabold uppercase text-slate-500">Residential Address</span>
                 <p className="text-sm font-bold text-slate-800">{student.Address}</p>
               </div>
             </div>

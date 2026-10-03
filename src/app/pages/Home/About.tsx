@@ -38,34 +38,34 @@ const About = () => {
 
           <div className="flex items-center gap-6 pt-4 border-t border-slate-200">
             <div>
-              <div className="text-2xl font-extrabold text-[#4285CD]">2018</div>
+              <div className="text-2xl font-extrabold text-teal-600">2018</div>
               <div className="text-xs text-slate-500 font-semibold">Established Year</div>
             </div>
             <div className="h-8 w-[1px] bg-slate-200" />
             <div>
-              <div className="text-2xl font-extrabold text-[#4285CD]">1500+</div>
+              <div className="text-2xl font-extrabold text-teal-600">1500+</div>
               <div className="text-xs text-slate-500 font-semibold">Trained Students</div>
             </div>
             <div className="h-8 w-[1px] bg-slate-200" />
             <div>
-              <div className="text-2xl font-extrabold text-[#4285CD]">100%</div>
+              <div className="text-2xl font-extrabold text-teal-600">100%</div>
               <div className="text-xs text-slate-500 font-semibold">Trade Practical Focus</div>
             </div>
           </div>
         </div>
 
         {/* Right Column: Clean Feature Points Card */}
-        <div className="lg:col-span-5 bg-white p-6 sm:p-8 rounded-3xl border border-slate-200/80 shadow-xs space-y-4">
-          <h3 className="text-base font-bold text-[#06090C] mb-2">
+        <div className="lg:col-span-5 bg-white p-6 sm:p-7 rounded-xl border border-slate-200 shadow-xs space-y-4">
+          <h3 className="text-base font-bold text-slate-900 mb-2">
             Why Choose Maa Gauri ITI?
           </h3>
           {highlights.map((item, idx) => (
-            <div key={idx} className="flex items-start gap-3 p-3 rounded-xl bg-slate-50 border border-slate-100">
-              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#EEF5FC] text-[#4285CD] shrink-0 mt-0.5">
+            <div key={idx} className="flex items-start gap-3 p-3 rounded-lg bg-slate-50 hover:bg-teal-50/40 border border-slate-100 hover:border-teal-200 transition-colors">
+              <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-teal-50 text-teal-600 shrink-0 mt-0.5 border border-teal-100">
                 <CheckCircle2 size={16} />
               </div>
               <div>
-                <div className="text-xs sm:text-sm font-bold text-[#06090C]">{item.title}</div>
+                <div className="text-xs sm:text-sm font-bold text-slate-900">{item.title}</div>
                 <div className="text-[11px] sm:text-xs text-slate-500">{item.desc}</div>
               </div>
             </div>

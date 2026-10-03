@@ -15,10 +15,10 @@ export default function Page() {
         
         {/* Compact Header */}
         <div className="text-center mb-6">
-          <div className="inline-flex h-12 w-12 items-center justify-center rounded-2xl bg-[#4285CD] text-white shadow-xs mb-2.5">
-            <GraduationCap size={26} />
+          <div className="inline-flex h-11 w-11 items-center justify-center rounded-lg bg-teal-600 text-white shadow-xs mb-2.5">
+            <GraduationCap size={24} />
           </div>
-          <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight text-[#06090C]">
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900">
             {t("login_choose_role")}
           </h1>
           <p className="mt-1 text-xs text-slate-500 max-w-md mx-auto">
@@ -57,7 +57,7 @@ export default function Page() {
         <div className="text-center">
           <Link 
             href="/" 
-            className="inline-flex items-center gap-1.5 text-xs font-bold text-[#4285CD] hover:text-[#2F8AD4] hover:underline transition-colors"
+            className="inline-flex items-center gap-1.5 text-xs font-bold text-teal-600 hover:text-teal-700 hover:underline transition-colors"
           >
             <ArrowLeft size={14} />
             <span>{t("login_btn_home")}</span>

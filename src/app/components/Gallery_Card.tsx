@@ -9,11 +9,11 @@ type GalleryCardProps = {
 
 const Gallery_card = ({ icon: Icon, text }: GalleryCardProps) => {
   return (
-    <article className="flex flex-col items-center justify-center p-6 bg-white rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:-translate-y-1 transition-all duration-200 text-center">
-      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#EEF5FC] text-[#4285CD] mb-3.5">
-        <Icon size={24} strokeWidth={2.2} />
+    <article className="flex flex-col items-center justify-center p-6 bg-white rounded-xl border border-slate-200 shadow-xs hover:border-teal-500/50 hover:shadow-sm transition-all text-center">
+      <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-teal-50 text-teal-600 border border-teal-100 mb-3.5">
+        <Icon size={22} strokeWidth={2.2} />
       </div>
-      <span className="text-xs sm:text-sm font-bold text-[#06090C] tracking-tight">
+      <span className="text-xs sm:text-sm font-bold text-slate-900 tracking-tight">
         {text}
       </span>
     </article>

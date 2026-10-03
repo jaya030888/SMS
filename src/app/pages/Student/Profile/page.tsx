@@ -197,7 +197,7 @@ export default function StudentProfilePage() {
 
           {/* Toast Notification */}
           {successToast && (
-            <div className="p-4 rounded-2xl bg-emerald-600 text-white font-bold text-xs flex items-center justify-between shadow-lg">
+            <div className="p-4 rounded-lg bg-emerald-600 text-white font-bold text-xs flex items-center justify-between shadow-xs">
               <div className="flex items-center gap-2">
                 <CheckCircle2 size={18} />
                 <span>{successToast}</span>
@@ -207,22 +207,22 @@ export default function StudentProfilePage() {
           )}
 
           {/* Profile Header Banner */}
-          <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200/80 shadow-xs flex flex-col sm:flex-row items-center sm:items-start gap-6">
+          <div className="bg-white rounded-xl p-5 sm:p-6 border border-slate-200 shadow-xs flex flex-col sm:flex-row items-center sm:items-start gap-5">
             <div className="relative group">
               {student.profile_photo && student.profile_photo.trim().length > 20 ? (
                 <img
                   src={student.profile_photo}
                   alt={student.name || "Student"}
-                  className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl object-cover border-4 border-slate-100 shadow-md"
+                  className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl object-cover border border-slate-200 shadow-xs"
                 />
               ) : (
-                <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-3xl bg-[#4285CD] border-4 border-slate-100 flex items-center justify-center text-white text-3xl font-black shadow-md">
-                  {student.name && student.name.trim() ? student.name.trim()[0].toUpperCase() : <User size={40} className="text-white" />}
+                <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-xl bg-teal-600 border border-teal-700 flex items-center justify-center text-white text-2xl font-bold shadow-xs">
+                  {student.name && student.name.trim() ? student.name.trim()[0].toUpperCase() : <User size={36} className="text-white" />}
                 </div>
               )}
 
-              <label className="absolute bottom-0 right-0 p-2 rounded-xl bg-[#06090C] text-white hover:bg-slate-800 shadow-md cursor-pointer transition-all hover:scale-105 border border-white/20">
-                <Camera size={14} />
+              <label className="absolute bottom-0 right-0 p-1.5 rounded-md bg-slate-900 text-white hover:bg-slate-800 shadow-xs cursor-pointer transition-all border border-white/20">
+                <Camera size={13} />
                 <input
                   type="file"
                   accept="image/*"
@@ -235,7 +235,7 @@ export default function StudentProfilePage() {
 
             <div className="flex-1 text-center sm:text-left space-y-1.5">
               <div className="flex flex-wrap items-center justify-center sm:justify-start gap-2 mb-1">
-                <span className="text-[10px] uppercase tracking-wider font-extrabold px-2.5 py-0.5 rounded-md bg-indigo-50 text-indigo-700 border border-indigo-200">
+                <span className="text-[10px] uppercase tracking-wider font-extrabold px-2.5 py-0.5 rounded-md bg-teal-50 text-teal-700 border border-teal-200">
                   Roll: {student.roll_no || `MG-2024-${String(student.id).padStart(3, "0")}`}
                 </span>
                 <span className="text-[10px] uppercase tracking-wider font-extrabold px-2.5 py-0.5 rounded-md bg-slate-100 text-slate-700">
@@ -248,7 +248,7 @@ export default function StudentProfilePage() {
                 </span>
               </div>
 
-              <h1 className="text-2xl sm:text-3xl font-black text-slate-900">{student.name}</h1>
+              <h1 className="text-xl sm:text-2xl font-bold text-slate-900">{student.name}</h1>
               <p className="text-xs sm:text-sm text-slate-500 font-medium">
                 Student ID: #{student.id} • Session {student.batch || "2024-2026"} • Maa Gauri ITI
               </p>
@@ -257,7 +257,7 @@ export default function StudentProfilePage() {
             <div className="sm:self-center">
               <Link
                 href="/pages/Student/Fee_Details"
-                className="px-4 py-2.5 rounded-xl bg-[#4285CD] hover:bg-[#2F8AD4] text-white font-bold text-xs shadow-xs transition-all flex items-center gap-1.5"
+                className="px-4 py-2.5 rounded-lg bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs shadow-xs transition-colors flex items-center gap-1.5"
                 style={{ color: "#ffffff" }}
               >
                 <CreditCard size={14} className="text-white shrink-0" />
@@ -267,21 +267,21 @@ export default function StudentProfilePage() {
           </div>
 
           {/* OFFICIAL PUBLISHED MARKSHEETS & RESULTS SECTION */}
-          <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-xs space-y-4">
+          <div className="bg-white rounded-xl p-5 sm:p-6 border border-slate-200 shadow-xs space-y-4">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-3 border-b border-slate-100 gap-2">
               <div className="flex items-center gap-2.5">
-                <div className="h-9 w-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">
-                  <Award size={20} />
+                <div className="h-8 w-8 rounded-lg bg-teal-50 text-teal-700 flex items-center justify-center font-bold">
+                  <Award size={18} />
                 </div>
                 <div>
-                  <h2 className="text-base font-extrabold text-slate-900">Official Published Marksheets</h2>
+                  <h2 className="text-base font-bold text-slate-900">Official Published Marksheets</h2>
                   <p className="text-xs text-slate-500">View, download, and accept semester marksheet issued by Admin</p>
                 </div>
               </div>
             </div>
 
             {marksheets.length === 0 ? (
-              <div className="p-6 text-center bg-slate-50 rounded-2xl border border-slate-150">
+              <div className="p-6 text-center bg-slate-50 rounded-lg border border-slate-200">
                 <p className="text-xs font-bold text-slate-500">No published marksheets available yet.</p>
               </div>
             ) : (
@@ -289,28 +289,27 @@ export default function StudentProfilePage() {
                 {marksheets.map((m) => {
                   const isAccepted = m.status === "Accepted by Student";
                   return (
-                    <div key={m.id} className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-3 flex flex-col justify-between">
+                    <div key={m.id} className="p-4 rounded-lg bg-slate-50 border border-slate-200 space-y-3 flex flex-col justify-between">
                       <div>
                         <div className="flex items-center justify-between gap-2 mb-1.5">
-                          <span className="text-[10px] font-mono font-bold text-slate-500 bg-white px-2 py-0.5 rounded border border-slate-200">
+                          <span className="text-[10px] font-mono font-bold text-slate-600 bg-white px-2 py-0.5 rounded border border-slate-200">
                             {m.certificate_no}
                           </span>
-                          <span className={`text-[10px] font-extrabold px-2.5 py-0.5 rounded-full flex items-center gap-1 ${
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${
                             isAccepted ? "bg-emerald-100 text-emerald-800" : "bg-amber-100 text-amber-800"
                           }`}>
-                            {isAccepted ? <CheckCircle2 size={12} /> : <Clock size={12} />}
-                            <span>{m.status}</span>
+                            {isAccepted ? "Accepted" : "Pending Signature"}
                           </span>
                         </div>
-                        <h4 className="text-xs font-extrabold text-slate-900">{m.semester}</h4>
+                        <h4 className="text-xs font-bold text-slate-900">{m.semester}</h4>
                         <p className="text-[11px] text-slate-500">{m.exam_session}</p>
-                        <p className="text-xs font-bold text-indigo-700 mt-1">Score: {m.total_marks}/{m.max_marks} ({m.percentage}%) • Grade: {m.grade}</p>
+                        <p className="text-xs font-bold text-teal-700 mt-1">Score: {m.total_marks}/{m.max_marks} ({m.percentage}%) • Grade: {m.grade}</p>
                       </div>
 
                       <div className="flex items-center gap-2 pt-2 border-t border-slate-200">
                         <button
                           onClick={() => setSelectedMarksheet(m)}
-                          className="flex-1 py-2 px-3 rounded-xl bg-white hover:bg-slate-100 text-slate-800 border border-slate-200 font-bold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
+                          className="flex-1 py-2 px-3 rounded-lg bg-white hover:bg-slate-100 text-slate-800 border border-slate-200 font-bold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer"
                         >
                           <Printer size={13} />
                           <span>View & Download</span>
@@ -319,7 +318,7 @@ export default function StudentProfilePage() {
                           <button
                             onClick={() => handleAcceptMarksheet(m.id)}
                             disabled={acceptingId === m.id}
-                            className="flex-1 py-2 px-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-all shadow-xs cursor-pointer disabled:opacity-50"
+                            className="flex-1 py-2 px-3 rounded-lg bg-teal-600 hover:bg-teal-700 text-white font-bold text-xs flex items-center justify-center gap-1.5 transition-colors shadow-xs cursor-pointer disabled:opacity-50"
                           >
                             <CheckCircle2 size={13} />
                             <span>{acceptingId === m.id ? "Signing..." : "Accept"}</span>
@@ -334,19 +333,19 @@ export default function StudentProfilePage() {
           </div>
 
           {/* Official Document Details Section */}
-          <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-xs space-y-5">
+          <div className="bg-white rounded-xl p-5 sm:p-6 border border-slate-200 shadow-xs space-y-5">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-100 gap-2">
               <div className="flex items-center gap-2.5">
-                <div className="h-9 w-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center font-bold">
-                  <BadgeCheck size={20} />
+                <div className="h-8 w-8 rounded-lg bg-teal-50 text-teal-700 flex items-center justify-center font-bold">
+                  <BadgeCheck size={18} />
                 </div>
                 <div>
-                  <h2 className="text-base font-extrabold text-slate-900">Student Document Details & Verification</h2>
+                  <h2 className="text-base font-bold text-slate-900">Student Document Details & Verification</h2>
                   <p className="text-xs text-slate-500">Government identity and academic certificates submitted for admission</p>
                 </div>
               </div>
 
-              <span className={`self-start sm:self-auto px-3 py-1 rounded-xl text-xs font-black uppercase tracking-wider flex items-center gap-1.5 ${
+              <span className={`self-start sm:self-auto px-3 py-1 rounded-md text-xs font-bold uppercase tracking-wider flex items-center gap-1.5 ${
                 docOverall === "Verified" ? "bg-emerald-50 text-emerald-700 border border-emerald-200" : "bg-amber-50 text-amber-700 border border-amber-200"
               }`}>
                 {docOverall === "Verified" ? <CheckCircle2 size={13} /> : <Clock size={13} />}
@@ -357,11 +356,11 @@ export default function StudentProfilePage() {
             {/* Grid of Documents */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {/* 1. Aadhaar Card */}
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-150 space-y-2">
+              <div className="p-4 rounded-lg bg-slate-50 border border-slate-200 space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <ShieldCheck size={18} className="text-indigo-600" />
-                    <h3 className="text-xs font-extrabold text-slate-800">Government Aadhaar Card</h3>
+                    <ShieldCheck size={18} className="text-teal-700" />
+                    <h3 className="text-xs font-bold text-slate-800">Government Aadhaar Card</h3>
                   </div>
                   <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
                     (student.aadhaar_status || "Verified") === "Verified"
@@ -378,11 +377,11 @@ export default function StudentProfilePage() {
               </div>
 
               {/* 2. 10th Marksheet */}
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-150 space-y-2">
+              <div className="p-4 rounded-lg bg-slate-50 border border-slate-200 space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <FileCheck2 size={18} className="text-indigo-600" />
-                    <h3 className="text-xs font-extrabold text-slate-800">10th / Matriculation Marksheet</h3>
+                    <FileCheck2 size={18} className="text-teal-700" />
+                    <h3 className="text-xs font-bold text-slate-800">10th / Matriculation Marksheet</h3>
                   </div>
                   <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
                     (student.marksheet_10th_status || "Verified") === "Verified"
@@ -399,11 +398,11 @@ export default function StudentProfilePage() {
               </div>
 
               {/* 3. 12th Marksheet */}
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-150 space-y-2">
+              <div className="p-4 rounded-lg bg-slate-50 border border-slate-200 space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <FileCheck2 size={18} className="text-indigo-600" />
-                    <h3 className="text-xs font-extrabold text-slate-800">12th / Intermediate Certificate</h3>
+                    <FileCheck2 size={18} className="text-teal-700" />
+                    <h3 className="text-xs font-bold text-slate-800">12th / Intermediate Certificate</h3>
                   </div>
                   <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
                     (student.marksheet_12th_status || "Verified") === "Verified"
@@ -420,11 +419,11 @@ export default function StudentProfilePage() {
               </div>
 
               {/* 4. Transfer Certificate (TC) */}
-              <div className="p-4 rounded-2xl bg-slate-50 border border-slate-150 space-y-2">
+              <div className="p-4 rounded-lg bg-slate-50 border border-slate-200 space-y-2">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <FileText size={18} className="text-indigo-600" />
-                    <h3 className="text-xs font-extrabold text-slate-800">Transfer Certificate (TC) / SLC</h3>
+                    <FileText size={18} className="text-teal-700" />
+                    <h3 className="text-xs font-bold text-slate-800">Transfer Certificate (TC) / SLC</h3>
                   </div>
                   <span className={`text-[10px] font-bold px-2 py-0.5 rounded-md ${
                     (student.tc_status || "Verified") === "Verified"
@@ -444,10 +443,10 @@ export default function StudentProfilePage() {
             </div>
 
             {/* Document Remarks */}
-            <div className="p-3.5 rounded-2xl bg-indigo-50/50 border border-indigo-100 text-xs flex items-start gap-2.5">
-              <AlertCircle size={16} className="text-indigo-600 shrink-0 mt-0.5" />
+            <div className="p-3.5 rounded-lg bg-teal-50/50 border border-teal-100 text-xs flex items-start gap-2.5">
+              <AlertCircle size={16} className="text-teal-700 shrink-0 mt-0.5" />
               <div>
-                <strong className="text-indigo-950 font-bold block">Verification Officer Remarks</strong>
+                <strong className="text-teal-950 font-bold block">Verification Officer Remarks</strong>
                 <p className="text-slate-600 mt-0.5">
                   {student.doc_remarks || "All primary KYC documents and educational marksheets have been verified and approved by the ITI Admission Office."}
                 </p>
@@ -456,8 +455,8 @@ export default function StudentProfilePage() {
           </div>
 
           {/* Personal Information */}
-          <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-xs">
-            <h2 className="text-base font-extrabold text-slate-900 pb-4 border-b border-slate-100 mb-5">
+          <div className="bg-white rounded-xl p-5 sm:p-6 border border-slate-200 shadow-xs">
+            <h2 className="text-base font-bold text-slate-900 pb-4 border-b border-slate-100 mb-5">
               Personal Profile & Contact Details
             </h2>
 
@@ -506,15 +505,15 @@ export default function StudentProfilePage() {
           </div>
 
           {/* Academic Enrollment Info */}
-          <div className="bg-white rounded-3xl p-6 sm:p-7 border border-slate-200/80 shadow-xs">
-            <h2 className="text-base font-extrabold text-slate-900 pb-4 border-b border-slate-100 mb-5">
+          <div className="bg-white rounded-xl p-5 sm:p-6 border border-slate-200 shadow-xs">
+            <h2 className="text-base font-bold text-slate-900 pb-4 border-b border-slate-100 mb-5">
               Trade & Enrollment Record
             </h2>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-5 text-xs">
               <div className="space-y-1">
                 <span className="text-[10px] font-extrabold uppercase text-slate-500">Enrolled Trade</span>
-                <p className="text-sm font-bold text-indigo-600">{student.course}</p>
+                <p className="text-sm font-bold text-teal-700">{student.course}</p>
               </div>
 
               <div className="space-y-1">

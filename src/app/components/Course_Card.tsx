@@ -14,18 +14,18 @@ const Course_Card = (props: CourseCardProps) => {
   const Icon = tradeName.includes("electrician") ? Zap : tradeName.includes("fitter") ? Cog : Monitor;
 
   return (
-    <article className="flex flex-col justify-between p-6 sm:p-7 bg-white rounded-2xl border border-slate-200/80 shadow-xs hover:shadow-md hover:-translate-y-1 transition-all duration-200">
+    <article className="flex flex-col justify-between p-6 sm:p-7 bg-white rounded-xl border border-slate-200 shadow-xs hover:border-teal-500/50 hover:shadow-sm transition-all">
       <div>
         <div className="flex items-center justify-between mb-4">
-          <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-[#EEF5FC] text-[#4285CD]">
-            <Icon size={24} strokeWidth={2.2} />
+          <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-teal-50 text-teal-600 border border-teal-100">
+            <Icon size={22} strokeWidth={2.2} />
           </div>
-          <span className="text-[11px] font-bold text-[#4285CD] bg-[#EEF5FC] px-3 py-1 rounded-full">
+          <span className="text-[11px] font-bold text-teal-700 bg-teal-50 border border-teal-200/60 px-2.5 py-0.5 rounded-md">
             {props.duration}
           </span>
         </div>
 
-        <h3 className="text-xl font-bold text-[#06090C] mb-2 tracking-tight">
+        <h3 className="text-xl font-bold text-slate-900 mb-2 tracking-tight">
           {props.trade}
         </h3>
 
@@ -42,7 +42,7 @@ const Course_Card = (props: CourseCardProps) => {
 
         <Link
           href="/pages/Home/Addmission_Application_Form"
-          className="inline-flex items-center gap-1.5 text-xs font-bold text-[#4285CD] hover:text-[#2F8AD4] transition-colors"
+          className="inline-flex items-center gap-1.5 text-xs font-bold text-teal-600 hover:text-teal-700 transition-colors"
         >
           <span>Apply Now</span>
           <ArrowRight size={13} />

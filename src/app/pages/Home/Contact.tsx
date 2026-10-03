@@ -70,7 +70,7 @@ const Contact = () => {
             />
           </div>
 
-          <div className="lg:col-span-7 rounded-3xl border border-slate-200/80 overflow-hidden shadow-xs relative min-h-[380px] bg-slate-100 flex flex-col">
+          <div className="lg:col-span-7 rounded-xl border border-slate-200 overflow-hidden shadow-xs relative min-h-[380px] bg-slate-100 flex flex-col">
             {/* Embedded Interactive Map */}
             <iframe
               src="https://www.google.com/maps?q=Maa+Gauri+Pvt.+ITI&ll=25.3220341,84.8122683&z=17&output=embed"
@@ -84,10 +84,10 @@ const Contact = () => {
             />
 
             {/* Bottom Floating Directions Overlay */}
-            <div className="absolute bottom-4 left-4 right-4 sm:left-auto sm:right-4 bg-white/95 backdrop-blur-md p-3.5 rounded-2xl shadow-lg border border-slate-200/80 flex items-center justify-between gap-4 z-10">
+            <div className="absolute bottom-4 left-4 right-4 sm:left-auto sm:right-4 bg-white/95 backdrop-blur-md p-3.5 rounded-lg shadow-sm border border-slate-200 flex items-center justify-between gap-4 z-10">
               <div className="flex items-center gap-2.5">
-                <div className="h-9 w-9 rounded-xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-[#4285CD] shrink-0">
-                  <MapPin size={18} />
+                <div className="h-8 w-8 rounded-lg bg-teal-50 border border-teal-100 flex items-center justify-center text-teal-600 shrink-0">
+                  <MapPin size={16} />
                 </div>
                 <div>
                   <h4 className="text-xs font-bold text-slate-900">Maa Gauri ITI Campus</h4>
@@ -98,7 +98,7 @@ const Contact = () => {
                 href="https://www.google.com/maps/search/?api=1&query=Maa+Gauri+Pvt.+ITI+Paliganj+Patna"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#4285CD] hover:bg-[#2F8AD4] text-white text-xs font-bold transition-all shadow-xs shrink-0 cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-teal-600 hover:bg-teal-700 text-white text-xs font-bold transition-colors shadow-xs shrink-0 cursor-pointer"
               >
                 <span>Get Directions</span>
                 <span className="text-[10px]">↗</span>
